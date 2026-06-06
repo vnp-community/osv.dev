@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+package osv.notification.v1;
+
+option go_package = "github.com/osv/gen/go/osv/notification/v1;notificationv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+// NotificationService manages webhooks, subscriptions, and event delivery.
+service NotificationService {
+  // RegisterWebhook registers a new webhook endpoint.
+  rpc RegisterWebhook(RegisterWebhookRequest) returns (WebhookRegistration) {
+    option (google.api.http) = {
+      post: "/v1/notifications/webhooks"
+      body: "*"
+    };
+  }
+
+  // ListWebhooks lists all webhooks for the authenticated user.
+  rpc ListWebhooks(ListWebhooksRequest) returns (ListWebhooksResponse) {
+    option (google.api.http) = {
+      get: "/v1/notifications/webhooks"
+    };
+  }
+
+  // DeleteWebhook removes a webhook registration.
+  rpc DeleteWebhook(DeleteWebhookRequest) returns (DeleteWebhookResponse) {
+    option (google.api.http) = {
+      delete: "/v1/notifications/webhooks/{webhook_id}"
+    };
+  }
+
+  // GetDeliveryStatus returns the delivery history for a webhook.
+  rpc GetDeliveryStatus(GetDeliveryStatusRequest) returns (DeliveryStatusResponse) {
+    option (google.api.http) = {
+      get: "/v1/notifications/webhooks/{webhook_id}/deliveries"
+    };
+  }
+
+  // Subscribe creates a filter subscription for a webhook.
+  rpc Subscribe(SubscribeRequest) returns (Subscription) {
+    option (google.api.http) = {
+      post: "/v1/notifications/webhooks/{webhook_id}/subscriptions"
+      body: "*"
+    };
+  }
+}
+
+// RegisterWebhookRequest registers a new webhook.
+message RegisterWebhookRequest {
+  string url         = 1 [(validate.rules).string.uri = true];
+  string secret      = 2;  // HMAC-SHA256 signing secret (min 32 chars)
+  repeated EventType events = 3;  // which events to receive
+  NotificationFilter filter = 4;  // optional pre-filter
+  int32  max_retries = 5;  // 0-5, default 3
+}
+
+// WebhookRegistration is the created webhook resource.
+message WebhookRegistration {
+  string webhook_id  = 1;
+  string owner_id    = 2;
+  string url         = 3;
+  repeated EventType events = 4;
+  NotificationFilter filter = 5;
+  WebhookStatus status = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp expires_at = 8;  // optional TTL
+}
+
+// ListWebhooksRequest paginates webhook listing.
+message ListWebhooksRequest {
+  int32  page_size = 1;
+  string page_token = 2;
+}
+
+// ListWebhooksResponse returns a page of webhooks.
+message ListWebhooksResponse {
+  repeated WebhookRegistration webhooks = 1;
+  string next_page_token = 2;
+}
+
+// DeleteWebhookRequest identifies the webhook to remove.
+message DeleteWebhookRequest {
+  string webhook_id = 1;
+}
+
+// DeleteWebhookResponse confirms deletion.
+message DeleteWebhookResponse {
+  bool deleted = 1;
+}
+
+// GetDeliveryStatusRequest retrieves deliveries for a webhook.
+message GetDeliveryStatusRequest {
+  string webhook_id = 1;
+  int32  limit      = 2;  // default 50
+}
+
+// DeliveryStatusResponse contains recent delivery records.
+message DeliveryStatusResponse {
+  repeated DeliveryRecord deliveries = 1;
+}
+
+// DeliveryRecord is a single webhook delivery attempt.
+message DeliveryRecord {
+  string delivery_id    = 1;
+  string event_id       = 2;
+  int32  http_status    = 3;
+  int32  attempt_number = 4;
+  bool   success        = 5;
+  string error_message  = 6;
+  google.protobuf.Timestamp delivered_at = 7;
+  int64  latency_ms     = 8;
+}
+
+// SubscribeRequest adds a topic filter to a webhook.
+message SubscribeRequest {
+  string webhook_id = 1;
+  repeated string ecosystems = 2;
+  repeated string severities = 3;
+  bool include_ai_enriched = 4;
+}
+
+// Subscription represents a topic subscription.
+message Subscription {
+  string subscription_id = 1;
+  string webhook_id      = 2;
+  repeated string ecosystems = 3;
+  repeated string severities = 4;
+}
+
+// NotificationFilter pre-filters events before delivery.
+message NotificationFilter {
+  repeated string ecosystems = 1;  // empty = all
+  repeated string severities = 2;  // empty = all (CRITICAL, HIGH, MEDIUM, LOW)
+  repeated string sources    = 3;  // empty = all sources
+  bool only_new              = 4;  // skip updates to existing vulns
+}
+
+// EventType identifies the type of vulnerability event.
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED    = 0;
+  VULN_IMPORTED             = 1;
+  VULN_UPDATED              = 2;
+  VULN_WITHDRAWN            = 3;
+  AI_ENRICHMENT_COMPLETED   = 4;
+  IMPACT_ANALYSIS_COMPLETED = 5;
+}
+
+// WebhookStatus indicates the current webhook health.
+enum WebhookStatus {
+  WEBHOOK_STATUS_UNSPECIFIED = 0;
+  WEBHOOK_ACTIVE             = 1;
+  WEBHOOK_DISABLED           = 2;
+  WEBHOOK_FAILED             = 3;  // too many consecutive failures
+}

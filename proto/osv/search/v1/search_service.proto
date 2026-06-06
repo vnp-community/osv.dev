@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package osv.search.v1;
+
+option go_package = "github.com/osv/gen/go/osv/search/v1;searchv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+// SearchService provides full-text, semantic, and hybrid search over vulnerabilities.
+service SearchService {
+  // SearchVulnerabilities performs text + optional semantic search.
+  rpc SearchVulnerabilities(SearchRequest) returns (SearchResponse) {
+    option (google.api.http) = {
+      get: "/v1/search"
+    };
+  }
+
+  // SemanticSearch performs vector similarity search.
+  rpc SemanticSearch(SemanticSearchRequest) returns (SearchResponse) {
+    option (google.api.http) = {
+      post: "/v1/search/semantic"
+      body: "*"
+    };
+  }
+
+  // HybridSearch combines BM25 and kNN with RRF re-ranking.
+  rpc HybridSearch(HybridSearchRequest) returns (SearchResponse) {
+    option (google.api.http) = {
+      post: "/v1/search/hybrid"
+      body: "*"
+    };
+  }
+
+  // Autocomplete returns search suggestions for a partial query.
+  rpc Autocomplete(AutocompleteRequest) returns (AutocompleteResponse) {
+    option (google.api.http) = {
+      get: "/v1/search/autocomplete"
+    };
+  }
+}
+
+// SearchRequest holds full-text search parameters.
+message SearchRequest {
+  string query     = 1;
+  SearchFilters filters = 2;
+  SortOrder sort   = 3;
+  int32 page_size  = 4 [(validate.rules).int32 = {gte: 1, lte: 100}];
+  string cursor    = 5;
+}
+
+// SemanticSearchRequest performs vector similarity search.
+message SemanticSearchRequest {
+  string query        = 1 [(validate.rules).string.min_len = 2];
+  SearchFilters filters = 2;
+  int32 top_k         = 3;
+}
+
+// HybridSearchRequest combines text and vector search with RRF.
+message HybridSearchRequest {
+  string query         = 1;
+  SearchFilters filters = 2;
+  int32 page_size      = 3;
+  string cursor        = 4;
+  float text_weight    = 5;   // 0.0–1.0, default 0.5
+  float vector_weight  = 6;   // 0.0–1.0, default 0.5
+}
+
+// SearchFilters allows narrowing results.
+message SearchFilters {
+  repeated string ecosystems = 1;
+  repeated string severities = 2;  // CRITICAL | HIGH | MEDIUM | LOW
+  google.protobuf.Timestamp date_from = 3;
+  google.protobuf.Timestamp date_to   = 4;
+  bool include_withdrawn = 5;
+  repeated string sources = 6;
+}
+
+// SortOrder controls result ordering.
+enum SortOrder {
+  SORT_ORDER_UNSPECIFIED = 0;
+  SORT_RELEVANCE         = 1;
+  SORT_DATE_DESC         = 2;
+  SORT_DATE_ASC          = 3;
+  SORT_SEVERITY          = 4;
+}
+
+// SearchResponse holds search results with facets and pagination.
+message SearchResponse {
+  repeated SearchResult results = 1;
+  int64 total_hits   = 2;
+  string next_cursor = 3;
+  map<string, FacetList> facets = 4;
+}
+
+// SearchResult is a single search hit.
+message SearchResult {
+  string vuln_id   = 1;
+  string summary   = 2;
+  string ecosystem = 3;
+  string severity  = 4;
+  float  score     = 5;
+  google.protobuf.Timestamp modified = 6;
+  repeated Highlight highlights = 7;
+}
+
+// Highlight is a highlighted snippet from matched fields.
+message Highlight {
+  string field   = 1;
+  string snippet = 2;
+}
+
+// FacetList is an ordered list of facet buckets.
+message FacetList {
+  repeated FacetBucket buckets = 1;
+}
+
+// FacetBucket is a single facet value+count.
+message FacetBucket {
+  string value = 1;
+  int64  count = 2;
+}
+
+// AutocompleteRequest requests search suggestions.
+message AutocompleteRequest {
+  string query = 1 [(validate.rules).string = {min_len: 2, max_len: 100}];
+  int32  limit = 2;
+}
+
+// AutocompleteResponse holds suggestion strings.
+message AutocompleteResponse {
+  repeated string suggestions = 1;
+}

@@ -1,125 +1,152 @@
-# Copyright 2022 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# OSV.dev Microservices — Root Makefile
+# Usage: make help
 
-install-cmd := poetry install
-run-cmd := poetry run
+SHELL := /bin/bash
+.DEFAULT_GOAL := help
 
-lib-tests:
-	./run_tests.sh
+SERVICES := api-gateway vulnerability-query ingestion search ai-enrichment \
+            impact-analysis version-index alias-relations notification source-sync web-bff
+PKG      := pkg
 
-worker-tests:
-	git submodule update --init --recursive
-	cd gcp/workers/worker && ./run_tests.sh
+BUF_VERSION  := v1.47.2
+GO_VERSION   := 1.22
+DOCKER_REPO  := ghcr.io/osv-dev
+VERSION      := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+COMMIT       := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+BUILD_DATE   := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+LDFLAGS      := -ldflags="-X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.buildDate=$(BUILD_DATE)"
 
-importer-tests:
-	cd gcp/workers/importer && ./run_tests.sh
+# Colors
+CYAN  := \033[36m
+GREEN := \033[32m
+RESET := \033[0m
 
-recoverer-tests:
-	cd gcp/workers/recoverer && ./run_tests.sh
+##@ Help
+.PHONY: help
+help: ## Show this help
+	@awk 'BEGIN {FS = ":.*##"; printf "\n$(CYAN)OSV.dev Microservices$(RESET)\nUsage: make [target]\n\n"} \
+	/^[a-zA-Z_-]+:.*?##/ { printf "  $(GREEN)%-28s$(RESET) %s\n", $$1, $$2 } \
+	/^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) }' $(MAKEFILE_LIST)
 
-vanir-signatures-tests:
-	cd gcp/workers/vanir_signatures && ./run_tests.sh
+##@ Development
+.PHONY: env-setup
+env-setup: ## Copy .env.example → .env (first-time setup)
+	@if [ -f .env ]; then \
+		echo "$(GREEN).env already exists — skipping. Edit it manually if needed.$(RESET)"; \
+	else \
+		cp .env.example .env; \
+		echo "$(GREEN).env created from .env.example. Fill in secrets before running.$(RESET)"; \
+	fi
 
-website-tests:
-	cd gcp/website && ./run_tests.sh
+.PHONY: infra
+infra: ## Start local infrastructure (NATS, Redis, OpenSearch, Firestore, Ollama)
+	@[ -f .env ] || (echo "$(CYAN)Tip: run 'make env-setup' to create your .env file first.$(RESET)")
+	docker-compose --profile infra up -d
+	@echo "$(GREEN)Infrastructure started.$(RESET)"
 
-vulnfeed-tests:
-	cd vulnfeeds && ./run_tests.sh
+.PHONY: up
+up: ## Start all services
+	docker-compose --profile all up -d
 
-bindings-tests:
-	cd bindings && ./run_tests.sh
+.PHONY: down
+down: ## Stop all services
+	docker-compose --profile all down
 
-go-tests:
-	cd go && ./run_tests.sh
+.PHONY: logs
+logs: ## Follow logs for all services (or SVC=service-name for one)
+	docker-compose logs -f $(SVC)
 
-api-server-tests:
-	test -f $(HOME)/.config/gcloud/application_default_credentials.json || (echo "GCP Application Default Credentials not set, try 'gcloud auth application-default login'"; exit 1)
-	cd gcp/api && docker build -f Dockerfile.esp -t osv/esp:latest .
-	cd gcp/api && ./run_tests.sh $(HOME)/.config/gcloud/application_default_credentials.json
-	cd gcp/api && ./run_tests_e2e.sh $(HOME)/.config/gcloud/application_default_credentials.json
+##@ Build
+.PHONY: build
+build: ## Build all service binaries
+	@for svc in $(SERVICES); do \
+		echo "$(CYAN)Building $$svc...$(RESET)"; \
+		(cd services/$$svc && go build $(LDFLAGS) ./cmd/...) || exit 1; \
+	done
+	@echo "$(GREEN)All services built$(RESET)"
 
-update-api-snapshots:
-	test -f $(HOME)/.config/gcloud/application_default_credentials.json || (echo "GCP Application Default Credentials not set, try 'gcloud auth application-default login'"; exit 1)
-	cd gcp/api && docker build -f Dockerfile.esp -t osv/esp:latest .
-	cd gcp/api && UPDATE_SNAPS=true ./run_tests_e2e.sh $(HOME)/.config/gcloud/application_default_credentials.json
+.PHONY: docker-build
+docker-build: ## Build Docker images for all services
+	@for svc in $(SERVICES); do \
+		docker build -t $(DOCKER_REPO)/$$svc:$(VERSION) -t $(DOCKER_REPO)/$$svc:latest services/$$svc/ || exit 1; \
+	done
 
-lint:
-	GOTOOLCHAIN=go1.26.3 $(run-cmd) tools/lint_and_format.sh
+##@ Proto
+.PHONY: proto
+proto: ## Generate gRPC code from all proto files (requires buf)
+	buf generate && echo "$(GREEN)Proto generation complete$(RESET)"
 
-build-osv-protos:
-	cd osv && $(run-cmd) python -m grpc_tools.protoc --python_out=. --mypy_out=. --proto_path=. --proto_path=osv-schema/proto vulnerability.proto importfinding.proto
+##@ Testing
+.PHONY: test
+test: ## Run all unit tests with race detector
+	@for svc in pkg $(SERVICES); do \
+		echo "$(CYAN)Testing services/$$svc...$(RESET)"; \
+		(cd services/$$svc && go test -race -count=1 -timeout=60s ./...) || exit 1; \
+	done
+	@echo "$(GREEN)All tests passed$(RESET)"
 
-build-api-protos:
-	cd gcp/api/v1 && $(run-cmd) python -m grpc_tools.protoc \
-      --include_imports \
-      --include_source_info \
-      --proto_path=googleapis \
-      --proto_path=. \
-      --proto_path=osv \
-      --proto_path=osv/osv-schema/proto \
-      --descriptor_set_out=api_descriptor.pb \
-      --python_out=.. \
-      --grpc_python_out=.. \
-      --mypy_out=.. \
-      vulnerability.proto importfinding.proto osv_service_v1.proto
-	cd osv && protoc \
-      --proto_path=. \
-      --go_out=paths=source_relative:../bindings/go/api \
-      importfinding.proto
-	cd gcp/api/v1 && protoc \
-      --proto_path=googleapis \
-      --proto_path=. \
-      --proto_path=osv \
-      --proto_path=osv/osv-schema/proto \
-      --go_out=paths=source_relative:../../../bindings/go/api \
-      --go-grpc_out=paths=source_relative:../../../bindings/go/api \
-      osv_service_v1.proto
+.PHONY: test-svc
+test-svc: ## Run tests for a specific service (SVC=search)
+	cd services/$(SVC) && go test -race -count=1 -v -timeout=60s ./...
 
-build-protos: build-osv-protos build-api-protos
+.PHONY: integration-test
+integration-test: infra ## Run integration tests (requires Docker)
+	@sleep 15
+	@for svc in $(SERVICES); do \
+		[ -d "services/$$svc/test/integration" ] && \
+		(cd services/$$svc && go test -tags=integration -race -timeout=300s ./test/integration/...); \
+	done
 
-run-website:
-	cd gcp/website/frontend3 && pnpm install && pnpm run build
-	cd gcp/website/blog && hugo --buildFuture -d ../dist/static/blog
-	cd gcp/website && $(install-cmd) && GOOGLE_CLOUD_PROJECT=oss-vdb OSV_VULNERABILITIES_BUCKET=osv-vulnerabilities $(run-cmd) python main.py
+##@ Quality
+.PHONY: lint
+lint: ## Run golangci-lint on all services
+	@for svc in pkg $(SERVICES); do \
+		echo "$(CYAN)Linting services/$$svc...$(RESET)"; \
+		(cd services/$$svc && golangci-lint run --timeout=5m ./...) || exit 1; \
+	done
+	@echo "$(GREEN)All lint checks passed$(RESET)"
 
-run-website-staging:
-	cd gcp/website/frontend3 && pnpm install && pnpm run build
-	cd gcp/website/blog && hugo --buildFuture -d ../dist/static/blog
-	cd gcp/website && $(install-cmd) && GOOGLE_CLOUD_PROJECT=oss-vdb-test OSV_VULNERABILITIES_BUCKET=osv-test-vulnerabilities $(run-cmd) python main.py
+.PHONY: vet
+vet: ## Run go vet on all services
+	@for svc in pkg $(SERVICES); do \
+		(cd services/$$svc && go vet ./...) || exit 1; \
+	done
 
-run-website-emulator:
-	cd gcp/website/frontend3 && pnpm install && pnpm run build
-	cd gcp/website/blog && hugo --buildFuture -d ../dist/static/blog
-	cd gcp/website && $(install-cmd) && DATASTORE_EMULATOR_PORT=5002 $(run-cmd) python frontend_emulator.py
+.PHONY: tidy
+tidy: ## Run go mod tidy on all services
+	@for svc in pkg $(SERVICES); do \
+		(cd services/$$svc && go mod tidy) || exit 1; \
+	done
 
-# Run with `make run-api-server ARGS=--no-backend` to launch esp without backend.
-run-api-server:
-	test -f $(HOME)/.config/gcloud/application_default_credentials.json || (echo "GCP Application Default Credentials not set, try 'gcloud auth application-default login'"; exit 1)
-	cd gcp/api && docker build -f Dockerfile.esp -t osv/esp:latest .
-	cd gcp/api && $(install-cmd) && GOOGLE_CLOUD_PROJECT=oss-vdb OSV_VULNERABILITIES_BUCKET=osv-vulnerabilities $(run-cmd) python test_server.py $(HOME)/.config/gcloud/application_default_credentials.json $(ARGS)
+.PHONY: vuln-check
+vuln-check: ## Run govulncheck on all services
+	@for svc in $(SERVICES); do \
+		(cd services/$$svc && govulncheck ./...) || true; \
+	done
 
-# Run the native Go developer server orchestrator (launches both ESPv2 and the Go API server).
-# Run with `run-go-api ARGS=--no-backend` to launch esp without backend.
-run-go-api:
-	test -f $(HOME)/.config/gcloud/application_default_credentials.json || (echo "GCP Application Default Credentials not set, try 'gcloud auth application-default login'"; exit 1)
-	docker inspect osv/esp:latest >/dev/null 2>&1 || (cd gcp/api && docker build -f Dockerfile.esp -t osv/esp:latest .)
-	@cd go && go build -o ./api-devserver ./cmd/api-devserver && (GOOGLE_CLOUD_PROJECT=oss-vdb OSV_VULNERABILITIES_BUCKET=osv-vulnerabilities ./api-devserver $(ARGS); EXIT_CODE=$$?; rm -f ./api-devserver; exit $$EXIT_CODE)
+##@ Smoke Tests
+.PHONY: smoke
+smoke: ## Run smoke tests against local stack
+	go run ./tools/smoke-test/main.go \
+		--api-gateway http://localhost:8080 \
+		--query http://localhost:8081 \
+		--search http://localhost:8082
 
-run-api-server-test:
-	test -f $(HOME)/.config/gcloud/application_default_credentials.json || (echo "GCP Application Default Credentials not set, try 'gcloud auth application-default login'"; exit 1)
-	cd gcp/api && docker build -f Dockerfile.esp -t osv/esp:latest .
-	cd gcp/api && $(install-cmd) && GOOGLE_CLOUD_PROJECT=oss-vdb-test OSV_VULNERABILITIES_BUCKET=osv-test-vulnerabilities $(run-cmd) python test_server.py $(HOME)/.config/gcloud/application_default_credentials.json $(ARGS)
+##@ Infrastructure
+.PHONY: tf-plan
+tf-plan: ## Plan Terraform changes (ENV=dev|staging|prod)
+	cd infrastructure/terraform/environments/$(or $(ENV),dev) && terraform plan
 
-# TODO: API integration tests.
-all-tests: lib-tests worker-tests importer-tests recoverer-tests website-tests vulnfeed-tests bindings-tests go-tests
+.PHONY: tf-apply
+tf-apply: ## Apply Terraform (ENV=dev|staging|prod)
+	cd infrastructure/terraform/environments/$(or $(ENV),dev) && terraform apply
+
+##@ Utilities
+.PHONY: fmt
+fmt: ## Format all Go code with gofumpt
+	find services -name "*.go" -exec gofumpt -w {} \;
+
+.PHONY: clean
+clean: ## Remove build artifacts and volumes
+	find services -name "*.test" -delete
+	docker-compose --profile all down -v --remove-orphans 2>/dev/null || true

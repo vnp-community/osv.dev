@@ -1,0 +1,55 @@
+---
+# Kubernetes Namespaces for OSV Microservices
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: osv-gateway
+  labels:
+    name: osv-gateway
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: osv-query
+  labels:
+    name: osv-query
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: osv-pipeline
+  labels:
+    name: osv-pipeline
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: osv-ai
+  labels:
+    name: osv-ai
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: osv-relations
+  labels:
+    name: osv-relations
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: osv-platform
+  labels:
+    name: osv-platform
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: osv-observability
+  labels:
+    name: osv-observability

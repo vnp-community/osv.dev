@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package osv.alias.v1;
+
+option go_package = "github.com/osv/gen/go/osv/alias/v1;aliasv1";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+// AliasRelationsService resolves CVE aliases and cross-database identifiers.
+service AliasRelationsService {
+  // ResolveAlias returns the canonical ID and all known aliases for a given ID.
+  rpc ResolveAlias(ResolveAliasRequest) returns (ResolveAliasResponse) {
+    option (google.api.http) = {
+      get: "/v1/alias/{id}"
+    };
+  }
+
+  // GetAliasGroup returns all IDs in the same alias cluster as the given ID.
+  rpc GetAliasGroup(GetAliasGroupRequest) returns (AliasGroup) {
+    option (google.api.http) = {
+      get: "/v1/alias/{id}/group"
+    };
+  }
+
+  // BatchResolve resolves multiple IDs in a single call.
+  rpc BatchResolve(BatchResolveRequest) returns (BatchResolveResponse) {
+    option (google.api.http) = {
+      post: "/v1/alias/batch"
+      body: "*"
+    };
+  }
+
+  // RecordAlias registers a new alias relationship.
+  rpc RecordAlias(RecordAliasRequest) returns (RecordAliasResponse) {
+    option (google.api.http) = {
+      post: "/v1/alias"
+      body: "*"
+    };
+  }
+}
+
+// ResolveAliasRequest identifies a vulnerability by any of its known IDs.
+message ResolveAliasRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+// ResolveAliasResponse returns the canonical ID and all aliases.
+message ResolveAliasResponse {
+  string canonical_id  = 1;  // OSV ID (primary identifier)
+  repeated string aliases = 2;  // All known IDs (CVE-*, GHSA-*, etc.)
+  AliasSource source   = 3;
+  bool   is_disputed   = 4;  // alias relationship is disputed/contested
+}
+
+// GetAliasGroupRequest identifies a group by any member ID.
+message GetAliasGroupRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+// AliasGroup contains all members of an alias cluster.
+message AliasGroup {
+  string group_id      = 1;  // stable group identifier
+  repeated string ids  = 2;  // all vulnerability IDs in this cluster
+  int32  member_count  = 3;
+}
+
+// BatchResolveRequest contains up to 1000 IDs to resolve.
+message BatchResolveRequest {
+  repeated string ids = 1 [(validate.rules).repeated = {min_items: 1, max_items: 1000}];
+}
+
+// BatchResolveResponse contains results indexed by input ID.
+message BatchResolveResponse {
+  map<string, ResolveAliasResponse> results = 1;
+}
+
+// RecordAliasRequest registers a relationship between two IDs.
+message RecordAliasRequest {
+  string id1    = 1 [(validate.rules).string.min_len = 1];
+  string id2    = 2 [(validate.rules).string.min_len = 1];
+  AliasSource source = 3;
+}
+
+// RecordAliasResponse confirms the alias was recorded.
+message RecordAliasResponse {
+  string group_id = 1;
+  bool   merged   = 2;  // true if two separate groups were merged
+}
+
+// AliasSource indicates how this alias relationship was discovered.
+enum AliasSource {
+  ALIAS_SOURCE_UNSPECIFIED = 0;
+  ALIAS_SOURCE_OSV         = 1;  // OSV advisory aliases field
+  ALIAS_SOURCE_NVD         = 2;  // NVD CVE reference
+  ALIAS_SOURCE_GITHUB      = 3;  // GHSA advisory
+  ALIAS_SOURCE_MANUAL      = 4;  // manually curated
+  ALIAS_SOURCE_AI          = 5;  // AI-inferred (lower confidence)
+}

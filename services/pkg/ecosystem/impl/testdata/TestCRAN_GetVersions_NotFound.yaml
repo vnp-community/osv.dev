@@ -1,0 +1,44 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        host: packagemanager.posit.co
+        url: https://packagemanager.posit.co/__api__/repos/2/packages/doesnotexist123456
+        method: GET
+      response:
+        proto: HTTP/2.0
+        proto_major: 2
+        proto_minor: 0
+        content_length: 74
+        body: '{"code":4,"error":"Package ''doesnotexist123456'' not found","payload":null}'
+        headers:
+            Cache-Control:
+                - no-cache, no-store, must-revalidate
+            Content-Length:
+                - "74"
+            Content-Type:
+                - application/json
+            Date:
+                - Tue, 02 Jun 2026 10:20:56 GMT
+            Expires:
+                - "0"
+            Pragma:
+                - no-cache
+            Request-Id:
+                - 89c9e9b0-2b93-451f-a907-889776932a0f
+            Server:
+                - Posit Package Manager v2026.05.0
+            X-Content-Type-Options:
+                - nosniff
+            X-Frame-Options:
+                - DENY
+            X-Repository-Type:
+                - RSPM
+        status: 404 Not Found
+        code: 404
+        duration: 279.914791ms

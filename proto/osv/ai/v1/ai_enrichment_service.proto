@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package osv.ai.v1;
+
+option go_package = "github.com/osv/gen/go/osv/ai/v1;aiv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+// AIEnrichmentService provides AI-generated vulnerability metadata and semantic capabilities.
+service AIEnrichmentService {
+  // GetEnrichment retrieves pre-computed AI enrichment for a vulnerability.
+  rpc GetEnrichment(GetEnrichmentRequest) returns (EnrichmentResult) {
+    option (google.api.http) = {
+      get: "/v1/ai/enrichment/{vuln_id}"
+    };
+  }
+
+  // TriggerEnrichment requests (re-)enrichment of a vulnerability.
+  rpc TriggerEnrichment(TriggerEnrichmentRequest) returns (TriggerEnrichmentResponse) {
+    option (google.api.http) = {
+      post: "/v1/ai/enrichment/{vuln_id}/trigger"
+      body: "*"
+    };
+  }
+
+  // TranslateQuery translates a natural language query into structured search parameters.
+  rpc TranslateQuery(TranslateQueryRequest) returns (TranslateQueryResponse) {
+    option (google.api.http) = {
+      post: "/v1/ai/translate-query"
+      body: "*"
+    };
+  }
+
+  // GenerateEmbedding generates a text embedding for external use.
+  rpc GenerateEmbedding(GenerateEmbeddingRequest) returns (GenerateEmbeddingResponse) {
+    option (google.api.http) = {
+      post: "/v1/ai/embed"
+      body: "*"
+    };
+  }
+
+  // FindSimilar finds vulnerabilities semantically similar to a given vuln.
+  rpc FindSimilar(FindSimilarRequest) returns (FindSimilarResponse) {
+    option (google.api.http) = {
+      post: "/v1/ai/similar"
+      body: "*"
+    };
+  }
+}
+
+// GetEnrichmentRequest identifies the vulnerability to retrieve enrichment for.
+message GetEnrichmentRequest {
+  string vuln_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+// TriggerEnrichmentRequest triggers (re-)enrichment.
+message TriggerEnrichmentRequest {
+  string vuln_id = 1;
+  bool   force   = 2; // force re-enrichment even if already done
+}
+
+// TriggerEnrichmentResponse confirms the enrichment was queued.
+message TriggerEnrichmentResponse {
+  string vuln_id = 1;
+  bool   queued  = 2;
+  string message = 3;
+}
+
+// EnrichmentResult holds all AI-generated metadata for a vulnerability.
+message EnrichmentResult {
+  string vuln_id              = 1;
+  string severity             = 2;   // CRITICAL | HIGH | MEDIUM | LOW | NONE | UNKNOWN
+  string technical_summary    = 3;
+  string remediation_advice   = 4;
+  repeated string attack_vector_tags = 5;
+  float  exploitability_score = 6;
+  bool   has_embedding        = 7;
+  google.protobuf.Timestamp enriched_at = 8;
+  string model_version        = 9;   // which AI model produced this
+}
+
+// TranslateQueryRequest wraps a natural language search query.
+message TranslateQueryRequest {
+  string nl_query = 1 [(validate.rules).string = {min_len: 3, max_len: 1000}];
+}
+
+// TranslateQueryResponse contains structured search parameters derived from NL query.
+message TranslateQueryResponse {
+  string structured_query    = 1;
+  repeated string ecosystems = 2;
+  repeated string severities = 3;
+  string date_range_hint     = 4;   // e.g. "last_30_days"
+  float  confidence          = 5;
+}
+
+// GenerateEmbeddingRequest wraps text to embed.
+message GenerateEmbeddingRequest {
+  string text = 1 [(validate.rules).string.min_len = 1];
+}
+
+// GenerateEmbeddingResponse contains the embedding vector.
+message GenerateEmbeddingResponse {
+  repeated float values = 1;
+  int32 dimension       = 2;
+  string model          = 3;
+}
+
+// FindSimilarRequest finds vulnerabilities similar to a given one.
+message FindSimilarRequest {
+  string vuln_id = 1;
+  int32  top_k   = 2;    // default 10
+  float  min_score = 3;  // minimum cosine similarity (0.0–1.0), default 0.7
+}
+
+// FindSimilarResponse returns similar vulnerability IDs with scores.
+message FindSimilarResponse {
+  repeated SimilarVuln similar = 1;
+}
+
+// SimilarVuln represents a semantically similar vulnerability.
+message SimilarVuln {
+  string vuln_id          = 1;
+  float  similarity_score = 2;
+  string summary          = 3;
+  string severity         = 4;
+}

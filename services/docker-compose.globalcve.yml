@@ -1,0 +1,155 @@
+version: '3.9'
+
+services:
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: globalcve
+      POSTGRES_USER: globalcve
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U globalcve -d globalcve"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # ── Services ────────────────────────────────────────────────────────────────
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    environment:
+      DATABASE_URL: postgres://globalcve:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/globalcve
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_min_32chars_change_in_production}
+      CVE_SEARCH_SERVICE_URL: http://cve-search-service:8081
+      KEV_SERVICE_URL: http://kev-service:8083
+      CVE_SYNC_SERVICE_URL: http://cve-sync-service:8082
+      NOTIFICATION_SERVICE_URL: http://notification-service:8084
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  cve-search-service:
+    build:
+      context: .
+      dockerfile: cve-search-service/Dockerfile
+    ports:
+      - "8081:8081"
+      - "9091:9091"
+    environment:
+      DATABASE_URL: postgres://globalcve:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/globalcve
+      REDIS_URL: redis://redis:6379
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  cve-sync-service:
+    build:
+      context: .
+      dockerfile: cve-sync-service/Dockerfile
+    ports:
+      - "8082:8082"
+      - "9092:9092"
+    environment:
+      DATABASE_URL: postgres://globalcve:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/globalcve
+      NVD_API_KEY: ${NVD_API_KEY:-}
+      SYNC_ON_STARTUP: "false"
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  kev-service:
+    build:
+      context: .
+      dockerfile: kev-service/Dockerfile
+    ports:
+      - "8083:8083"
+      - "9093:9093"
+    environment:
+      DATABASE_URL: postgres://globalcve:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/globalcve
+      REDIS_URL: redis://redis:6379
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    ports:
+      - "8084:8084"
+      - "9094:9094"
+    environment:
+      DATABASE_URL: postgres://globalcve:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/globalcve
+      JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_min_32chars_change_in_production}
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Observability ────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9099:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  grafana_data:

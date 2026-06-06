@@ -1,0 +1,47 @@
+sources:
+  - name: ghsa
+    type: GIT
+    repo_url: https://github.com/github/advisory-database.git
+    directory_path: advisories/github-reviewed
+    extension: .json
+    db_prefixes: [GHSA]
+    sync_interval: 5m
+
+  - name: nvd-cve
+    type: BUCKET
+    bucket: cve-osv-conversion
+    directory_path: osv-output/
+    extension: .json
+    db_prefixes: [CVE]
+    sync_interval: 1h
+
+  - name: chainguard
+    type: REST_ENDPOINT
+    rest_api_url: https://packages.cgr.dev/chainguard/osv/all.json
+    extension: .json
+    db_prefixes: [CGA]
+    sync_interval: 30m
+
+  - name: go
+    type: BUCKET
+    bucket: go-vulndb
+    directory_path: ID/
+    extension: .json
+    db_prefixes: [GO]
+    sync_interval: 15m
+
+  - name: osv
+    type: GIT
+    repo_url: https://github.com/google/osv-advisories.git
+    directory_path: .
+    extension: .json
+    db_prefixes: [OSV]
+    sync_interval: 10m
+
+  - name: pypa
+    type: GIT
+    repo_url: https://github.com/pypa/advisory-database.git
+    directory_path: advisories/
+    extension: .yaml
+    db_prefixes: [PYSEC]
+    sync_interval: 10m

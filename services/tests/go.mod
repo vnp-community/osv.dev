@@ -1,0 +1,11 @@
+module github.com/osv/tests
+
+go 1.26.3
+
+replace github.com/osv/sbomvex => ../sbomvex
+
+replace github.com/osv/proto => ../proto
+
+replace github.com/osv/pkg => ../pkg
+
+require github.com/osv/sbomvex v0.0.0

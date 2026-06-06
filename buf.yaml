@@ -1,0 +1,19 @@
+version: v2
+
+modules:
+  - path: proto
+
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/grpc-ecosystem/grpc-gateway
+  - buf.build/envoyproxy/protoc-gen-validate
+
+lint:
+  use:
+    - STANDARD
+  except:
+    - FIELD_LOWER_SNAKE_CASE  # Allow JSON names that differ from proto field names
+
+breaking:
+  use:
+    - FILE

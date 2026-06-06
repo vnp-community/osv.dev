@@ -1,0 +1,44 @@
+## CVE Binary Tool - Additional Makefile targets
+## Include this in the main Makefile or run directly
+
+.PHONY: build-new test-new docker-new run-all health-check lint-new
+
+## Build scanner and sbomvex services
+build-new:
+	cd scanner && GOWORK=off go build ./...
+	cd sbomvex && GOWORK=off go build ./...
+	cd report-service && GOWORK=off go build ./...
+
+## Run tests for all new services
+test-new:
+	cd report-service && GOWORK=off go test -race ./internal/...
+	cd scanner && GOWORK=off go test -race ./internal/...
+	cd sbomvex && GOWORK=off go test -race ./internal/...
+
+## Build Docker images for new services
+docker-new:
+	docker compose -f docker-compose.ovs.yml build scanner sbomvex report-service
+
+## Start all services with Docker Compose
+run-all:
+	docker compose -f docker-compose.ovs.yml up -d
+
+## Check health of all services
+health-check:
+	@echo "Checking API Gateway health..."
+	@curl -sf http://localhost:8080/health/ready && echo " ✅ api-gateway healthy" || echo " ❌ api-gateway not ready"
+	@echo "Done."
+
+## Lint new services
+lint-new:
+	cd scanner && GOWORK=off golangci-lint run ./...
+	cd sbomvex && GOWORK=off golangci-lint run ./...
+	cd report-service && GOWORK=off golangci-lint run ./...
+
+## Run integration tests (no Docker required)
+test-integration:
+	go test -race -timeout 60s ./tests/integration/...
+
+## Run E2E tests (requires docker compose up)
+test-e2e:
+	go test -race -timeout 120s -tags e2e ./tests/e2e/...

@@ -1,0 +1,33 @@
+cluster:
+  enabled: true
+  replicas: {{ .replicas }}
+
+jetstream:
+  enabled: true
+  fileStorage:
+    enabled: true
+    size: {{ .storage_size }}
+    storageClassName: {{ .storage_class }}
+
+natsBox:
+  enabled: true
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: nats
+        topologyKey: kubernetes.io/hostname

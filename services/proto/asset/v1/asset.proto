@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package asset.v1;
+
+option go_package = "github.com/osv/proto/gen/go/asset/v1;assetv1";
+
+import "google/protobuf/timestamp.proto";
+
+// AssetService manages network assets discovered by scans.
+// Called by scan-service (UpsertAsset after each finding)
+// and by report-service (GetAsset for report generation).
+service AssetService {
+  // UpsertAsset creates or updates an asset by IP address (idempotent).
+  // Called by scan-service after each Nmap/ZAP finding.
+  rpc UpsertAsset(UpsertAssetRequest) returns (UpsertAssetResponse);
+
+  // LinkVulnerability associates a CVE with an asset.
+  // Called by cve-service after enrichment (or via NATS subscriber).
+  rpc LinkVulnerability(LinkVulnerabilityRequest) returns (LinkVulnerabilityResponse);
+
+  // GetAsset retrieves full asset details by ID.
+  rpc GetAsset(GetAssetRequest) returns (GetAssetResponse);
+}
+
+// ─── UpsertAsset ─────────────────────────────────────────────────────────────
+
+message UpsertAssetRequest {
+  string ip_address = 1;
+  string hostname   = 2;
+  string os         = 3;
+  string mac_address = 4;
+  repeated AssetServiceInfo services = 5;
+  repeated WebTechnology web_tech = 6;
+  string scan_id    = 7;  // UUID of originating scan
+}
+
+message UpsertAssetResponse {
+  string asset_id = 1;   // UUID of created/updated asset
+  bool   created  = 2;   // true if newly created, false if updated
+}
+
+// ─── LinkVulnerability ───────────────────────────────────────────────────────
+
+message LinkVulnerabilityRequest {
+  string asset_id = 1;
+  string cve_id   = 2;
+  string summary  = 3;
+  string severity = 4;   // critical|high|medium|low|none
+  float  cvss     = 5;
+  string scan_id  = 6;
+}
+
+message LinkVulnerabilityResponse {
+  string vuln_id = 1;  // UUID of vulnerability record
+}
+
+// ─── GetAsset ────────────────────────────────────────────────────────────────
+
+message GetAssetRequest {
+  string asset_id = 1;
+}
+
+message GetAssetResponse {
+  string asset_id   = 1;
+  string ip_address = 2;
+  string hostname   = 3;
+  string os         = 4;
+  repeated AssetServiceInfo services = 5;
+  repeated WebTechnology web_tech = 6;
+  repeated Vulnerability vulnerabilities = 7;
+  google.protobuf.Timestamp last_scanned_at = 8;
+  google.protobuf.Timestamp created_at      = 9;
+}
+
+// ─── Shared messages ─────────────────────────────────────────────────────────
+
+message AssetServiceInfo {
+  int32  port    = 1;
+  string protocol = 2;
+  string name    = 3;
+  string product = 4;
+  string version = 5;
+}
+
+message WebTechnology {
+  string name       = 1;
+  string version    = 2;
+  repeated string categories = 3;
+}
+
+message Vulnerability {
+  string vuln_id  = 1;
+  string cve_id   = 2;
+  string summary  = 3;
+  string severity = 4;
+  float  cvss     = 5;
+  google.protobuf.Timestamp detected_at    = 6;
+  google.protobuf.Timestamp remediated_at  = 7;
+}

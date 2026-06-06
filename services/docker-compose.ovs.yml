@@ -1,0 +1,208 @@
+version: "3.9"
+
+# OpenVulnScan full-stack Docker Compose
+# Usage: docker compose -f docker-compose.ovs.yml --env-file docker-compose.ovs.env up -d
+
+services:
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: ovs-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: openvulnscan
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/create_schemas.sql:/docker-entrypoint-initdb.d/00_create_schemas.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s; timeout: 5s; retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ovs-redis
+    restart: unless-stopped
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s; timeout: 3s; retries: 5
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: ovs-nats
+    restart: unless-stopped
+    command: ["-js", "-m", "8222"]
+    ports:
+      - "4222:4222"   # client
+      - "8222:8222"   # monitoring
+
+  minio:
+    image: minio/minio
+    container_name: ovs-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # console
+    volumes:
+      - miniodata:/data
+
+  zap:
+    image: zaproxy/zaproxy:stable
+    container_name: ovs-zap
+    restart: unless-stopped
+    command: zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.disablekey=true
+    ports: ["8090:8090"]
+
+  # ── Application Services ────────────────────────────────────────────────────
+  api-gateway:
+    build: { context: ., dockerfile: api-gateway/Dockerfile }
+    container_name: ovs-api-gateway
+    restart: unless-stopped
+    ports: ["8443:8443"]
+    environment:
+      AUTH_GRPC_ADDR: auth-service:9001
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      auth-service:
+        condition: service_healthy
+
+  auth-service:
+    build: { context: ., dockerfile: auth-service/Dockerfile }
+    container_name: ovs-auth-service
+    restart: unless-stopped
+    ports:
+      - "9101:9101"   # HTTP
+      - "9001:9001"   # gRPC
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=auth&sslmode=disable
+      REDIS_URL: redis://redis:6379
+      JWT_PRIVATE_KEY_PATH: /secrets/jwt_private.pem
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+    volumes:
+      - ./secrets:/secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9101/health/live || exit 1"]
+      interval: 15s; timeout: 5s; retries: 5
+
+  scan-service:
+    build: { context: ., dockerfile: scan-service/Dockerfile }
+    container_name: ovs-scan-service
+    restart: unless-stopped
+    ports:
+      - "9102:9102"
+      - "9002:9002"
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=scan&sslmode=disable
+      REDIS_URL: redis://redis:6379
+      NATS_URL: nats://nats:4222
+      ASSET_GRPC_ADDR: asset-service:9003
+      CVE_GRPC_ADDR: cve-service:9004
+      ZAP_BASE_URL: http://zap:8090
+    depends_on: [postgres, redis, nats, asset-service, cve-service]
+
+  asset-service:
+    build: { context: ., dockerfile: asset-service/Dockerfile }
+    container_name: ovs-asset-service
+    restart: unless-stopped
+    ports:
+      - "9103:9103"
+      - "9003:9003"
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=asset&sslmode=disable
+      REDIS_URL: redis://redis:6379
+      NATS_URL: nats://nats:4222
+    depends_on: [postgres, redis, nats]
+
+  cve-service:
+    build: { context: ., dockerfile: cve-service/Dockerfile }
+    container_name: ovs-cve-service
+    restart: unless-stopped
+    ports:
+      - "9104:9104"
+      - "9004:9004"
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=cve&sslmode=disable
+      REDIS_URL: redis://redis:6379
+      NATS_URL: nats://nats:4222
+    depends_on: [postgres, redis, nats]
+
+  agent-service:
+    build: { context: ., dockerfile: agent-service/Dockerfile }
+    container_name: ovs-agent-service
+    restart: unless-stopped
+    ports: ["9105:9105"]
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=agent&sslmode=disable
+      NATS_URL: nats://nats:4222
+      AUTH_GRPC_ADDR: auth-service:9001
+    depends_on: [postgres, nats, auth-service]
+
+  schedule-service:
+    build: { context: ., dockerfile: schedule-service/Dockerfile }
+    container_name: ovs-schedule-service
+    restart: unless-stopped
+    ports: ["9106:9106"]
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=schedule&sslmode=disable
+      REDIS_URL: redis://redis:6379
+      NATS_URL: nats://nats:4222
+    depends_on: [postgres, redis, nats]
+
+  report-service:
+    build: { context: ., dockerfile: report-service/Dockerfile }
+    container_name: ovs-report-service
+    restart: unless-stopped
+    ports: ["9107:9107"]
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=report&sslmode=disable
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      SCAN_GRPC_ADDR: scan-service:9002
+      ASSET_GRPC_ADDR: asset-service:9003
+      CVE_GRPC_ADDR: cve-service:9004
+    depends_on: [postgres, minio]
+
+  # ── Observability ────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ovs-prometheus
+    ports: ["9090:9090"]
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ovs-grafana
+    ports: ["3000:3000"]
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafanadata:/var/lib/grafana
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: ovs-jaeger
+    ports:
+      - "16686:16686"  # UI
+      - "14268:14268"  # collector
+
+volumes:
+  pgdata:
+  miniodata:
+  grafanadata:

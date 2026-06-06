@@ -1,0 +1,36 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: globalcve
+    env: dev
+
+scrape_configs:
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['api-gateway:9090']
+    metrics_path: '/metrics'
+
+  - job_name: 'cve-search'
+    static_configs:
+      - targets: ['cve-search-service:9091']
+    metrics_path: '/metrics'
+
+  - job_name: 'cve-sync'
+    static_configs:
+      - targets: ['cve-sync-service:9092']
+    metrics_path: '/metrics'
+
+  - job_name: 'kev-service'
+    static_configs:
+      - targets: ['kev-service:9093']
+    metrics_path: '/metrics'
+
+  - job_name: 'notification'
+    static_configs:
+      - targets: ['notification-service:9094']
+    metrics_path: '/metrics'
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

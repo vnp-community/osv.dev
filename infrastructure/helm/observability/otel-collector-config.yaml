@@ -1,0 +1,55 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1000
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512
+    spike_limit_mib: 128
+  resource:
+    attributes:
+      - action: insert
+        key: service.namespace
+        value: osv
+
+exporters:
+  otlp/jaeger:
+    endpoint: jaeger-collector.osv-observability.svc.cluster.local:14250
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: osv
+  googlecloud:
+    project: ${GCP_PROJECT}
+    log:
+      default_log_name: osv-services
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [otlp/jaeger]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [googlecloud]
+
+  telemetry:
+    logs:
+      level: warn
+    metrics:
+      address: 0.0.0.0:8888

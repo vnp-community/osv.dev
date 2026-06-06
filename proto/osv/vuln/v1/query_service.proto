@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package osv.vuln.v1;
+
+option go_package = "github.com/osv/gen/go/osv/vuln/v1;vulnv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+// OSVQueryService provides vulnerability lookup by ID, package, and version.
+service OSVQueryService {
+  // GetVulnerabilityByID retrieves a vulnerability by its OSV ID.
+  rpc GetVulnerabilityByID(GetVulnerabilityRequest) returns (VulnerabilityResponse) {
+    option (google.api.http) = {
+      get: "/v1/vulns/{id}"
+    };
+  }
+
+  // QueryAffected queries vulnerabilities affecting a specific package+version.
+  rpc QueryAffected(QueryAffectedRequest) returns (QueryAffectedResponse) {
+    option (google.api.http) = {
+      post: "/v1/query"
+      body: "*"
+    };
+  }
+
+  // BatchQuery queries multiple vulnerabilities in a single call.
+  rpc BatchQuery(BatchQueryRequest) returns (BatchQueryResponse) {
+    option (google.api.http) = {
+      post: "/v1/querybatch"
+      body: "*"
+    };
+  }
+}
+
+// GetVulnerabilityRequest identifies a vulnerability to retrieve.
+message GetVulnerabilityRequest {
+  string id = 1 [(validate.rules).string = {min_len: 1, max_len: 64}];
+}
+
+// QueryAffectedRequest queries by package+version or commit hash.
+message QueryAffectedRequest {
+  oneof query {
+    PackageVersionQuery package_version = 1;
+    CommitQuery commit = 2;
+  }
+}
+
+// PackageVersionQuery queries by ecosystem package + version.
+message PackageVersionQuery {
+  string name      = 1 [(validate.rules).string.min_len = 1];
+  string ecosystem = 2 [(validate.rules).string.min_len = 1];
+  string version   = 3;
+  string purl      = 4; // alternative to name+ecosystem
+}
+
+// CommitQuery queries by git commit hash.
+message CommitQuery {
+  string commit = 1 [(validate.rules).string = {min_len: 7, max_len: 40}];
+}
+
+// BatchQueryRequest holds multiple queries.
+message BatchQueryRequest {
+  repeated QueryAffectedRequest queries = 1 [(validate.rules).repeated.max_items = 1000];
+}
+
+// VulnerabilityResponse is a full vulnerability document.
+message VulnerabilityResponse {
+  string id        = 1;
+  string summary   = 2;
+  string details   = 3;
+  Severity severity = 4;
+  repeated Affected affected = 5;
+  repeated string aliases   = 6;
+  repeated string related   = 7;
+  google.protobuf.Timestamp published = 8;
+  google.protobuf.Timestamp modified  = 9;
+  bool withdrawn = 10;
+
+  // AI-enriched fields (populated if ai_enrichment service has processed this vuln)
+  AIEnrichment ai_enrichment = 11;
+}
+
+// Severity holds CVSS scoring info.
+message Severity {
+  string type  = 1; // CVSS_V3 | CVSS_V2
+  string score = 2; // CVSS vector string
+  float  base_score = 3;
+  string severity   = 4; // CRITICAL | HIGH | MEDIUM | LOW | NONE
+}
+
+// Affected describes what package versions are affected.
+message Affected {
+  Package package = 1;
+  repeated Range ranges = 2;
+  repeated string versions = 3;
+}
+
+// Package identifies an affected package.
+message Package {
+  string name      = 1;
+  string ecosystem = 2;
+  string purl      = 3;
+}
+
+// Range describes a version range.
+message Range {
+  string type = 1; // GIT | SEMVER | ECOSYSTEM
+  repeated Event events = 2;
+  string repo = 3;
+}
+
+// Event is a single introduced/fixed event.
+message Event {
+  string introduced = 1;
+  string fixed      = 2;
+  string last_affected = 3;
+  string limit      = 4;
+}
+
+// AIEnrichment holds AI-generated metadata.
+message AIEnrichment {
+  string technical_summary  = 1;
+  string remediation_advice = 2;
+  repeated string attack_vector_tags = 3;
+  string ai_severity        = 4;
+  bool   has_embedding      = 5;
+  google.protobuf.Timestamp enriched_at = 6;
+}
+
+// QueryAffectedResponse holds matching vulnerabilities.
+message QueryAffectedResponse {
+  repeated VulnerabilityResponse vulns = 1;
+}
+
+// BatchQueryResponse holds results for batch queries.
+message BatchQueryResponse {
+  repeated QueryAffectedResponse results = 1;
+}

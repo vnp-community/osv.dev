@@ -1,0 +1,71 @@
+groups:
+  - name: osv-critical
+    rules:
+      - alert: APIGatewayHighErrorRate
+        expr: rate(gateway_requests_total{status=~"5.."}[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: critical
+          team: osv-platform
+        annotations:
+          summary: "High error rate on API Gateway"
+          description: "Error rate {{ $value | humanizePercentage }} exceeds 1% threshold."
+
+      - alert: IngestionLagHigh
+        expr: nats_stream_pending_messages{stream="OSV-EVENTS"} > 10000
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Ingestion lag is high"
+          description: "{{ $value }} pending messages in OSV-EVENTS stream."
+
+      - alert: FirestoreWriteFailures
+        expr: rate(firestore_write_errors_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Firestore write failures detected"
+
+      - alert: NATSClusterNotHealthy
+        expr: nats_server_count < 3
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "NATS cluster has fewer than 3 nodes"
+
+  - name: osv-warning
+    rules:
+      - alert: QueryServiceHighLatency
+        expr: histogram_quantile(0.99, rate(grpc_server_handling_seconds_bucket{grpc_service="VulnerabilityQueryService"}[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Query service P99 latency > 1s"
+
+      - alert: DLQNotificationHigh
+        expr: firestore_collection_document_count{collection="dlq-notifications"} > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Notification DLQ count exceeds 100"
+
+      - alert: AIEnrichmentLow
+        expr: rate(ai_enrichment_completed_total[1h]) / rate(vuln_imported_total[1h]) < 0.9
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AI enrichment coverage below 90%"
+
+      - alert: RedisHighMemory
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage > 85%"

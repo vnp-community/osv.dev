@@ -1,0 +1,21 @@
+server:
+  port: 8084
+  read_timeout: 10s
+  write_timeout: 10s
+  shutdown_timeout: 10s
+
+database:
+  url: "${DATABASE_URL}"
+  max_conns: 10
+  min_conns: 2
+
+dispatch:
+  timeout: 10s
+  max_retries: 3
+
+auth:
+  jwt_secret: "${JWT_SECRET}"
+
+observability:
+  log_level: "info"
+  metrics_port: 9094

@@ -1,0 +1,36 @@
+architecture: replication
+auth:
+  enabled: true
+  existingSecret: redis-secret
+  existingSecretPasswordKey: password
+
+master:
+  persistence:
+    enabled: true
+    size: {{ .storage_size }}
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "4Gi"
+    limits:
+      cpu: "2000m"
+      memory: "8Gi"
+
+replica:
+  replicaCount: 3
+  persistence:
+    enabled: true
+    size: {{ .storage_size }}
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "2Gi"
+    limits:
+      cpu: "1000m"
+      memory: "4Gi"
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: osv-observability

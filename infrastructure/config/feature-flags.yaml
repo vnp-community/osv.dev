@@ -1,0 +1,52 @@
+# Feature Flags — OSV Migration Phases
+# Controls which features/services are active at each migration phase
+# Update these flags as migration progresses
+
+features:
+  # ── Phase 1: Data Pipeline ──────────────────────────────────────────────────
+  # Enable parallel data pipeline alongside legacy importer
+  dual_write_mode: true          # New ingestion writes to Firestore alongside legacy Datastore
+  new_source_sync: true          # New Source Sync service active (read-only compare initially)
+  new_ingestion: true            # New Ingestion service processes events
+  source_sync_write_enabled: false  # Set true after 1 week of validate-only mode
+
+  # ── Phase 2: Query + Gateway ────────────────────────────────────────────────
+  new_query_service: false       # Enable new Vulnerability Query Service
+  query_shadow_mode: true        # Log diffs but return legacy response
+  new_query_traffic_pct: 0       # 0 → 1 → 5 → 25 → 50 → 100
+
+  # ── Phase 3: Remaining Services ─────────────────────────────────────────────
+  new_version_index: false       # Version Index Service
+  new_impact_analysis: false     # Impact Analysis Service
+  new_search_service: false      # Search Service
+  semantic_search: false         # Semantic/vector search (enable after full index)
+  ai_enrichment: false           # AI Enrichment Service
+  embedding_generation: false    # Generate embeddings (enable when AI service ready)
+  alias_service: false           # Alias & Relations Service
+  notification_service: false    # Notification Service
+  web_bff: false                 # Web BFF Service
+
+  # ── Phase 4: Cutover ─────────────────────────────────────────────────────────
+  legacy_decommission: false     # Enable only after 100% traffic on new services
+
+# ── Per-Source Overrides ────────────────────────────────────────────────────
+# Override global flags per source (for gradual rollout)
+source_overrides:
+  cve-list:
+    ai_enrichment: true          # Enable AI enrichment for CVE first
+  github-reviewed:
+    ai_enrichment: true
+
+# ── AI Feature Flags (T11 specific) ─────────────────────────────────────────
+ai_features:
+  embeddings_enabled: true
+  severity_classification: true
+  tag_extraction: true
+  summary_generation: false       # Expensive — disable initially
+  nl_query_translation: true
+  exploitability_prediction: false
+
+# ── Traffic Weights (updated by gateway during migration) ────────────────────
+traffic_weights:
+  legacy_api: 100
+  new_query_service: 0

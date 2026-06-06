@@ -1,0 +1,134 @@
+---
+# PodDisruptionBudget — API Gateway
+# At least 1 replica always available during rolling updates / node drains
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-gateway-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+  minAvailable: 1
+
+---
+# PodDisruptionBudget — Vulnerability Query Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: vulnerability-query-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: vulnerability-query
+  minAvailable: 1
+
+---
+# PodDisruptionBudget — Search Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: search-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: search
+  # maxUnavailable=1 allows one pod to be disrupted at a time
+  maxUnavailable: 1
+
+---
+# PodDisruptionBudget — AI Enrichment Service
+# Conservative: never allow 0 replicas (tasks must always be processable)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ai-enrichment-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: ai-enrichment
+  minAvailable: 1
+
+---
+# PodDisruptionBudget — Ingestion Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ingestion-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: ingestion
+  minAvailable: 1
+
+---
+# PodDisruptionBudget — Alias Relations Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: alias-relations-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: alias-relations
+  minAvailable: 1
+
+---
+# PodDisruptionBudget — Notification Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: notification-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: notification
+  minAvailable: 1
+
+---
+# PodDisruptionBudget — Web BFF
+# Keep at least 50% pods available
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web-bff-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: web-bff
+  minAvailable: "50%"
+
+---
+# PodDisruptionBudget — Version Index Worker (multiple replicas, allow 1 disruption)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: version-index-worker-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: version-index-worker
+  maxUnavailable: 1
+
+---
+# PodDisruptionBudget — Source Sync (single instance, block all disruptions during sync)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: source-sync-pdb
+  namespace: osv-dev
+spec:
+  selector:
+    matchLabels:
+      app: source-sync
+  minAvailable: 0
+  # Note: set minAvailable: 1 if you run multiple replicas for HA

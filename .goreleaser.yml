@@ -1,0 +1,260 @@
+version: 2
+
+project_name: osv-dev
+
+# ── Build ──────────────────────────────────────────────────────────────────────
+builds:
+  - id: api-gateway
+    binary: api-gateway
+    main: ./services/api-gateway/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.buildDate={{.Date}}
+
+  - id: vulnerability-query
+    binary: vulnerability-query
+    main: ./services/vulnerability-query/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: &default-ldflags
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.buildDate={{.Date}}
+
+  - id: ingestion
+    binary: ingestion
+    main: ./services/ingestion/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+  - id: search
+    binary: search
+    main: ./services/search/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+  - id: ai-enrichment
+    binary: ai-enrichment
+    main: ./services/ai-enrichment/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+  - id: impact-analysis
+    binary: impact-analysis
+    main: ./services/impact-analysis/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+  - id: alias-relations
+    binary: alias-relations
+    main: ./services/alias-relations/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+  - id: notification
+    binary: notification
+    main: ./services/notification/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+  - id: source-sync
+    binary: source-sync
+    main: ./services/source-sync/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+  - id: web-bff
+    binary: web-bff
+    main: ./services/web-bff/cmd/server
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+  - id: version-index-controller
+    binary: version-index-controller
+    main: ./services/version-index/cmd/controller
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+  - id: version-index-worker
+    binary: version-index-worker
+    main: ./services/version-index/cmd/worker
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    ldflags: *default-ldflags
+
+# ── Docker Images ──────────────────────────────────────────────────────────────
+dockers:
+  # api-gateway — amd64
+  - image_templates:
+      - "ghcr.io/osv-dev/api-gateway:{{ .Version }}-amd64"
+      - "ghcr.io/osv-dev/api-gateway:latest-amd64"
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.revision={{.Commit}}"
+    goarch: amd64
+    ids: [api-gateway]
+    dockerfile: services/api-gateway/Dockerfile
+
+  # api-gateway — arm64
+  - image_templates:
+      - "ghcr.io/osv-dev/api-gateway:{{ .Version }}-arm64"
+      - "ghcr.io/osv-dev/api-gateway:latest-arm64"
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/arm64"
+    goarch: arm64
+    ids: [api-gateway]
+    dockerfile: services/api-gateway/Dockerfile
+
+  # vulnerability-query — amd64
+  - image_templates:
+      - "ghcr.io/osv-dev/vulnerability-query:{{ .Version }}-amd64"
+    use: buildx
+    build_flag_templates: ["--platform=linux/amd64"]
+    goarch: amd64
+    ids: [vulnerability-query]
+    dockerfile: services/vulnerability-query/Dockerfile
+
+  # vulnerability-query — arm64
+  - image_templates:
+      - "ghcr.io/osv-dev/vulnerability-query:{{ .Version }}-arm64"
+    use: buildx
+    build_flag_templates: ["--platform=linux/arm64"]
+    goarch: arm64
+    ids: [vulnerability-query]
+    dockerfile: services/vulnerability-query/Dockerfile
+
+  # search — amd64
+  - image_templates:
+      - "ghcr.io/osv-dev/search:{{ .Version }}-amd64"
+    use: buildx
+    build_flag_templates: ["--platform=linux/amd64"]
+    goarch: amd64
+    ids: [search]
+    dockerfile: services/search/Dockerfile
+
+  # search — arm64
+  - image_templates:
+      - "ghcr.io/osv-dev/search:{{ .Version }}-arm64"
+    use: buildx
+    build_flag_templates: ["--platform=linux/arm64"]
+    goarch: arm64
+    ids: [search]
+    dockerfile: services/search/Dockerfile
+
+  # ai-enrichment — amd64
+  - image_templates:
+      - "ghcr.io/osv-dev/ai-enrichment:{{ .Version }}-amd64"
+    use: buildx
+    build_flag_templates: ["--platform=linux/amd64"]
+    goarch: amd64
+    ids: [ai-enrichment]
+    dockerfile: services/ai-enrichment/Dockerfile
+
+  # ai-enrichment — arm64
+  - image_templates:
+      - "ghcr.io/osv-dev/ai-enrichment:{{ .Version }}-arm64"
+    use: buildx
+    build_flag_templates: ["--platform=linux/arm64"]
+    goarch: arm64
+    ids: [ai-enrichment]
+    dockerfile: services/ai-enrichment/Dockerfile
+
+  # web-bff — amd64
+  - image_templates:
+      - "ghcr.io/osv-dev/web-bff:{{ .Version }}-amd64"
+    use: buildx
+    build_flag_templates: ["--platform=linux/amd64"]
+    goarch: amd64
+    ids: [web-bff]
+    dockerfile: services/web-bff/Dockerfile
+
+  # web-bff — arm64
+  - image_templates:
+      - "ghcr.io/osv-dev/web-bff:{{ .Version }}-arm64"
+    use: buildx
+    build_flag_templates: ["--platform=linux/arm64"]
+    goarch: arm64
+    ids: [web-bff]
+    dockerfile: services/web-bff/Dockerfile
+
+# ── Docker Manifests (multi-arch) ──────────────────────────────────────────────
+docker_manifests:
+  - name_template: "ghcr.io/osv-dev/api-gateway:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/osv-dev/api-gateway:{{ .Version }}-amd64"
+      - "ghcr.io/osv-dev/api-gateway:{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/osv-dev/api-gateway:latest"
+    image_templates:
+      - "ghcr.io/osv-dev/api-gateway:latest-amd64"
+      - "ghcr.io/osv-dev/api-gateway:latest-arm64"
+
+  - name_template: "ghcr.io/osv-dev/vulnerability-query:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/osv-dev/vulnerability-query:{{ .Version }}-amd64"
+      - "ghcr.io/osv-dev/vulnerability-query:{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/osv-dev/search:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/osv-dev/search:{{ .Version }}-amd64"
+      - "ghcr.io/osv-dev/search:{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/osv-dev/ai-enrichment:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/osv-dev/ai-enrichment:{{ .Version }}-amd64"
+      - "ghcr.io/osv-dev/ai-enrichment:{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/osv-dev/web-bff:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/osv-dev/web-bff:{{ .Version }}-amd64"
+      - "ghcr.io/osv-dev/web-bff:{{ .Version }}-arm64"
+
+# ── Changelog ──────────────────────────────────────────────────────────────────
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+# ── GitHub Release ─────────────────────────────────────────────────────────────
+release:
+  github:
+    owner: osv-dev
+    name: osv-dev
+  name_template: "OSV.dev {{.Version}}"
+  draft: false
+  prerelease: auto

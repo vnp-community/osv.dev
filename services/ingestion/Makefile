@@ -1,0 +1,32 @@
+.PHONY: build test docker lint clean
+
+SERVICE_NAME := ingestion-service
+IMAGE_NAME := osv/$(SERVICE_NAME)
+IMAGE_TAG ?= latest
+
+build:
+	go build -o bin/$(SERVICE_NAME) ./cmd/server/
+
+test:
+	go test -race -count=1 ./...
+
+test-cover:
+	go test -race -count=1 -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
+
+lint:
+	golangci-lint run ./...
+
+docker:
+	docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .
+
+docker-push:
+	docker push $(IMAGE_NAME):$(IMAGE_TAG)
+
+clean:
+	rm -rf bin/ coverage.out coverage.html
+
+run:
+	go run ./cmd/server/
+
+.DEFAULT_GOAL := build

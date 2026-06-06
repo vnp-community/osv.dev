@@ -1,0 +1,73 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    stack: osv-local
+
+scrape_configs:
+  # OTel Collector Prometheus exporter (aggregates all service metrics)
+  - job_name: otel-collector
+    static_configs:
+      - targets: ["otel-collector:8888"]
+
+  # Individual service /metrics endpoints
+  - job_name: api-gateway
+    static_configs:
+      - targets: ["api-gateway:9090"]
+    metrics_path: /metrics
+
+  - job_name: vulnerability-query
+    static_configs:
+      - targets: ["vulnerability-query:9090"]
+
+  - job_name: search
+    static_configs:
+      - targets: ["search:9090"]
+
+  - job_name: ai-enrichment
+    static_configs:
+      - targets: ["ai-enrichment:9090"]
+
+  - job_name: ingestion
+    static_configs:
+      - targets: ["ingestion:9090"]
+
+  - job_name: impact-analysis
+    static_configs:
+      - targets: ["impact-analysis:9090"]
+
+  - job_name: version-index
+    static_configs:
+      - targets: ["version-index-controller:9090"]
+
+  - job_name: alias-relations
+    static_configs:
+      - targets: ["alias-relations:9090"]
+
+  - job_name: notification
+    static_configs:
+      - targets: ["notification:9090"]
+
+  - job_name: source-sync
+    static_configs:
+      - targets: ["source-sync:9090"]
+
+  - job_name: web-bff
+    static_configs:
+      - targets: ["web-bff:9090"]
+
+  # NATS JetStream metrics (via NATS monitoring)
+  - job_name: nats
+    static_configs:
+      - targets: ["nats:8222"]
+    metrics_path: /metrics
+
+  # Redis via redis_exporter
+  # - job_name: redis
+  #   static_configs:
+  #     - targets: ["redis-exporter:9121"]
+
+  # OpenSearch metrics
+  # - job_name: opensearch
+  #   static_configs:
+  #     - targets: ["opensearch-exporter:9114"]

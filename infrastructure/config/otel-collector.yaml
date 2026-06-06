@@ -1,0 +1,73 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://localhost:*"
+
+processors:
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+    send_batch_max_size: 2048
+
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512
+    spike_limit_mib: 128
+
+  resource:
+    attributes:
+      - action: upsert
+        key: deployment.environment
+        value: local
+
+  filter/health:
+    # Drop health check spans to reduce noise
+    spans:
+      exclude:
+        match_type: strict
+        span_names: ["/health/live", "/health/ready", "/metrics"]
+
+exporters:
+  # Prometheus metrics scrape endpoint
+  prometheus:
+    endpoint: "0.0.0.0:8888"
+    namespace: osv
+    const_labels:
+      stack: local
+
+  # Debug logging (development only — disable in production)
+  debug:
+    verbosity: basic
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+  # OTLP export to Jaeger (uncomment if Jaeger is running)
+  # otlp/jaeger:
+  #   endpoint: jaeger:4317
+  #   tls:
+  #     insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, filter/health, batch]
+      exporters: [debug]
+
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [prometheus]
+
+  telemetry:
+    logs:
+      level: warn
+    metrics:
+      level: basic
+      address: 0.0.0.0:8889

@@ -1,0 +1,251 @@
+name: CI/CD — OSV Platform Services
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'services/**'
+      - '.github/workflows/ci-services.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'services/**'
+
+env:
+  GO_VERSION: '1.25'
+  REGISTRY: gcr.io
+  IMAGE_PREFIX: ${{ secrets.GCP_PROJECT_ID }}/osv
+
+jobs:
+  # ── Detect changed services ──────────────────────────────────────────────────
+  changes:
+    name: Detect changed services
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.filter.outputs.services }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            admin:           ['services/admin/**', 'services/pkg/**']
+            ai-enrichment:   ['services/ai-enrichment/**', 'services/pkg/**']
+            api-gateway:     ['services/api-gateway/**', 'services/pkg/**']
+            converter:       ['services/converter/**', 'services/pkg/**']
+            cvectl:          ['services/cvectl/**']
+            impact-analysis: ['services/impact-analysis/**', 'services/pkg/**']
+            source-sync:     ['services/source-sync/**', 'services/pkg/**']
+            pkg:             ['services/pkg/**']
+      - id: set-matrix
+        run: |
+          SERVICES=()
+          for svc in admin ai-enrichment api-gateway converter cvectl impact-analysis source-sync pkg; do
+            if echo "${{ steps.filter.outputs[svc] }}" | grep -q true; then
+              SERVICES+=("\"$svc\"")
+            fi
+          done
+          # If pkg changes, test all
+          if echo "${{ steps.filter.outputs.pkg }}" | grep -q true; then
+            SERVICES='"admin","ai-enrichment","api-gateway","converter","cvectl","impact-analysis","source-sync","pkg"'
+          fi
+          MATRIX=$(echo "[${SERVICES[@]}]" | tr ' ' ',')
+          echo "matrix={\"service\":${MATRIX}}" >> $GITHUB_OUTPUT
+
+  # ── Lint + Test ──────────────────────────────────────────────────────────────
+  test:
+    name: Test ${{ matrix.service }}
+    needs: changes
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.changes.outputs.matrix) }}
+    defaults:
+      run:
+        working-directory: services/${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go ${{ env.GO_VERSION }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: services/${{ matrix.service }}/go.sum
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.62
+          working-directory: services/${{ matrix.service }}
+          args: --timeout=5m
+
+      - name: Run tests with race detector
+        run: go test -race -count=1 -timeout=5m ./... 2>&1
+
+      - name: Upload test coverage
+        if: matrix.service != 'cvectl'
+        uses: codecov/codecov-action@v4
+        with:
+          directory: services/${{ matrix.service }}
+          flags: ${{ matrix.service }}
+
+  # ── Build Docker images ──────────────────────────────────────────────────────
+  build:
+    name: Build ${{ matrix.service }}
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - admin
+          - ai-enrichment
+          - api-gateway
+          - converter
+          - impact-analysis
+          - source-sync
+    permissions:
+      contents: read
+      id-token: write  # for Workload Identity Federation
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker ${{ env.REGISTRY }} --quiet
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}
+          tags: |
+            type=sha,prefix={{branch}}-
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: services/${{ matrix.service }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:buildcache,mode=max
+
+  # ── Deploy to Staging ─────────────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy to staging
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: https://osv-staging.example.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER_STAGING }}
+          location: ${{ secrets.GKE_REGION }}
+
+      - name: Deploy with Helm
+        run: |
+          SHORT_SHA="${GITHUB_SHA::8}"
+          for svc in admin ai-enrichment api-gateway converter impact-analysis source-sync; do
+            helm upgrade --install osv-$svc ./deploy/helm/osv-$svc \
+              --namespace osv-staging \
+              --set image.tag="develop-${SHORT_SHA}" \
+              --set environment=staging \
+              --atomic --timeout=5m
+          done
+
+  # ── Deploy to Production ──────────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy to production
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://osv.example.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER_PROD }}
+          location: ${{ secrets.GKE_REGION }}
+
+      - name: Deploy with Helm (production)
+        run: |
+          SHORT_SHA="${GITHUB_SHA::8}"
+          for svc in admin ai-enrichment api-gateway converter impact-analysis source-sync; do
+            helm upgrade --install osv-$svc ./deploy/helm/osv-$svc \
+              --namespace osv-production \
+              --set image.tag="main-${SHORT_SHA}" \
+              --set environment=production \
+              --set replicaCount=3 \
+              --atomic --timeout=10m
+          done
+
+  # ── CLI Release ───────────────────────────────────────────────────────────────
+  release-cvectl:
+    name: Release cvectl CLI
+    needs: test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/cvectl/')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build multi-platform binaries
+        working-directory: services/cvectl
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/cvectl/}"
+          for OS in linux darwin windows; do
+            for ARCH in amd64 arm64; do
+              EXT=""
+              [ "$OS" = "windows" ] && EXT=".exe"
+              GOOS=$OS GOARCH=$ARCH go build \
+                -ldflags="-X main.Version=${VERSION}" \
+                -o "dist/cvectl-${OS}-${ARCH}${EXT}" \
+                ./cmd/cvectl/
+            done
+          done
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: services/cvectl/dist/cvectl-*
+          generate_release_notes: true

@@ -1,0 +1,39 @@
+name: Proto Breaking Change Check
+
+on:
+  pull_request:
+    paths:
+      - 'proto/**'
+      - 'buf.yaml'
+      - 'buf.gen.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  breaking:
+    name: Check proto backward compatibility
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write  # to post annotation comments
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: '1.47.2'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for breaking proto changes
+        uses: bufbuild/buf-breaking-action@v1
+        with:
+          # Compare against the target branch (main/master)
+          against: 'https://github.com/${{ github.repository }}.git#branch=${{ github.base_ref }},subdir=proto'
+          # Only fail on FILE-level breaking changes (field removal, type changes, etc.)
+          # Does NOT fail on additions (new fields, new messages) which are backward-compatible

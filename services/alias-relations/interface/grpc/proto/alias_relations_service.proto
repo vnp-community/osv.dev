@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package osv.alias.v1;
+
+option go_package = "github.com/osv/alias-relations/interface/grpc/proto;aliasproto";
+
+service AliasRelationsService {
+  // Resolve any vuln ID to its canonical alias group.
+  rpc ResolveAlias(ResolveAliasRequest) returns (ResolveAliasResponse);
+
+  // Get the full alias group by group ID.
+  rpc GetAliasGroup(GetAliasGroupRequest) returns (AliasGroup);
+
+  // Manually add an alias relationship.
+  rpc AddAlias(AddAliasRequest) returns (AddAliasResponse);
+
+  // Get upstream/downstream relationships for a vulnerability.
+  rpc GetUpstreamRelations(GetUpstreamRequest) returns (UpstreamRelations);
+}
+
+message ResolveAliasRequest {
+  string vuln_id = 1;
+}
+
+message ResolveAliasResponse {
+  string canonical_id   = 1;
+  repeated string all_ids = 2;
+  string group_id       = 3;
+  string last_modified  = 4;  // RFC3339
+  bool found            = 5;
+}
+
+message GetAliasGroupRequest {
+  string group_id = 1;
+}
+
+message AliasGroup {
+  string group_id             = 1;
+  repeated string bug_ids     = 2;
+  string canonical_id         = 3;
+  string last_modified        = 4;
+  string detection_method     = 5;  // MANUAL | SOURCE_DECLARED | AI_DETECTED
+}
+
+message AddAliasRequest {
+  string vuln_id              = 1;
+  repeated string alias_ids   = 2;
+}
+
+message AddAliasResponse {
+  string group_id     = 1;
+  string canonical_id = 2;
+  int32  total_ids    = 3;
+}
+
+message GetUpstreamRequest {
+  string vuln_id = 1;
+}
+
+message UpstreamRelations {
+  string vuln_id              = 1;
+  repeated string upstream    = 2;  // this vuln is downstream of...
+  repeated string downstream  = 3;  // this vuln is upstream of...
+}

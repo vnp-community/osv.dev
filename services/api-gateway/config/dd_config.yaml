@@ -1,0 +1,93 @@
+# DefectDojo API Gateway Configuration
+
+server:
+  http_port: "8080"
+  https_port: "8443"
+  read_timeout: 30s
+  write_timeout: 30s
+  idle_timeout: 120s
+
+auth:
+  grpc_address: "identity:9002"
+  jwks_url: "http://identity:8082/.well-known/jwks.json"
+  jwks_cache_ttl: 5m
+  token_blacklist_ttl: 24h
+  skip_paths:
+    - "/health/live"
+    - "/health/ready"
+    - "/metrics"
+    - "/.well-known/jwks.json"
+    - "/api/v2/auth"
+
+upstreams:
+  identity:
+    address: "http://identity:8082"
+    timeout: 10s
+  product-mgmt:
+    address: "http://product-mgmt:8083"
+    timeout: 15s
+  scan-orchestrator:
+    address: "http://scan-orchestrator:8084"
+    timeout: 120s    # import can take time
+  finding-mgmt:
+    address: "http://finding-mgmt:8085"
+    timeout: 15s
+  sla:
+    address: "http://sla:8086"
+    timeout: 10s
+  notification:
+    address: "http://notification:8087"
+    timeout: 10s
+  jira:
+    address: "http://jira:8088"
+    timeout: 30s
+  report:
+    address: "http://report:8089"
+    timeout: 120s    # PDF generation
+  search:
+    address: "http://search:8090"
+    timeout: 10s
+  ai:
+    address: "http://ai:8091"
+    timeout: 60s
+  audit:
+    address: "http://audit:8092"
+    timeout: 10s
+
+redis:
+  url: "redis://redis:6379"
+  db: 0
+
+nats:
+  url: "nats://nats:4222"
+
+rate_limit:
+  enabled: true
+  default:
+    rpm: 1000
+    burst: 100
+  per_route:
+    "/api/v2/import-scan":
+      rpm: 10
+      burst: 3
+      key_by: "user_id"
+    "/api/v2/auth/login":
+      rpm: 5
+      burst: 2
+      key_by: "ip"
+    "/api/v2/reports":
+      rpm: 5
+      burst: 2
+      key_by: "user_id"
+
+circuit_breaker:
+  threshold: 5
+  reset_timeout: 30s
+
+cors:
+  allowed_origins:
+    - "https://defectdojo.example.com"
+    - "http://localhost:3000"   # local dev
+  allowed_methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+  allowed_headers: ["Authorization", "Content-Type", "X-Request-ID"]
+  max_age: 3600

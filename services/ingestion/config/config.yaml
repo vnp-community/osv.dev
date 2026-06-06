@@ -1,0 +1,29 @@
+grpc:
+  port: 9090
+
+http:
+  port: 8080
+
+firestore:
+  project_id: "osv-dev"
+  collection: "vulnerabilities"
+
+gcs:
+  bucket: "osv-vulnz"
+  prefix: "vulns"
+
+nats:
+  url: "nats://localhost:4222"
+  stream_name: "OSV"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+
+telemetry:
+  otlp_endpoint: "localhost:4317"
+  service_name: "ingestion"
+
+deletion:
+  safety_threshold_pct: 10.0

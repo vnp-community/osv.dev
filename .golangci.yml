@@ -1,0 +1,120 @@
+run:
+  timeout: 5m
+  issues-exit-code: 1
+  tests: true
+  allow-parallel-runners: true
+
+linters:
+  enable:
+    # Correctness
+    - errcheck        # unchecked errors
+    - govet           # go vet passes
+    - staticcheck     # advanced static analysis (SA, S, QF, ST lints)
+    - ineffassign     # ineffectual assignments
+    - unused          # unused code detection
+    - gosimple        # code simplification suggestions
+
+    # Security
+    - gosec           # CWE-based security checks
+    - bodyclose       # HTTP response body not closed
+
+    # Style / Quality
+    - revive          # fast, configurable linter (replaces golint)
+    - gofmt           # formatting
+    - goimports       # import organization
+    - gocritic        # opinionated checks
+
+    # Error handling
+    - wrapcheck       # errors from external packages must be wrapped
+    - errorlint       # fmt.Errorf %w and errors.Is/As checks
+
+    # Concurrency
+    - rowserrcheck    # sql.Rows.Err() checked
+    - sqlclosecheck   # sql.Rows/Stmt.Close() called
+
+    # Complexity
+    - cyclop          # cyclomatic complexity
+    - gocognit        # cognitive complexity
+
+    # Context
+    - contextcheck    # context propagated correctly
+
+    # Maintenance
+    - godot           # comments should end with period
+    - misspell        # spell check comments/strings
+
+  disable:
+    - depguard        # too noisy for monorepo
+    - exhaustruct     # struct field exhaustiveness too strict
+    - ireturn         # too strict for interface returns
+    - varnamelen      # too strict on short names
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: false  # allow _ = fn()
+
+  gosec:
+    excludes:
+      - G104  # Errors unhandled — covered by errcheck
+      - G401  # Use of weak crypto — we have intentional MD5 for non-security use (file hashing)
+      - G501  # Import blocklist crypto/md5 — same as above
+
+  revive:
+    rules:
+      - name: exported
+      - name: context-as-argument
+      - name: error-return
+      - name: error-strings
+      - name: blank-imports
+      - name: dot-imports
+      - name: var-naming
+
+  cyclop:
+    max-complexity: 15
+    package-average: 10
+
+  gocognit:
+    min-complexity: 25
+
+  wrapcheck:
+    ignoreSigs:
+      - .Errorf(
+      - errors.New(
+      - errors.Unwrap(
+      - .Wrap(
+      - .Wrapf(
+      - .WithMessage(
+    ignorePackageGlobs:
+      - github.com/osv/*
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - performance
+      - style
+    disabled-checks:
+      - hugeParam      # too strict for domain structs
+
+issues:
+  exclude-rules:
+    # Test files — more permissive
+    - path: "_test.go"
+      linters:
+        - errcheck
+        - gosec
+        - wrapcheck
+
+    # cmd/server/main.go — complex wiring, less strict
+    - path: "cmd/server/main.go"
+      linters:
+        - wrapcheck
+        - cyclop
+
+    # Generated code
+    - path: ".*\\.pb\\.go"
+      linters:
+        - all
+
+  max-issues-per-linter: 50
+  max-same-issues: 3

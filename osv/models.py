@@ -11,7 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Datastore types."""
+"""OSV Datastore model definitions and business logic.
+
+This module is the primary public interface for OSV models. Existing code
+that uses from osv import models or osv.models.* continues to work.
+
+Architecture note — ongoing refactoring
+----------------------------------------
+This file is being progressively split into focused submodules under
+osv/models/ to improve maintainability. New code should prefer importing
+directly from the submodules:
+
+    from osv.models.entities import AffectedPackage, SourceRepository
+    from osv.models.indexing import affected_from_proto, normalize_repo_package
+
+Current submodule status:
+
+* osv/models/entities.py  — NDB entity class definitions (schema only)
+* osv/models/indexing.py  — Search indexing, affected version computation
+* osv/models/__init__.py  — Re-exports all symbols for backward compat
+
+The Bug class and its proto conversion methods (to_vulnerability,
+update_from_vulnerability) remain here during the transition.
+"""
 
 import datetime
 import enum
@@ -123,6 +145,10 @@ def maybe_strip_repo_prefixes(versions: list[str], repo_urls: list[str]) -> str:
 
   return repo_stripped_versions
 
+
+# NOTE: The entity classes below are being migrated to osv/models/entities.py
+# The versions in this file are the authoritative ones for now.
+# See the module docstring for the migration plan.
 
 # --- OSS-Fuzz-related Entities ---
 

@@ -192,6 +192,22 @@
     {
       "matchDatasources": ["golang-version"],
       "rangeStrategy": "bump"
+    },
+    {
+      "matchFileNames": [
+        "services/**"
+      ],
+      "matchCategories": ["golang"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "services-go"
+    },
+    {
+      "matchFileNames": [
+        "services/**"
+      ],
+      "matchCategories": ["golang"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "services-go major"
     }
   ],
   "customManagers": [

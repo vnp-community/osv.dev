@@ -1,0 +1,199 @@
+version: "3.9"
+
+services:
+  # ── Infrastructure ───────────────────────────────────────────────────────────
+  nats:
+    image: nats:2.10-alpine
+    command: ["-js", "-sd", "/data", "--http_port", "8222"]
+    volumes:
+      - nats-data:/data
+    ports:
+      - "4222:4222"   # NATS client
+      - "8222:8222"   # NATS monitoring / health
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:8222/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: defectdojo
+      POSTGRES_PASSWORD: defectdojo
+      POSTGRES_DB: defectdojo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U defectdojo"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --save "" --appendonly no
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── DefectDojo Services ──────────────────────────────────────────────────────
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      GATEWAY_CONFIG: /app/config/dd_config.yaml
+      REDIS_URL: redis://redis:6379
+      NATS_URL: nats://nats:4222
+    depends_on:
+      nats: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  identity:
+    build: ./identity
+    ports:
+      - "8082:8082"   # HTTP
+      - "9002:9002"   # gRPC
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/identity
+      REDIS_URL: redis://redis:6379
+      NATS_URL: nats://nats:4222
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+  product-mgmt:
+    build: ./product-management
+    ports:
+      - "8083:8083"
+      - "9003:9003"
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/product
+      NATS_URL: nats://nats:4222
+      IDENTITY_GRPC_ADDR: identity:9002
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+  scan-orchestrator:
+    build: ./scan-orchestrator
+    ports:
+      - "8084:8084"
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/scan
+      NATS_URL: nats://nats:4222
+      IDENTITY_GRPC_ADDR: identity:9002
+      PRODUCT_GRPC_ADDR: product-mgmt:9003
+      FINDING_GRPC_ADDR: finding-mgmt:9005
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+  finding-mgmt:
+    build: ./finding-management
+    ports:
+      - "8085:8085"
+      - "9005:9005"
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/finding
+      NATS_URL: nats://nats:4222
+      IDENTITY_GRPC_ADDR: identity:9002
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+  sla:
+    build: ./sla
+    ports:
+      - "8086:8086"
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/sla
+      NATS_URL: nats://nats:4222
+      FINDING_GRPC_ADDR: finding-mgmt:9005
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+  notification:
+    build: ./notification
+    ports:
+      - "8087:8087"
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/notification
+      NATS_URL: nats://nats:4222
+      SMTP_HOST: ""
+      SMTP_PORT: "587"
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+  jira:
+    build: ./jira
+    ports:
+      - "8088:8088"
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/jira
+      NATS_URL: nats://nats:4222
+      FINDING_GRPC_ADDR: finding-mgmt:9005
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+  report:
+    build: ./report
+    ports:
+      - "8089:8089"
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/report
+      NATS_URL: nats://nats:4222
+      FINDING_GRPC_ADDR: finding-mgmt:9005
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+  search:
+    build: ./search
+    ports:
+      - "8090:8090"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      NATS_URL: nats://nats:4222
+    depends_on:
+      nats: { condition: service_healthy }
+
+  ai:
+    build: ./ai
+    ports:
+      - "8091:8091"
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/ai
+      NATS_URL: nats://nats:4222
+      FINDING_GRPC_ADDR: finding-mgmt:9005
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+  audit:
+    build: ./audit
+    ports:
+      - "8092:8092"
+    environment:
+      DATABASE_URL: postgres://defectdojo:defectdojo@postgres:5432/audit
+      NATS_URL: nats://nats:4222
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
+
+volumes:
+  nats-data:
+  pg-data:

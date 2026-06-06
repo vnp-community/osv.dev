@@ -1,0 +1,183 @@
+{
+  "title": "OSV.dev — Service Overview",
+  "uid": "osv-services-overview",
+  "schemaVersion": 39,
+  "tags": ["osv", "microservices", "enterprise"],
+  "time": { "from": "now-1h", "to": "now" },
+  "refresh": "30s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Service Health",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "expr": "up{job=~\"api-gateway|vulnerability-query|search|ai-enrichment|ingestion|web-bff\"}",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "value": 0, "color": "red" },
+              { "value": 1, "color": "green" }
+            ]
+          },
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } }
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "gRPC Request Rate (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "expr": "rate(osv_grpc_requests_total[1m])",
+          "legendFormat": "{{service}} / {{method}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "gRPC P99 Latency (ms)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, rate(osv_grpc_request_duration_seconds_bucket[5m])) * 1000",
+          "legendFormat": "{{service}} p99"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "gRPC Error Rate (%)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "expr": "100 * rate(osv_grpc_requests_total{status!=\"OK\"}[5m]) / rate(osv_grpc_requests_total[5m])",
+          "legendFormat": "{{service}} errors %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "value": 0, "color": "green" },
+              { "value": 1, "color": "yellow" },
+              { "value": 5, "color": "red" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Circuit Breaker State (0=Closed, 1=HalfOpen, 2=Open)",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        {
+          "expr": "osv_circuit_breaker_state",
+          "legendFormat": "{{service}} / {{downstream}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": {
+              "0": { "text": "CLOSED", "color": "green" },
+              "1": { "text": "HALF-OPEN", "color": "yellow" },
+              "2": { "text": "OPEN", "color": "red" }
+            }}
+          ]
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "AI Token Usage (daily)",
+      "type": "bargauge",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 20 },
+      "targets": [
+        {
+          "expr": "osv_ai_tokens_total",
+          "legendFormat": "{{provider}}"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Redis Cache Hit Rate (%)",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 20 },
+      "targets": [
+        {
+          "expr": "100 * rate(osv_cache_hits_total[5m]) / (rate(osv_cache_hits_total[5m]) + rate(osv_cache_misses_total[5m]))",
+          "legendFormat": "Cache hit %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0, "max": 100,
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              { "value": 0, "color": "red" },
+              { "value": 60, "color": "yellow" },
+              { "value": 80, "color": "green" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "OpenSearch kNN Latency p99 (ms)",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 20 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, rate(osv_search_knn_duration_seconds_bucket[5m])) * 1000",
+          "legendFormat": "kNN p99"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "NATS Message Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 26 },
+      "targets": [
+        {
+          "expr": "rate(nats_consumer_msgs_received_total[1m])",
+          "legendFormat": "{{consumer}}"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(up, job)",
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  }
+}
