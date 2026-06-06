@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog"
 
 	"github.com/osv/api-gateway/internal/adapter/upstream"
+	"github.com/osv/api-gateway/internal/adapter/grpcclient"
 	"github.com/osv/api-gateway/internal/domain/entity"
 	gatemw "github.com/osv/api-gateway/internal/delivery/http/middleware"
 	pkghealth "github.com/osv/pkg/health"
@@ -21,21 +22,23 @@ import (
 
 // CVEHandler extends the base Handler with v1 use cases.
 type CVEHandler struct {
-	upstream *upstream.HTTPUpstreamClient
-	cfg      Config
-	log      zerolog.Logger
+	upstream       *upstream.HTTPUpstreamClient
+	cfg            Config
+	log            zerolog.Logger
 
 	// v1 use cases (nil if not configured)
-	scanUC   *scan.UseCase
-	dbsyncUC *dbsync.UseCase
-	reportUC *report.UseCase
+	scanUC        *scan.UseCase
+	dbsyncUC      *dbsync.UseCase
+	reportUC      *report.UseCase
+	sbomvexClient *grpcclient.SBOMVEXClient
 }
 
 // CVEHandlerOptions configures v1 use cases.
 type CVEHandlerOptions struct {
-	ScanUC   *scan.UseCase
-	DBSyncUC *dbsync.UseCase
-	ReportUC *report.UseCase
+	ScanUC        *scan.UseCase
+	DBSyncUC      *dbsync.UseCase
+	ReportUC      *report.UseCase
+	SBOMVEXClient *grpcclient.SBOMVEXClient
 }
 
 // NewCVEHandler creates a CVEHandler.
@@ -45,12 +48,13 @@ func NewCVEHandler(cfg Config, opts CVEHandlerOptions, log zerolog.Logger) *CVEH
 		services[name] = upstream.UpstreamConfig{URL: url, Timeout: 15 * time.Second}
 	}
 	return &CVEHandler{
-		upstream: upstream.NewHTTPUpstreamClient(services),
-		cfg:      cfg,
-		log:      log,
-		scanUC:   opts.ScanUC,
-		dbsyncUC: opts.DBSyncUC,
-		reportUC: opts.ReportUC,
+		upstream:       upstream.NewHTTPUpstreamClient(services),
+		cfg:            cfg,
+		log:            log,
+		scanUC:         opts.ScanUC,
+		dbsyncUC:       opts.DBSyncUC,
+		reportUC:       opts.ReportUC,
+		sbomvexClient:  opts.SBOMVEXClient,
 	}
 }
 
@@ -133,6 +137,15 @@ func NewCVERouter(h *CVEHandler, log zerolog.Logger, rateLimiter *gatemw.IPRateL
 		// Report
 		r.Post("/report", h.handleGenerateReport)
 		r.Get("/report/formats", h.handleListFormats)
+
+		// SBOM
+		r.Post("/sbom/parse", h.HandleSBOMParse)
+		r.Post("/sbom/generate", h.HandleSBOMGenerate)
+		r.Post("/sbom/detect", h.HandleSBOMDetect)
+
+		// VEX
+		r.Post("/vex/parse", h.HandleVEXParse)
+		r.Post("/vex/generate", h.HandleVEXGenerate)
 	})
 
 	// v2 API — GlobalCVE proxy (unchanged)

@@ -15,6 +15,6 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=builder /report-service /report-service
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-EXPOSE 9107
+EXPOSE 50054
 USER nonroot:nonroot
 ENTRYPOINT ["/report-service"]

@@ -65,13 +65,32 @@ services:
     build: { context: ., dockerfile: api-gateway/Dockerfile }
     container_name: ovs-api-gateway
     restart: unless-stopped
-    ports: ["8443:8443"]
+    ports:
+      - "8080:8080"     # REST API
+      - "9090:9090"     # gRPC
     environment:
       AUTH_GRPC_ADDR: auth-service:9001
       REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      # NEW: gRPC upstream addresses for CVE Binary Tool
+      SCANNER_ADDR: scanner:50051
+      CVEDB_ADDR: cve-service:50052
+      DATASYNC_ADDR: cve-sync-service:50053
+      REPORTER_ADDR: report-service:50054
+      SBOMVEX_ADDR: sbomvex:50055
+      # Keep existing upstreams for v2 compatibility
+      CVE_SERVICE_URL: http://cve-service:9104
     depends_on:
       auth-service:
         condition: service_healthy
+      scanner:
+        condition: service_started
+      sbomvex:
+        condition: service_started
+      cve-sync-service:
+        condition: service_started
+      report-service:
+        condition: service_started
 
   auth-service:
     build: { context: ., dockerfile: auth-service/Dockerfile }
@@ -133,12 +152,18 @@ services:
     container_name: ovs-cve-service
     restart: unless-stopped
     ports:
-      - "9104:9104"
-      - "9004:9004"
+      - "9104:9104"    # HTTP REST
+      - "9004:9004"    # gRPC (legacy)
+    expose:
+      - "50052"        # NEW: CVE Binary Tool gRPC
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=cve&sslmode=disable
       REDIS_URL: redis://redis:6379
       NATS_URL: nats://nats:4222
+      GRPC_PORT: 50052
+    volumes:
+      - cvedb-data:/data
+      - cvedb-backup:/data-backup
     depends_on: [postgres, redis, nats]
 
   agent-service:
@@ -167,16 +192,63 @@ services:
     build: { context: ., dockerfile: report-service/Dockerfile }
     container_name: ovs-report-service
     restart: unless-stopped
-    ports: ["9107:9107"]
+    expose:
+      - "50054"        # NEW: gRPC port
     environment:
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=report&sslmode=disable
-      MINIO_ENDPOINT: minio:9000
-      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
-      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
-      SCAN_GRPC_ADDR: scan-service:9002
-      ASSET_GRPC_ADDR: asset-service:9003
-      CVE_GRPC_ADDR: cve-service:9004
-    depends_on: [postgres, minio]
+      GRPC_PORT: 50054
+      PDF_ENABLED: "true"
+    networks:
+      - default
+
+  # ── CVE Binary Tool NEW Services ─────────────────────────────────────────────
+  cve-sync-service:
+    build: { context: ., dockerfile: cve-sync-service/Dockerfile }
+    container_name: ovs-cve-sync-service
+    restart: unless-stopped
+    expose:
+      - "50053"        # gRPC
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/openvulnscan?search_path=cve&sslmode=disable
+      GRPC_PORT: 50053
+      CVEDB_ADDR: cve-service:50052
+      NVD_MODE: ${NVD_MODE:-json-mirror}
+      NVD_API_KEY: ${NVD_API_KEY:-}
+      GAD_GITHUB_TOKEN: ${GAD_GITHUB_TOKEN:-}
+    volumes:
+      - datasync-cache:/cache
+    depends_on: [cve-service]
+
+  scanner:
+    build:
+      context: ./scanner
+      dockerfile: Dockerfile
+    container_name: ovs-scanner
+    restart: unless-stopped
+    expose:
+      - "50051"        # gRPC
+    environment:
+      GRPC_PORT: 50051
+      EXTRACTOR_ENABLED: "true"
+      EXTRACTOR_MAX_DEPTH: "10"
+    volumes:
+      - /tmp/ovs-scanner:/tmp
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8086/health || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  sbomvex:
+    build:
+      context: ./sbomvex
+      dockerfile: Dockerfile
+    container_name: ovs-sbomvex
+    restart: unless-stopped
+    expose:
+      - "50055"        # gRPC
+    environment:
+      GRPC_PORT: 50055
+      VALIDATION_ENABLED: "true"
 
   # ── Observability ────────────────────────────────────────────────────────────
   prometheus:
@@ -206,3 +278,6 @@ volumes:
   pgdata:
   miniodata:
   grafanadata:
+  cvedb-data:
+  cvedb-backup:
+  datasync-cache:
