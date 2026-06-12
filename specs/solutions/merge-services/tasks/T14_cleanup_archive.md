@@ -1,7 +1,8 @@
-# T14 — Cleanup: Delete Archive & Old Services
+# T14 — Cleanup: Delete Archive & Old Services ✅ DONE
 
 **Phase**: 14 (FINAL)
 **Depends on**: T13
+**Status**: ✅ Completed — 2026-06-12
 **Estimated effort**: 15 minutes
 
 > ⚠️ **KHÔNG THỰC HIỆN BƯỚC NÀY cho đến khi TẤT CẢ điều kiện prerequisite hoàn thành.**
@@ -221,13 +222,13 @@ archive/   (45 services)        shared/    (unchanged)
 
 ## Điều kiện hoàn thành CUỐI CÙNG
 
-- [ ] Pre-condition script pass (tất cả 8 services build OK)
-- [ ] Git tag `merge-complete` tạo thành công trước khi xoá
-- [ ] `services/` chỉ còn 8 core services + `shared/`
-- [ ] `archive/` KHÔNG còn tồn tại
-- [ ] Tất cả 8 services build pass sau cleanup
-- [ ] Git commit final với message mô tả đầy đủ
-- [ ] Git tag `v1.0.0-merged`
+- [x] Pre-condition script pass (tất cả 8 services build OK trước khi xóa)
+- [x] Git tag `merge-complete` tạo thành công trước khi xóa (commit: aa8a5e3d)
+- [x] `services/` chỉ còn 8 core services + `shared/` (9 total)
+- [x] `archive/` KHÔNG còn tồn tại (154MB deleted, 45 services removed)
+- [x] Tất cả 8 services build pass sau cleanup
+- [x] Git commit final với message mô tả đầy đủ
+- [x] Git tag `v1.0.0-merged` (commit: b444b5d5)
 
 ---
 

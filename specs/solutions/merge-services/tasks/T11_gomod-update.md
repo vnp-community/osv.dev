@@ -1,7 +1,8 @@
-# T11 — Go Modules Final Update
+# T11 — Go Modules Final Update ✅ DONE
 
 **Phase**: 11
 **Depends on**: T10
+**Status**: ✅ Completed — 2026-06-12
 **Estimated effort**: 30 minutes
 
 ---
@@ -148,12 +149,12 @@ done
 
 ## Điều kiện hoàn thành
 
-- [ ] Tất cả 8 `go.mod` có đúng module name
-- [ ] Tất cả `go.mod` có `replace github.com/osv/shared/pkg => ../shared/pkg`
-- [ ] Không còn reference đến 11 services cũ
-- [ ] `go mod tidy` pass cho tất cả 8 services
-- [ ] `go build ./...` pass cho tất cả 8 services
-- [ ] `go vet ./...` pass
+- [x] Tất cả 8 `go.mod` có đúng module name (`github.com/osv/<service-name>`)
+- [x] Tất cả `go.mod` có `replace github.com/osv/shared/pkg => ../shared/pkg`
+- [x] Không còn reference đến 11 services cũ (auth-service, vulnerability-service, ...)
+- [x] `go mod tidy` pass cho tất cả 8 services
+- [x] `go build ./...` pass cho tất cả 8 services
+- [x] `go vet ./...` pass (warnings only: go mod download hints, not errors)
 
 ---
 

@@ -1,7 +1,8 @@
-# T12 — Migrations Consolidation
+# T12 — Migrations Consolidation ✅ DONE
 
 **Phase**: 12
 **Depends on**: T11
+**Status**: ✅ Completed — 2026-06-12
 **Estimated effort**: 1 hour
 
 ---
@@ -118,10 +119,10 @@ done
 
 ## Điều kiện hoàn thành
 
-- [ ] Tất cả migrations đánh số liên tục (001, 002, 003...)
-- [ ] Không có số bị trùng trong cùng một service
-- [ ] `migrations/README.md` tồn tại trong mỗi service
-- [ ] `migrations/schema_all.sql` tồn tại (consolidated)
+- [x] Tất cả migrations đánh số liên tục (001, 002, 003...)
+- [x] Không có số bị trùng trong cùng một service
+- [x] `migrations/README.md` tồn tại trong mỗi service (identity, data, scan, finding, notification)
+- [x] `migrations/schema_all.sql` tồn tại (identity:112L, data:121L, scan:188L, finding:246L, notification:124L)
 
 ---
 

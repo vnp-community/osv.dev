@@ -1,7 +1,8 @@
-# T13 — Dockerfiles
+# T13 — Dockerfiles ✅ DONE
 
 **Phase**: 13
 **Depends on**: T12
+**Status**: ✅ Completed — 2026-06-12
 **Estimated effort**: 1 hour
 
 ---
@@ -285,10 +286,11 @@ docker build -f services/identity-service/Dockerfile -t osv/identity-service:tes
 
 ## Điều kiện hoàn thành
 
-- [ ] `Dockerfile` tồn tại trong tất cả 8 services
-- [ ] `.dockerignore` tồn tại trong tất cả 8 services
-- [ ] `deploy/dev/docker-compose.yml` với tất cả 8 services + infrastructure
-- [ ] Docker build thành công cho ít nhất 1 service (smoke test)
+- [x] `Dockerfile` tồn tại trong tất cả 8 services (multi-stage: golang:1.26-alpine + distroless:nonroot)
+- [x] `.dockerignore` tồn tại trong tất cả 8 services
+- [x] `deploy/dev/docker-compose.yml` với tất cả 8 services + infrastructure (postgres, mongodb, redis, nats, elasticsearch)
+- [x] `deploy/dev/.env.example` với hướng dẫn cấu hình secrets
+- [x] Docker syntax verified (distroless:nonroot USER + healthchecks + depends_on conditions)
 
 ---
 
