@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package osv.ai.v1;
+
+option go_package = "github.com/osv/shared/proto/gen/go/ai/v1;aiv1";
+
+service AIEnrichmentService {
+  rpc EnrichCVE(EnrichCVERequest) returns (EnrichCVEResponse);
+  rpc GetEnrichment(GetEnrichmentRequest) returns (EnrichCVEResponse);
+  rpc GetEPSS(GetEPSSRequest) returns (EPSSResponse);
+  rpc TriageFinding(TriageFindingRequest) returns (TriageResponse);
+  rpc GenerateEmbedding(GenerateEmbeddingRequest) returns (EmbeddingResponse);
+  rpc BatchEnrich(BatchEnrichRequest) returns (BatchEnrichResponse);
+}
+
+message EnrichCVERequest { string cve_id = 1; bool force_refresh = 2; }
+
+message EnrichCVEResponse {
+  string cve_id = 1;
+  string summary_short = 2;
+  string summary_long = 3;
+  string impact_analysis = 4;
+  string remediation_guide = 5;
+  double epss_score = 6;
+  repeated string mitre_tags = 7;
+  string severity_ml = 8;
+  bool has_exploit = 9;
+  double confidence = 10;
+}
+
+message GetEnrichmentRequest { string cve_id = 1; }
+
+message GetEPSSRequest { string cve_id = 1; }
+message EPSSResponse {
+  string cve_id = 1;
+  double score = 2;
+  double percentile = 3;
+}
+
+message TriageFindingRequest { string finding_id = 1; string cve_id = 2; }
+message TriageResponse {
+  int32 priority = 1;
+  string rationale = 2;
+  string suggestion = 3;
+  double confidence = 4;
+  repeated string context_factors = 5;
+}
+
+message GenerateEmbeddingRequest { string cve_id = 1; string text = 2; }
+message EmbeddingResponse {
+  string cve_id = 1;
+  repeated float values = 2;
+  int32 dimensions = 3;
+}
+
+message BatchEnrichRequest { repeated string cve_ids = 1; }
+message BatchEnrichResponse {
+  int32 queued = 1;
+  repeated string failed = 2;
+}

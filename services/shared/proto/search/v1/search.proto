@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package osv.search.v1;
+
+option go_package = "github.com/osv/shared/proto/gen/go/search/v1;searchv1";
+
+service SearchService {
+  rpc Search(SearchRequest) returns (SearchResponse);
+  rpc Suggest(SuggestRequest) returns (SuggestResponse);
+  rpc Aggregate(AggregateRequest) returns (AggregateResponse);
+  rpc IndexCVE(IndexCVERequest) returns (IndexCVEResponse);
+}
+
+message SearchRequest {
+  string keyword = 1;
+  repeated string severity = 2;
+  repeated string ecosystems = 3;
+  bool kev_only = 4;
+  int32 page = 5;
+  int32 size = 6;
+  string cursor = 7;
+}
+
+message SearchResponse {
+  int64 total = 1;
+  repeated SearchHit hits = 2;
+  int64 took_ms = 3;
+  string next_cursor = 4;
+}
+
+message SearchHit {
+  string cve_id = 1;
+  float score = 2;
+  string title = 3;
+  string severity = 4;
+  double cvss_score = 5;
+  bool is_kev = 6;
+  repeated string ecosystems = 7;
+}
+
+message SuggestRequest {
+  string prefix = 1;
+  int32 limit = 2;
+}
+message SuggestResponse { repeated string suggestions = 1; }
+
+message AggregateRequest {}
+message AggregateResponse {
+  map<string, int64> severity_dist = 1;
+  int64 total_cve = 2;
+  int64 kev_count = 3;
+  int64 exploit_count = 4;
+}
+
+message IndexCVERequest { string cve_id = 1; bool force = 2; }
+message IndexCVEResponse { bool success = 1; }
