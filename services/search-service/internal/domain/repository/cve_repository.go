@@ -1,0 +1,22 @@
+// Package repository defines CVE persistence interfaces for the search service.
+package repository
+
+import (
+	"context"
+
+	"github.com/osv/search-service/internal/domain/entity"
+)
+
+// CVERepository is the read-side persistence interface.
+type CVERepository interface {
+	Search(ctx context.Context, filter *entity.SearchFilter) ([]*entity.CVE, int64, error)
+	FindByID(ctx context.Context, id string) (*entity.CVE, error)
+	Count(ctx context.Context) (int64, error)
+}
+
+// CVECacheRepository caches search results in Redis.
+type CVECacheRepository interface {
+	GetSearchResult(ctx context.Context, key string) ([]byte, error)
+	SetSearchResult(ctx context.Context, key string, data []byte, ttlSec int) error
+	InvalidatePattern(ctx context.Context, pattern string) error
+}

@@ -1,0 +1,368 @@
+version: "3.9"
+
+# ─── OSV.dev Local Development Stack ──────────────────────────────────────────
+# Starts all infrastructure + all 12 microservices
+#
+# Usage:
+#   docker-compose up -d infra     # Start infrastructure only
+#   docker-compose up -d           # Start everything
+#   docker-compose logs -f search  # Follow service logs
+#
+# Port Map:
+#   API Gateway:        8080 (HTTP) / 9090 (gRPC)
+#   Web BFF:            8090 (HTTP)
+#   Vuln Query:         50051 (gRPC) / 8081 (health)
+#   Search:             50052 (gRPC) / 8082 (health)
+#   Ingestion:          50053 (gRPC) / 8083 (health)
+#   AI Enrichment:      50054 (gRPC) / 8084 (health)
+#   Impact Analysis:    50055 (gRPC) / 8085 (health)
+#   Version Index:      50056 (gRPC) / 8086 (health)
+#   Alias Relations:    50057 (gRPC) / 8087 (health)
+#   Notification:       50058 (gRPC) / 8088 (health)
+#   Source Sync:        8089 (health)
+#   NATS:               4222
+#   Redis:              6379
+#   OpenSearch:         9200
+#   Firestore Emulator: 8200
+#   Ollama:             11434
+#   OTel Collector:     4318
+#   Prometheus:         9091
+#   Grafana:            3000
+
+x-common-env: &common-env
+  GCP_PROJECT_ID: osv-local
+  NATS_URL: nats://nats:4222
+  REDIS_ADDR: redis:6379
+  FIRESTORE_EMULATOR_HOST: firestore-emulator:8200
+  OTLP_ENDPOINT: http://otel-collector:4318
+  OTEL_SAMPLING_RATE: "1.0"
+
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+  depends_on:
+    nats:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    firestore-emulator:
+      condition: service_started
+
+# ─── Infrastructure ────────────────────────────────────────────────────────────
+services:
+
+  nats:
+    image: nats:2.10-alpine
+    command: ["-js", "-m", "8222", "--name", "osv-nats"]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - nats-data:/data
+    profiles: [infra, all]
+
+  redis:
+    image: redis:7.2-alpine
+    command: redis-server --save 60 1 --loglevel warning --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - redis-data:/data
+    profiles: [infra, all]
+
+  opensearch:
+    image: opensearchproject/opensearch:2.17.1
+    environment:
+      discovery.type: single-node
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+      DISABLE_SECURITY_PLUGIN: "true"
+      plugins.security.disabled: "true"
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -v '\"status\":\"red\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    profiles: [infra, all]
+
+  firestore-emulator:
+    image: google/cloud-sdk:latest
+    command: >
+      gcloud emulators firestore start
+      --host-port=0.0.0.0:8200
+      --project=osv-local
+    ports:
+      - "8200:8200"
+    environment:
+      CLOUDSDK_CORE_PROJECT: osv-local
+    profiles: [infra, all]
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      OLLAMA_NUM_PARALLEL: "2"
+      OLLAMA_MAX_LOADED_MODELS: "2"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              count: all
+    profiles: [infra, all]
+
+  # OTel Collector — receives traces + metrics, exports to Prometheus/Jaeger
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otelcol/config.yaml"]
+    ports:
+      - "4317:4317"  # gRPC OTLP
+      - "4318:4318"  # HTTP OTLP
+      - "8888:8888"  # Prometheus metrics
+    volumes:
+      - ../../infrastructure/config/otel-collector.yaml:/etc/otelcol/config.yaml:ro
+    profiles: [infra, all]
+
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=7d'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9091:9090"
+    volumes:
+      - ../../infrastructure/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    profiles: [infra, all]
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ../../infrastructure/config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+    depends_on: [prometheus]
+    profiles: [infra, all]
+
+# ─── Services ──────────────────────────────────────────────────────────────────
+
+  vulnerability-query:
+    build:
+      context: ../../services/vulnerability-query
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+      - "8081:8080"
+      - "9181:9090"  # Prometheus metrics
+    environment:
+      <<: *common-env
+      GCS_BUCKET: osv-vulnerabilities-local
+      ALIAS_SERVICE_ADDR: alias-relations:50057
+    <<: *service-defaults
+    profiles: [services, all]
+
+  ingestion:
+    build:
+      context: ../../services/ingestion
+      dockerfile: Dockerfile
+    ports:
+      - "50053:50051"
+      - "8083:8080"
+      - "9183:9090"
+    environment:
+      <<: *common-env
+      GCS_BUCKET: osv-vulnerabilities-local
+    <<: *service-defaults
+    profiles: [services, all]
+
+  search:
+    build:
+      context: ../../services/search
+      dockerfile: Dockerfile
+    ports:
+      - "50052:50051"
+      - "8082:8080"
+      - "9182:9090"
+    environment:
+      <<: *common-env
+      OPENSEARCH_URL: http://opensearch:9200
+      OPENSEARCH_INDEX: vulnerabilities
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles: [services, all]
+
+  ai-enrichment:
+    build:
+      context: ../../services/ai-enrichment
+      dockerfile: Dockerfile
+    ports:
+      - "50054:50051"
+      - "8084:8080"
+      - "9184:9090"
+    environment:
+      <<: *common-env
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: nomic-embed-text
+      OLLAMA_LLM_MODEL: llama3.2
+      AI_PROVIDER_PRIMARY: vertex
+      VERTEX_PROJECT_ID: osv-local
+      VERTEX_REGION: us-central1
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    <<: *service-defaults
+    profiles: [services, all]
+
+  impact-analysis:
+    build:
+      context: ../../services/impact-analysis
+      dockerfile: Dockerfile
+    ports:
+      - "50055:50051"
+      - "8085:8080"
+      - "9185:9090"
+    environment:
+      <<: *common-env
+      CLONE_DIR: /tmp/repos
+    <<: *service-defaults
+    volumes:
+      - repo-cache:/tmp/repos
+    profiles: [services, all]
+
+  version-index-controller:
+    build:
+      context: ../../services/version-index
+      dockerfile: Dockerfile
+      target: controller
+    ports:
+      - "8086:8081"
+    environment:
+      <<: *common-env
+    <<: *service-defaults
+    profiles: [services, all]
+
+  version-index-worker:
+    build:
+      context: ../../services/version-index
+      dockerfile: Dockerfile
+      target: worker
+    ports:
+      - "8096:8082"
+    environment:
+      <<: *common-env
+      CLONE_DIR: /tmp/repos
+    <<: *service-defaults
+    volumes:
+      - repo-cache:/tmp/repos
+    deploy:
+      replicas: 3
+    profiles: [services, all]
+
+  alias-relations:
+    build:
+      context: ../../services/alias-relations
+      dockerfile: Dockerfile
+    ports:
+      - "50057:50051"
+      - "8087:8080"
+      - "9187:9090"
+    environment:
+      <<: *common-env
+    <<: *service-defaults
+    profiles: [services, all]
+
+  notification:
+    build:
+      context: ../../services/notification
+      dockerfile: Dockerfile
+    ports:
+      - "50058:50051"
+      - "8088:8080"
+      - "9188:9090"
+    environment:
+      <<: *common-env
+    <<: *service-defaults
+    profiles: [services, all]
+
+  source-sync:
+    build:
+      context: ../../services/source-sync
+      dockerfile: Dockerfile
+    ports:
+      - "8089:8080"
+      - "9189:9090"
+    environment:
+      <<: *common-env
+    <<: *service-defaults
+    profiles: [services, all]
+
+  web-bff:
+    build:
+      context: ../../services/web-bff
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8080"
+    environment:
+      <<: *common-env
+      QUERY_SERVICE_ADDR: vulnerability-query:50051
+      SEARCH_SERVICE_ADDR: search:50052
+      AI_ENRICHMENT_ADDR: ai-enrichment:50054
+      ALLOWED_ORIGINS: "http://localhost:3001,http://localhost:5173"
+    depends_on: [vulnerability-query, search, ai-enrichment]
+    profiles: [services, all]
+
+  api-gateway:
+    build:
+      context: ../../services/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    environment:
+      <<: *common-env
+      JWKS_URL: "${JWKS_URL:-http://localhost:8080/.well-known/jwks.json}"
+      JWT_AUDIENCE: "${JWT_AUDIENCE:-osv-api}"
+      JWT_ISSUER: "${JWT_ISSUER:-https://accounts.google.com}"
+    depends_on: [web-bff, vulnerability-query, search]
+    profiles: [services, all]
+
+# ─── Volumes ───────────────────────────────────────────────────────────────────
+volumes:
+  nats-data:
+  redis-data:
+  opensearch-data:
+  ollama-data:
+  prometheus-data:
+  grafana-data:
+  repo-cache:

@@ -1,0 +1,138 @@
+// Package grpcclient provides a gRPC client for the CVEDB service.
+// Used by the DataSync service to push CVE data batches after fetching.
+package grpcclient
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/rs/zerolog"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/osv/ingestion-service/internal/adapter/external/sources"
+	pbcvedb "github.com/osv/shared/proto/gen/go/cvedb/v1"
+)
+
+// CVEDBClient is a gRPC client that pushes CVE data to the CVEDB service.
+type CVEDBClient struct {
+	conn   *grpc.ClientConn
+	client pbcvedb.CVEDBServiceClient
+	log    zerolog.Logger
+}
+
+// NewCVEDBClient creates a new CVEDBClient connecting to addr (e.g. "localhost:50052").
+func NewCVEDBClient(addr string, log zerolog.Logger) (*CVEDBClient, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, addr, //nolint:staticcheck
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("cvedb client: connect to %s: %w", addr, err)
+	}
+
+	return &CVEDBClient{
+		conn:   conn,
+		client: pbcvedb.NewCVEDBServiceClient(conn),
+		log:    log.With().Str("component", "CVEDBClient").Logger(),
+	}, nil
+}
+
+// Close releases the gRPC connection.
+func (c *CVEDBClient) Close() error {
+	return c.conn.Close()
+}
+
+// PopulateDB sends a CVEData batch to the CVEDB service for storage.
+func (c *CVEDBClient) PopulateDB(ctx context.Context, data sources.CVEData) error {
+	batch := convertToBatch(data)
+	req := &pbcvedb.PopulateDBRequest{Batches: []*pbcvedb.CVEDataBatch{batch}}
+
+	resp, err := c.client.PopulateDB(ctx, req)
+	if err != nil {
+		return fmt.Errorf("cvedb.PopulateDB(%s): %w", data.Source, err)
+	}
+
+	c.log.Debug().
+		Str("source", data.Source).
+		Int32("severities", resp.GetSeveritiesInserted()).
+		Int32("ranges", resp.GetRangesInserted()).
+		Int32("metrics", resp.GetMetricsInserted()).
+		Int32("purl2cpes", resp.GetPurl2CpesInserted()).
+		Msg("PopulateDB done")
+
+	return nil
+}
+
+// PopulateDBBatch sends multiple CVEData batches in a single RPC call.
+func (c *CVEDBClient) PopulateDBBatch(ctx context.Context, batches []sources.CVEData) error {
+	pbBatches := make([]*pbcvedb.CVEDataBatch, 0, len(batches))
+	for _, b := range batches {
+		pbBatches = append(pbBatches, convertToBatch(b))
+	}
+
+	req := &pbcvedb.PopulateDBRequest{Batches: pbBatches}
+	_, err := c.client.PopulateDB(ctx, req)
+	if err != nil {
+		return fmt.Errorf("cvedb.PopulateDB (batch=%d): %w", len(batches), err)
+	}
+	return nil
+}
+
+// InitDB triggers CVEDB to initialize/rebuild its schema.
+func (c *CVEDBClient) InitDB(ctx context.Context) error {
+	_, err := c.client.InitDB(ctx, &pbcvedb.InitDBRequest{ForceRebuild: false})
+	return err
+}
+
+// convertToBatch converts sources.CVEData to the proto CVEDataBatch.
+func convertToBatch(data sources.CVEData) *pbcvedb.CVEDataBatch {
+	batch := &pbcvedb.CVEDataBatch{Source: data.Source}
+
+	for _, s := range data.Severities {
+		batch.Severities = append(batch.Severities, &pbcvedb.CVESeverityRow{
+			CveNumber:   s.CVENumber,
+			Severity:    s.Severity,
+			Description: s.Description,
+			Score:       float32(s.Score),
+			CvssVersion: int32(s.CVSSVersion),
+			CvssVector:  s.CVSSVector,
+		})
+	}
+
+	for _, r := range data.Ranges {
+		batch.Ranges = append(batch.Ranges, &pbcvedb.CVERangeRow{
+			CveNumber:             r.CVENumber,
+			Vendor:                r.Vendor,
+			Product:               r.Product,
+			Version:               r.Version,
+			VersionStartIncluding: r.VersionStartIncluding,
+			VersionStartExcluding: r.VersionStartExcluding,
+			VersionEndIncluding:   r.VersionEndIncluding,
+			VersionEndExcluding:   r.VersionEndExcluding,
+			DataSource:            r.DataSource,
+		})
+	}
+
+	for _, m := range data.Metrics {
+		batch.Metrics = append(batch.Metrics, &pbcvedb.CVEMetricRow{
+			CveNumber:   m.CVENumber,
+			MetricId:    int32(m.MetricID),
+			MetricScore: float32(m.MetricScore),
+			MetricField: m.MetricField,
+		})
+	}
+
+	for _, p := range data.PURL2CPEs {
+		batch.Purl2Cpes = append(batch.Purl2Cpes, &pbcvedb.PURL2CPERow{
+			Purl: p.PURL,
+			Cpe:  p.CPE,
+		})
+	}
+
+	return batch
+}

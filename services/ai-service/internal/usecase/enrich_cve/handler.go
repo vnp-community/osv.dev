@@ -1,0 +1,214 @@
+// Package enrich_vulnerability orchestrates the full AI enrichment pipeline.
+// Triggered by VulnImported events; produces AIEnrichmentCompleted events.
+package enrich_vulnerability
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/osv/ai-service/internal/domain/enrichment/port"
+	"github.com/osv/ai-service/internal/domain/enrichment"
+	"github.com/rs/zerolog"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+)
+
+// Command triggers enrichment for a single vulnerability.
+type Command struct {
+	VulnID      string
+	Summary     string
+	Details     string
+	References  []string
+	CVSSScore   float64
+	CVSSVector  string
+	Ecosystems  []string
+}
+
+// Result contains the enriched metadata produced by this command.
+type Result struct {
+	VulnID              string
+	Severity            string // CRITICAL | HIGH | MEDIUM | LOW | NONE
+	TechnicalSummary    string
+	RemediationAdvice   string
+	AttackVectorTags    []string
+	ExploitabilityScore float64
+	Embedding           []float32
+	EnrichedAt          time.Time
+}
+
+// EnrichmentRepo persists AI enrichment results.
+type EnrichmentRepo interface {
+	Save(ctx context.Context, result *Result) error
+	GetByVulnID(ctx context.Context, vulnID string) (*Result, error)
+}
+
+// Handler orchestrates embedding, classification, and text generation.
+type Handler struct {
+	embedding   *service.EmbeddingService
+	classifier  *service.SeverityClassifier
+	llm         port.LLMProvider
+	repo        EnrichmentRepo
+	publisher   port.EventPublisher
+	tracer      trace.Tracer
+	log         zerolog.Logger
+}
+
+// NewHandler creates a new enrichment handler.
+func NewHandler(
+	embedding *service.EmbeddingService,
+	classifier *service.SeverityClassifier,
+	llm port.LLMProvider,
+	repo EnrichmentRepo,
+	publisher port.EventPublisher,
+	tracer trace.Tracer,
+	log zerolog.Logger,
+) *Handler {
+	return &Handler{
+		embedding:  embedding,
+		classifier: classifier,
+		llm:        llm,
+		repo:       repo,
+		publisher:  publisher,
+		tracer:     tracer,
+		log:        log,
+	}
+}
+
+// Handle runs the full enrichment pipeline for a vulnerability.
+func (h *Handler) Handle(ctx context.Context, cmd Command) (*Result, error) {
+	ctx, span := h.tracer.Start(ctx, "EnrichVulnerability")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("vuln_id", cmd.VulnID))
+
+	h.log.Info().Str("vuln_id", cmd.VulnID).Msg("enrichment started")
+
+	// 1. Generate text embedding (cached in Redis for 7 days)
+	descText := buildEnrichmentText(cmd)
+	embedding, err := h.embedding.GenerateForVuln(ctx, cmd.VulnID, cmd.Summary, cmd.Details)
+	if err != nil {
+		h.log.Warn().Err(err).Str("vuln_id", cmd.VulnID).Msg("embedding failed, continuing without")
+		embedding = nil
+	}
+
+	// 2. Classify severity
+	severity, err := h.classifier.Classify(ctx, cmd.Summary, descText, nil)
+	if err != nil {
+		h.log.Warn().Err(err).Str("vuln_id", cmd.VulnID).Msg("severity classification failed")
+		severity = &service.SeverityPrediction{Severity: "UNKNOWN", Confidence: 0}
+	}
+
+	// 3. Generate technical summary + remediation (LLM)
+	technicalSummary, remediationAdvice, err := h.generateTextEnrichments(ctx, cmd)
+	if err != nil {
+		h.log.Warn().Err(err).Str("vuln_id", cmd.VulnID).Msg("text generation failed, using fallback")
+		technicalSummary = cmd.Summary
+		remediationAdvice = ""
+	}
+
+	// 4. Extract attack vector tags (keyword extraction from LLM)
+	tags, err := h.extractTags(ctx, descText)
+	if err != nil {
+		h.log.Warn().Err(err).Msg("tag extraction failed")
+		tags = nil
+	}
+
+	result := &Result{
+		VulnID:            cmd.VulnID,
+		Severity:          string(severity.Severity),
+		TechnicalSummary:  technicalSummary,
+		RemediationAdvice: remediationAdvice,
+		AttackVectorTags:  tags,
+		Embedding:         embedding,
+		EnrichedAt:        time.Now().UTC(),
+	}
+
+	// 5. Persist to Firestore
+	if err := h.repo.Save(ctx, result); err != nil {
+		return nil, fmt.Errorf("save enrichment %s: %w", cmd.VulnID, err)
+	}
+
+	// 6. Publish AIEnrichmentCompleted event
+	evt := &aiEnrichmentCompletedEvent{
+		EventID:      fmt.Sprintf("ai-%s-%d", cmd.VulnID, time.Now().UnixNano()),
+		EventType:    "osv.ai.enrichment.completed",
+		VulnID:       cmd.VulnID,
+		HasEmbedding: len(embedding) > 0,
+		Embedding:    embedding,
+		Severity:     string(severity.Severity),
+		OccurredAt:   result.EnrichedAt,
+	}
+	if pubErr := h.publisher.Publish(ctx, evt); pubErr != nil {
+		h.log.Error().Err(pubErr).Str("vuln_id", cmd.VulnID).Msg("publish AIEnrichmentCompleted failed")
+	}
+
+	h.log.Info().Str("vuln_id", cmd.VulnID).Str("severity", string(severity.Severity)).Msg("enrichment completed")
+	return result, nil
+}
+
+func (h *Handler) generateTextEnrichments(ctx context.Context, cmd Command) (string, string, error) {
+	prompt := fmt.Sprintf(`You are a security expert. Analyze this vulnerability and respond in JSON with fields:
+- "technical_summary": one-sentence technical explanation (max 200 chars)
+- "remediation_advice": specific upgrade or mitigation instructions (max 300 chars)
+
+Vulnerability ID: %s
+Summary: %s
+Details: %s
+Ecosystems: %v
+
+Respond ONLY with valid JSON.`, cmd.VulnID, cmd.Summary, truncate(cmd.Details, 1000), cmd.Ecosystems)
+
+	type llmResponse struct {
+		TechnicalSummary  string `json:"technical_summary"`
+		RemediationAdvice string `json:"remediation_advice"`
+	}
+
+	var result llmResponse
+	if err := h.llm.GenerateStructured(ctx, prompt, &result); err != nil {
+		return "", "", err
+	}
+
+	return result.TechnicalSummary, result.RemediationAdvice, nil
+}
+
+func (h *Handler) extractTags(ctx context.Context, text string) ([]string, error) {
+	prompt := fmt.Sprintf(`Extract attack vector tags from this vulnerability description.
+Return JSON: {"tags": ["tag1", "tag2"]}
+Tags should be from: network, local, physical, unauthenticated, authenticated, rce, sqli, xss, csrf, lfi, ssrf, xxe, deserialization, buffer-overflow, dos, privilege-escalation
+Description: %s`, truncate(text, 500))
+
+	type tagResponse struct {
+		Tags []string `json:"tags"`
+	}
+	var result tagResponse
+	if err := h.llm.GenerateStructured(ctx, prompt, &result); err != nil {
+		return nil, err
+	}
+	return result.Tags, nil
+}
+
+func buildEnrichmentText(cmd Command) string {
+	return fmt.Sprintf("%s\n%s", cmd.Summary, cmd.Details)
+}
+
+func truncate(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	return s[:n] + "..."
+}
+
+// aiEnrichmentCompletedEvent is published after enrichment completes.
+type aiEnrichmentCompletedEvent struct {
+	EventID      string    `json:"event_id"`
+	EventType    string    `json:"event_type"`
+	VulnID       string    `json:"vuln_id"`
+	HasEmbedding bool      `json:"has_embedding"`
+	Embedding    []float32 `json:"embedding,omitempty"`
+	Severity     string    `json:"severity"`
+	OccurredAt   time.Time `json:"occurred_at"`
+}
+
+func (e *aiEnrichmentCompletedEvent) Topic() string { return "osv.ai.enrichment.completed" }
+func (e *aiEnrichmentCompletedEvent) ID() string    { return e.EventID }

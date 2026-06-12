@@ -1,0 +1,179 @@
+syntax = "proto3";
+package finding.v1;
+option go_package = "github.com/defectdojo/proto/finding/v1;findingv1";
+
+import "google/protobuf/timestamp.proto";
+
+// FindingService manages the full lifecycle of vulnerability findings.
+// Called by Scan Orchestrator (create/dedup), SLA Service (update SLA dates),
+// and Report Service (stream findings for report generation).
+service FindingService {
+  // Called by Scan Orchestrator
+  rpc BatchCreateFindings(BatchCreateFindingsRequest) returns (BatchCreateFindingsResponse);
+  rpc CloseOldFindings(CloseOldFindingsRequest) returns (CloseOldFindingsResponse);
+  rpc FindByHashCode(FindByHashCodeRequest) returns (FindByHashCodeResponse);
+  rpc ReactivateFindings(ReactivateFindingsRequest) returns (ReactivateFindingsResponse);
+  rpc ApplyTags(ApplyTagsRequest) returns (ApplyTagsResponse);
+
+  // Called by SLA Service
+  rpc BatchUpdateSLADates(BatchUpdateSLADatesRequest) returns (BatchUpdateSLADatesResponse);
+  rpc ListFindingsForSLACheck(ListFindingsForSLACheckRequest) returns (ListFindingsForSLACheckResponse);
+
+  // Called by Report Service (server-streaming to avoid OOM on large result sets)
+  rpc ListFindingsForReport(ListFindingsForReportRequest) returns (stream FindingProto);
+}
+
+// ── Finding creation ──────────────────────────────────────────────────────────
+
+message FindingInput {
+  string title = 1;
+  string description = 2;
+  string mitigation = 3;
+  string impact = 4;
+  string references = 5;
+  string severity = 6;       // "Critical" | "High" | "Medium" | "Low" | "Info"
+  string cve = 7;
+  int32 cwe = 8;
+  string vuln_id_from_tool = 9;
+  string cvss_v3 = 10;
+  optional double cvss_v3_score = 11;
+  bool active = 12;
+  bool verified = 13;
+  bool false_positive = 14;
+  bool duplicate = 15;
+  string component_name = 16;
+  string component_version = 17;
+  string file_path = 18;
+  int32 line_number = 19;
+  string service = 20;
+  string hash_code = 21;
+  repeated string tags = 22;
+  repeated string endpoints = 23;
+  google.protobuf.Timestamp date = 24;
+}
+
+message BatchCreateFindingsRequest {
+  string test_id = 1;
+  string engagement_id = 2;
+  string product_id = 3;
+  repeated FindingInput findings = 4;
+}
+
+message BatchCreateFindingsResponse {
+  repeated string finding_ids = 1;
+  int32 created = 2;
+}
+
+// ── Old finding closure ───────────────────────────────────────────────────────
+
+message CloseOldFindingsRequest {
+  string test_id = 1;
+  string engagement_id = 2;
+  bool deduplication_on_engagement = 3;
+  repeated string exclude_finding_ids = 4;  // findings from current scan
+  string mitigated_by_id = 5;
+}
+
+message CloseOldFindingsResponse {
+  int32 closed = 1;
+}
+
+// ── Deduplication lookup ──────────────────────────────────────────────────────
+
+message FindByHashCodeRequest {
+  string hash_code = 1;
+  string test_id = 2;
+  optional string engagement_id = 3;
+  optional string product_id = 4;
+  bool deduplication_on_engagement = 5;
+}
+
+message FindByHashCodeResponse {
+  optional string finding_id = 1;
+  optional string status = 2;  // "active" | "mitigated" | "false_positive"
+}
+
+// ── Reactivation ──────────────────────────────────────────────────────────────
+
+message ReactivateFindingsRequest {
+  repeated string finding_ids = 1;
+}
+
+message ReactivateFindingsResponse {
+  int32 reactivated = 1;
+}
+
+// ── Tag application ───────────────────────────────────────────────────────────
+
+message ApplyTagsRequest {
+  repeated string finding_ids = 1;
+  repeated string tags = 2;
+}
+
+message ApplyTagsResponse {}
+
+// ── SLA date updates ──────────────────────────────────────────────────────────
+
+message SLAUpdate {
+  string finding_id = 1;
+  google.protobuf.Timestamp expiration_date = 2;
+}
+
+message BatchUpdateSLADatesRequest {
+  repeated SLAUpdate updates = 1;
+}
+
+message BatchUpdateSLADatesResponse {
+  int32 updated = 1;
+}
+
+// ── SLA check listing ─────────────────────────────────────────────────────────
+
+message ListFindingsForSLACheckRequest {
+  repeated string finding_ids = 1;  // empty = return all active findings
+  bool active_only = 2;
+  bool has_sla_date = 3;            // filter to findings that have an SLA date set
+}
+
+message FindingForSLA {
+  string id = 1;
+  string severity = 2;
+  string product_id = 3;
+  google.protobuf.Timestamp date = 4;
+  optional google.protobuf.Timestamp sla_expiration_date = 5;
+}
+
+message ListFindingsForSLACheckResponse {
+  repeated FindingForSLA findings = 1;
+}
+
+// ── Report streaming ──────────────────────────────────────────────────────────
+
+message ListFindingsForReportRequest {
+  optional string product_id = 1;
+  optional string engagement_id = 2;
+  optional string test_id = 3;
+  repeated string severity = 4;
+  bool active_only = 5;
+  bool verified_only = 6;
+}
+
+message FindingProto {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string severity = 4;
+  string cve = 5;
+  int32 cwe = 6;
+  string status = 7;             // "Active" | "Mitigated" | "False Positive" | "Risk Accepted"
+  string product_id = 8;
+  string product_name = 9;
+  string engagement_id = 10;
+  string test_id = 11;
+  string component_name = 12;
+  string component_version = 13;
+  optional double cvss_v3_score = 14;
+  optional google.protobuf.Timestamp sla_expiration_date = 15;
+  google.protobuf.Timestamp date = 16;
+  repeated string tags = 17;
+}

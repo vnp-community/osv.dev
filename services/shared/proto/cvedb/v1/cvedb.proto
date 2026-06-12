@@ -1,0 +1,206 @@
+syntax = "proto3";
+
+package cvedb.v1;
+
+option go_package = "github.com/osv/proto/gen/go/cvedb/v1;cvedbv1";
+
+// CVEDBService manages the local CVE database — storage, lookup, and lifecycle.
+service CVEDBService {
+  // LookupCVEs finds CVEs for a list of products with version range matching.
+  rpc LookupCVEs(LookupCVEsRequest) returns (LookupCVEsResponse);
+
+  // PopulateDB receives bulk CVE data from the DataSync service.
+  rpc PopulateDB(PopulateDBRequest) returns (PopulateDBResponse);
+
+  // InitDB creates or upgrades the database schema.
+  rpc InitDB(InitDBRequest) returns (InitDBResponse);
+
+  // ImportDB imports a JSON or binary CVE database (with optional PGP verify).
+  rpc ImportDB(stream ImportDBChunk) returns (ImportDBResponse);
+
+  // ExportDB exports the CVE database (with optional PGP sign).
+  rpc ExportDB(ExportDBRequest) returns (stream ExportDBChunk);
+
+  // BackupDB creates a backup of the current database.
+  rpc BackupDB(BackupDBRequest) returns (BackupDBResponse);
+
+  // GetDBStatus returns database metadata (size, last updated, etc.).
+  rpc GetDBStatus(GetDBStatusRequest) returns (GetDBStatusResponse);
+}
+
+// ─── LookupCVEs ──────────────────────────────────────────────────────────────
+
+message LookupCVEsRequest {
+  repeated ProductInfo    products              = 1;
+  float                   min_score             = 2;   // Minimum CVSS score (0-10)
+  float                   min_epss_percentile   = 3;   // EPSS percentile filter
+  float                   min_epss_probability  = 4;   // EPSS probability filter
+  bool                    check_exploits        = 5;   // Mark known exploited CVEs
+  bool                    check_metrics         = 6;   // Include EPSS metrics
+  repeated string         disabled_sources      = 7;   // Sources to exclude
+  map<string, TriageEntry> triage_data          = 8;   // VEX triage data
+  bool                    filter_triage         = 9;   // Remove mitigated/not_affected
+  bool                    no_scan               = 10;  // Skip DB lookup (dry run)
+}
+
+message LookupCVEsResponse {
+  repeated ProductCVEs results         = 1;
+  int32                total_cves      = 2;
+  int32                products_scanned = 3;
+}
+
+// ─── PopulateDB ──────────────────────────────────────────────────────────────
+
+message PopulateDBRequest {
+  repeated CVEDataBatch batches = 1;
+}
+
+message CVEDataBatch {
+  string                  source     = 1;  // NVD|OSV|GAD|REDHAT|CURL|EPSS|PURL2CPE
+  repeated CVESeverityRow severities = 2;
+  repeated CVERangeRow    ranges     = 3;
+  repeated CVEMetricRow   metrics    = 4;
+  repeated PURL2CPERow    purl2cpes  = 5;
+}
+
+message CVESeverityRow {
+  string cve_number     = 1;
+  string severity       = 2;   // CRITICAL|HIGH|MEDIUM|LOW|NONE
+  string description    = 3;
+  float  score          = 4;   // CVSS base score
+  int32  cvss_version   = 5;   // 2 or 3
+  string cvss_vector    = 6;   // e.g. CVSS:3.1/AV:N/AC:L/...
+  string last_modified  = 7;   // RFC3339
+}
+
+message CVERangeRow {
+  string cve_number              = 1;
+  string vendor                  = 2;
+  string product                 = 3;
+  string version                 = 4;   // "*" = wildcard (range mode)
+  string version_start_including = 5;
+  string version_start_excluding = 6;
+  string version_end_including   = 7;
+  string version_end_excluding   = 8;
+  string data_source             = 9;
+}
+
+message CVEMetricRow {
+  string cve_number   = 1;
+  int32  metric_id    = 2;   // 0=UNKNOWN, 1=EPSS, 2=CVSS2, 3=CVSS3
+  float  metric_score = 3;   // EPSS probability (0.0-1.0)
+  string metric_field = 4;   // EPSS percentile (0.0-1.0)
+}
+
+message PURL2CPERow {
+  string purl = 1;
+  string cpe  = 2;
+}
+
+message PopulateDBResponse {
+  int32 severities_inserted = 1;
+  int32 ranges_inserted     = 2;
+  int32 metrics_inserted    = 3;
+  int32 purl2cpes_inserted  = 4;
+}
+
+// ─── InitDB ──────────────────────────────────────────────────────────────────
+
+message InitDBRequest {
+  bool force_rebuild = 1;  // Drop and recreate all tables
+}
+
+message InitDBResponse {
+  bool   created         = 1;  // true if schema was newly created
+  string schema_version  = 2;
+}
+
+// ─── ImportDB ────────────────────────────────────────────────────────────────
+
+message ImportDBChunk {
+  bytes  data          = 1;   // Chunk of DB file bytes
+  bool   last_chunk    = 2;   // true on final chunk
+  bool   verify_pgp    = 3;   // Only meaningful on first chunk
+  bytes  pgp_signature = 4;   // Detached PGP signature (first chunk only)
+}
+
+message ImportDBResponse {
+  bool   success        = 1;
+  int32  records_imported = 2;
+  string error          = 3;
+}
+
+// ─── ExportDB ────────────────────────────────────────────────────────────────
+
+message ExportDBRequest {
+  string format     = 1;   // "json" | "sqlite"
+  bool   sign_pgp   = 2;   // Sign output with PGP
+  int32  year       = 3;   // 0 = all years; non-zero = specific year
+}
+
+message ExportDBChunk {
+  bytes data       = 1;
+  bool  last_chunk = 2;
+}
+
+// ─── BackupDB ────────────────────────────────────────────────────────────────
+
+message BackupDBRequest {
+  bool rollback = 1;  // true = restore last backup
+}
+
+message BackupDBResponse {
+  bool   success     = 1;
+  string backup_path = 2;
+}
+
+// ─── GetDBStatus ─────────────────────────────────────────────────────────────
+
+message GetDBStatusRequest {}
+
+message GetDBStatusResponse {
+  string db_path        = 1;
+  int64  db_size_bytes  = 2;
+  string last_updated   = 3;  // RFC3339
+  string schema_version = 4;
+  bool   is_outdated    = 5;  // true if DB > 24h old
+  int64  cve_count      = 6;
+  int64  range_count    = 7;
+}
+
+// ─── Shared Types ─────────────────────────────────────────────────────────────
+
+message ProductInfo {
+  string vendor  = 1;
+  string product = 2;
+  string version = 3;
+  string purl    = 4;
+}
+
+message CVEData {
+  string          cve_number    = 1;
+  string          severity      = 2;   // CRITICAL|HIGH|MEDIUM|LOW|NONE
+  int32           remarks       = 3;   // 1=NewFound,2=Unexplored,...,6=NotAffected
+  string          description   = 4;
+  float           score         = 5;
+  int32           cvss_version  = 6;
+  string          cvss_vector   = 7;
+  string          data_source   = 8;
+  bool            is_exploit    = 9;   // Known exploited (KEV)
+  string          justification = 10;  // VEX justification
+  repeated string response      = 11;  // VEX response actions
+  float           epss          = 12;  // EPSS probability
+  float           epss_percentile = 13;
+}
+
+message ProductCVEs {
+  ProductInfo      product = 1;
+  repeated CVEData cves    = 2;
+}
+
+message TriageEntry {
+  string          remarks       = 1;
+  string          justification = 2;
+  string          comments      = 3;
+  repeated string response      = 4;
+}

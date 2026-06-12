@@ -64,6 +64,10 @@ type ReportInput struct {
 	MinSeverity string
 	MinScore    float64
 	Theme       string // "light"|"dark"
+
+	// DefectDojo-specific fields (for Excel formatter)
+	Findings []Finding
+	Target   string
 }
 
 // ReportOutput contains the generated report bytes per format.
@@ -79,4 +83,24 @@ type AvailableFixResult struct {
 	Distro      string
 	FixVersion  string
 	IsAvailable bool
+}
+
+// Finding represents a single DefectDojo vulnerability finding for Excel reports.
+type Finding struct {
+	ID               string
+	Title            string
+	Severity         string
+	CVE              string
+	CWE              int32
+	Status           string
+	Component        string
+	ComponentVersion string
+	FilePath         string
+	Line             int32
+	HashCode         string
+	Date             string    // RFC3339 formatted
+	FoundDate        time.Time // date the finding was found
+	SLAExpiration    string // RFC3339 formatted, optional
+	ProductID        string
+	TestID           string
 }

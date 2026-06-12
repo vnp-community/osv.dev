@@ -1,0 +1,129 @@
+// Package purl2cpe implements a DataSource for PURL-to-CPE mappings.
+// Downloads the purl2cpe mapping file from CERTCC GitHub and parses it.
+// Uses a plain-text format to avoid CGO SQLite dependencies.
+package purl2cpe
+
+import (
+	"bufio"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/osv/ingestion-service/internal/adapter/external/sources"
+)
+
+const (
+	// DefaultDownloadURL is the CERTCC purl2cpe JSON mapping file.
+	// Using the JSON format from the GitHub repo to avoid SQLite/CGO.
+	DefaultDownloadURL = "https://raw.githubusercontent.com/CERTCC/purl2cpe/main/purl2cpe.json"
+)
+
+// PURL2CPESource implements sources.DataSource for PURL-to-CPE mappings.
+type PURL2CPESource struct {
+	downloadURL string
+	httpClient  *http.Client
+}
+
+// New creates a new PURL2CPESource.
+func New(downloadURL string, httpClient *http.Client) *PURL2CPESource {
+	if downloadURL == "" {
+		downloadURL = DefaultDownloadURL
+	}
+	if httpClient == nil {
+		httpClient = &http.Client{Timeout: 120 * time.Second}
+	}
+	return &PURL2CPESource{
+		downloadURL: downloadURL,
+		httpClient:  httpClient,
+	}
+}
+
+// Name returns the source identifier.
+func (s *PURL2CPESource) Name() string { return "PURL2CPE" }
+
+// FetchCVEData downloads the PURL2CPE mapping and returns PURL2CPERow list.
+func (s *PURL2CPESource) FetchCVEData(ctx context.Context) (sources.CVEData, error) {
+	data := sources.CVEData{Source: s.Name()}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.downloadURL, nil)
+	if err != nil {
+		return data, err
+	}
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return data, fmt.Errorf("purl2cpe: fetch: %w", err)
+	}
+	defer resp.Body.Close() //nolint:errcheck
+
+	if resp.StatusCode != http.StatusOK {
+		return data, fmt.Errorf("purl2cpe: status %d", resp.StatusCode)
+	}
+
+	rows, err := parseMappings(resp.Body)
+	if err != nil {
+		return data, fmt.Errorf("purl2cpe: parse: %w", err)
+	}
+
+	data.PURL2CPEs = rows
+	return data, nil
+}
+
+// parseMappings parses the PURL2CPE mapping file.
+// Supports both JSON ({"purl":"cpe", ...}) and JSONL (one mapping per line).
+func parseMappings(r io.Reader) ([]sources.PURL2CPERow, error) {
+	body, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	// Try JSON object format: {"pkg:npm/lodash": "cpe:2.3:a:..."}
+	var jsonMap map[string]string
+	if err := json.Unmarshal(body, &jsonMap); err == nil {
+		rows := make([]sources.PURL2CPERow, 0, len(jsonMap))
+		for purl, cpe := range jsonMap {
+			if purl != "" && cpe != "" {
+				rows = append(rows, sources.PURL2CPERow{PURL: purl, CPE: cpe})
+			}
+		}
+		return rows, nil
+	}
+
+	// Try JSON array format: [{"purl":"...", "cpe":"..."}, ...]
+	var jsonArray []struct {
+		PURL string `json:"purl"`
+		CPE  string `json:"cpe"`
+	}
+	if err := json.Unmarshal(body, &jsonArray); err == nil {
+		rows := make([]sources.PURL2CPERow, 0, len(jsonArray))
+		for _, item := range jsonArray {
+			if item.PURL != "" && item.CPE != "" {
+				rows = append(rows, sources.PURL2CPERow{PURL: item.PURL, CPE: item.CPE})
+			}
+		}
+		return rows, nil
+	}
+
+	// Try tab-separated format: purl\tcpe
+	var rows []sources.PURL2CPERow
+	scanner := bufio.NewScanner(strings.NewReader(string(body)))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "\t", 2)
+		if len(parts) == 2 && parts[0] != "" && parts[1] != "" {
+			rows = append(rows, sources.PURL2CPERow{PURL: parts[0], CPE: parts[1]})
+		}
+	}
+	if len(rows) > 0 {
+		return rows, nil
+	}
+
+	return nil, fmt.Errorf("purl2cpe: unrecognized format")
+}

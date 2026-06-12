@@ -1,0 +1,151 @@
+// Package handler implements the DataSyncServiceServer gRPC interface.
+package handler
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/rs/zerolog"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"github.com/osv/ingestion-service/internal/domain/service"
+	"github.com/osv/ingestion-service/internal/usecase/syncall"
+	"github.com/osv/ingestion-service/internal/usecase/syncsource"
+	pb "github.com/osv/shared/proto/gen/go/datasync/v1"
+)
+
+// DataSyncHandler implements pb.DataSyncServiceServer.
+type DataSyncHandler struct {
+	pb.UnimplementedDataSyncServiceServer
+
+	syncAllUC    *syncall.UseCase
+	syncSourceUC *syncsource.UseCase
+	stateManager *service.SyncStateManager
+	sourceNames  []string // all registered source names
+	log          zerolog.Logger
+}
+
+// New creates a new DataSyncHandler.
+func New(
+	syncAllUC *syncall.UseCase,
+	syncSourceUC *syncsource.UseCase,
+	stateManager *service.SyncStateManager,
+	sourceNames []string,
+	log zerolog.Logger,
+) *DataSyncHandler {
+	return &DataSyncHandler{
+		syncAllUC:    syncAllUC,
+		syncSourceUC: syncSourceUC,
+		stateManager: stateManager,
+		sourceNames:  sourceNames,
+		log:          log,
+	}
+}
+
+// SyncAll triggers a full sync across all enabled sources.
+func (h *DataSyncHandler) SyncAll(ctx context.Context, req *pb.SyncAllRequest) (*pb.SyncAllResponse, error) {
+	h.log.Info().
+		Bool("force", req.GetForceUpdate()).
+		Bool("offline", req.GetOffline()).
+		Str("nvd_mode", req.GetNvdMode()).
+		Msg("SyncAll RPC called")
+
+	out, err := h.syncAllUC.Execute(ctx, syncall.Input{
+		DisabledSources: req.GetDisabledSources(),
+		ForceUpdate:     req.GetForceUpdate(),
+		Offline:         req.GetOffline(),
+		Mirror:          req.GetMirror(),
+		NVDAPIKey:       req.GetNvdApiKey(),
+		NVDMode:         req.GetNvdMode(),
+	})
+	if err != nil {
+		h.log.Error().Err(err).Msg("SyncAll failed")
+		return nil, status.Errorf(codes.Internal, "sync all: %v", err)
+	}
+
+	return &pb.SyncAllResponse{
+		SourcesUpdated: out.SourcesUpdated,
+		SourcesFailed:  out.SourcesFailed,
+		TotalCves:      int32(out.TotalCVEs),
+		Duration:       out.Duration.Round(time.Second).String(),
+	}, nil
+}
+
+// SyncSource triggers an on-demand sync for a single source.
+func (h *DataSyncHandler) SyncSource(ctx context.Context, req *pb.SyncSourceRequest) (*pb.SyncSourceResponse, error) {
+	sourceName := req.GetSource()
+	h.log.Info().Str("source", sourceName).Msg("SyncSource RPC called")
+
+	out, err := h.syncSourceUC.Execute(ctx, syncsource.Input{
+		SourceName: sourceName,
+	})
+	if err != nil {
+		h.log.Error().Err(err).Str("source", sourceName).Msg("SyncSource failed")
+		return &pb.SyncSourceResponse{
+			Source:  sourceName,
+			Success: false,
+			Error:   err.Error(),
+		}, nil
+	}
+
+	return &pb.SyncSourceResponse{
+		Source:         out.SourceName,
+		Success:        true,
+		RecordsFetched: int32(out.TotalCVEs),
+	}, nil
+}
+
+// GetSyncStatus returns the current sync status for all sources.
+func (h *DataSyncHandler) GetSyncStatus(ctx context.Context, _ *pb.GetSyncStatusRequest) (*pb.GetSyncStatusResponse, error) {
+	resp := &pb.GetSyncStatusResponse{}
+
+	var globalLastSync time.Time
+	for _, name := range h.sourceNames {
+		lastSync := h.stateManager.LastSyncTime(name)
+		ss := &pb.SourceStatus{
+			Name:      name,
+			Available: true,
+		}
+		if !lastSync.IsZero() {
+			ss.LastSync = lastSync.UTC().Format(time.RFC3339)
+			if lastSync.After(globalLastSync) {
+				globalLastSync = lastSync
+			}
+		}
+		resp.Sources = append(resp.Sources, ss)
+	}
+
+	if !globalLastSync.IsZero() {
+		resp.LastSync = globalLastSync.UTC().Format(time.RFC3339)
+	}
+
+	return resp, nil
+}
+
+// CheckLatestVersion returns version information.
+// Currently returns a stub — version checking is done by the gateway.
+func (h *DataSyncHandler) CheckLatestVersion(ctx context.Context, req *pb.CheckVersionRequest) (*pb.CheckVersionResponse, error) {
+	return &pb.CheckVersionResponse{
+		CurrentVersion:  "2.0.0",
+		LatestVersion:   "2.0.0",
+		UpdateAvailable: false,
+	}, nil
+}
+
+// allSourceNames combines the source names for handler registration.
+func allSourceNames(sources []string, extra ...string) []string {
+	all := make([]string, 0, len(sources)+len(extra))
+	all = append(all, sources...)
+	all = append(all, extra...)
+	return all
+}
+
+// fmtError safely converts an error to string.
+func fmtError(err error) string {
+	if err == nil {
+		return ""
+	}
+	return fmt.Sprintf("%v", err)
+}

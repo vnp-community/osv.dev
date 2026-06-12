@@ -1,0 +1,25 @@
+// Package entity defines search-service domain types.
+package entity
+
+// SearchRequest holds fulltext search parameters.
+type SearchRequest struct {
+	Keywords []string // AND semantics: all keywords must appear
+	Limit    int
+	FullData bool // return full CVE vs summary only
+}
+
+// CVESummary is a lightweight search result.
+type CVESummary struct {
+	ID      string  `bson:"id"      json:"id"`
+	Summary string  `bson:"summary" json:"summary"`
+	CVSS3   float64 `bson:"cvss3"   json:"cvss3,omitempty"`
+	Score   float64 `bson:"-"       json:"score,omitempty"` // text search relevance score
+}
+
+
+// MongoSearchResult is the response from MongoDB full-text search.
+type MongoSearchResult struct {
+	Results []*CVESummary `json:"results"`
+	Total   int           `json:"total"`
+	Query   []string      `json:"query"`
+}

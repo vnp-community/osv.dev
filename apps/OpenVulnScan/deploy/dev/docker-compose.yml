@@ -1,0 +1,107 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: ovs-postgres-dev
+    environment:
+      POSTGRES_USER: openvulnscan
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: openvulnscan
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ../../migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openvulnscan -d openvulnscan"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: ovs-redis-dev
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data_dev:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: ovs-nats-dev
+    ports:
+      - "4222:4222"   # Client
+      - "8222:8222"   # Monitoring
+    command: >
+      -js
+      -m 8222
+      --store_dir /data
+      --max_file_store 10GB
+      --max_mem_store 512MB
+    volumes:
+      - nats_data_dev:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8222/healthz | grep -q ok || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  minio:
+    image: minio/minio:latest
+    container_name: ovs-minio-dev
+    ports:
+      - "9000:9000"
+      - "9001:9001"   # Console UI
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data_dev:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  openvulnscan:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    container_name: ovs-app-dev
+    ports:
+      - "8080:8080"
+    environment:
+      CONFIG_PATH: /app/configs/config.yaml
+    volumes:
+      - ../../secrets:/app/secrets:ro
+      - ../../configs:/app/configs:ro
+      - ../../:/app # Map source code for local dev (if using air or similar)
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  postgres_data_dev:
+  redis_data_dev:
+  nats_data_dev:
+  minio_data_dev:

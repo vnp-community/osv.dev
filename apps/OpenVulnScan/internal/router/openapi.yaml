@@ -1,0 +1,1159 @@
+openapi: 3.0.3
+info:
+  title: OpenVulnScan API
+  description: |
+    ## OpenVulnScan — Vulnerability Scanning & Management Platform
+
+    Built as a Go monolith reusing osv.dev microservices via goroutine-per-service architecture.
+
+    ### Authentication
+    - **Bearer JWT**: Obtained via `POST /api/v1/auth/login`
+    - **API Key**: Pass `X-API-Key` header with a pre-issued key
+
+    ### Scan Types
+    | Type | Description |
+    |------|-------------|
+    | `discovery` | Fast host discovery (nmap ping scan) |
+    | `full` | Full port + service scan |
+    | `web` | Web application scan via OWASP ZAP |
+    | `agent` | Agent-reported package vulnerability scan |
+  version: "1.0.0"
+  contact:
+    email: admin@openvulnscan.local
+  license:
+    name: Apache 2.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+  - url: https://openvulnscan.example.com
+    description: Production
+
+# ── Security Schemes ──────────────────────────────────────────────────────────
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /api/v1/auth/login
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Pre-issued API key for programmatic access
+
+  schemas:
+    # ── Scan ──────────────────────────────────────────────────────────────────
+    Scan:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        targets:
+          type: array
+          items:
+            type: string
+          example: ["192.168.1.0/24", "10.0.0.1"]
+        scan_type:
+          type: string
+          enum: [full, discovery, web, agent]
+        status:
+          type: string
+          enum: [pending, running, completed, failed, cancelled]
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 5
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    CreateScanRequest:
+      type: object
+      required: [targets, scan_type]
+      properties:
+        targets:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 100
+          example: ["192.168.1.1", "10.0.0.0/24"]
+        scan_type:
+          type: string
+          enum: [full, discovery, web]
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 5
+
+    # ── Finding ───────────────────────────────────────────────────────────────
+    Finding:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+          enum: [Critical, High, Medium, Low, Info]
+        cve:
+          type: string
+          example: "CVE-2021-44228"
+        cvss_score:
+          type: number
+          format: float
+        component_name:
+          type: string
+        component_version:
+          type: string
+        hostname:
+          type: string
+        active:
+          type: boolean
+        false_p:
+          type: boolean
+        duplicate:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    # ── Dashboard ─────────────────────────────────────────────────────────────
+    DashboardStats:
+      type: object
+      properties:
+        total_scans:
+          type: integer
+        active_scans:
+          type: integer
+        completed_scans:
+          type: integer
+        failed_scans:
+          type: integer
+        total_findings:
+          type: integer
+        active_findings:
+          type: integer
+        critical_findings:
+          type: integer
+        high_findings:
+          type: integer
+        medium_findings:
+          type: integer
+        low_findings:
+          type: integer
+        severity_breakdown:
+          type: object
+          additionalProperties:
+            type: integer
+        recent_scans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scan'
+        top_cves:
+          type: array
+          items:
+            type: object
+            properties:
+              cve:
+                type: string
+              severity:
+                type: string
+              affected_hosts:
+                type: integer
+        generated_at:
+          type: string
+          format: date-time
+
+    # ── Auth ──────────────────────────────────────────────────────────────────
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+          description: Seconds until access_token expires
+
+    RegisterRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        first_name:
+          type: string
+        last_name:
+          type: string
+
+    # ── Error ─────────────────────────────────────────────────────────────────
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    # ── Agent ─────────────────────────────────────────────────────────────────
+    AgentReportRequest:
+      type: object
+      required: [hostname, packages]
+      properties:
+        hostname:
+          type: string
+          example: "prod-server-01"
+        os_info:
+          type: string
+          example: "Ubuntu 22.04"
+        packages:
+          type: array
+          items:
+            type: object
+            required: [name, version]
+            properties:
+              name:
+                type: string
+              version:
+                type: string
+              ecosystem:
+                type: string
+                example: "PyPI"
+
+    # ── Report ────────────────────────────────────────────────────────────────
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        scan_id:
+          type: string
+          format: uuid
+        format:
+          type: string
+          enum: [json, csv, html, pdf]
+        status:
+          type: string
+          enum: [pending, completed, failed]
+        download_url:
+          type: string
+        generated_at:
+          type: string
+          format: date-time
+
+    # ── SIEM ──────────────────────────────────────────────────────────────────
+    SIEMConfig:
+      type: object
+      properties:
+        host:
+          type: string
+        port:
+          type: integer
+          default: 514
+        protocol:
+          type: string
+          enum: [udp, tcp]
+          default: udp
+        enabled:
+          type: boolean
+
+# ── Global Security ───────────────────────────────────────────────────────────
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+paths:
+  # ── Health ──────────────────────────────────────────────────────────────────
+  /health:
+    get:
+      tags: [System]
+      security: []
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: openvulnscan
+
+  /ready:
+    get:
+      tags: [System]
+      security: []
+      summary: Readiness check — all goroutine services running
+      operationId: readinessCheck
+      responses:
+        "200":
+          description: All services ready
+        "503":
+          description: One or more services not ready
+
+  # ── Auth ────────────────────────────────────────────────────────────────────
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Login with email/password
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: admin@openvulnscan.local
+              password: Admin123!
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Register a new user account
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        "201":
+          description: User registered successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Refresh access token
+      operationId: refreshToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        "200":
+          description: New access token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        "401":
+          description: Invalid refresh token
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout — revoke current token
+      operationId: logout
+      responses:
+        "200":
+          description: Logged out successfully
+
+  # ── Scans ───────────────────────────────────────────────────────────────────
+  /api/v1/scans:
+    get:
+      tags: [Scans]
+      summary: List scans (paginated)
+      operationId: listScans
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: page_size
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, running, completed, failed, cancelled]
+      responses:
+        "200":
+          description: Paginated scan list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scans:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Scan'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+        "401":
+          description: Unauthorized
+    post:
+      tags: [Scans]
+      summary: Create and queue a new scan
+      operationId: createScan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScanRequest'
+            example:
+              targets: ["192.168.1.0/24"]
+              scan_type: discovery
+              priority: 5
+      responses:
+        "201":
+          description: Scan queued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scan_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+        "400":
+          description: Invalid request (e.g., invalid target)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/scans/{id}:
+    get:
+      tags: [Scans]
+      summary: Get scan details
+      operationId: getScan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Scan detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scan'
+        "404":
+          description: Scan not found
+    delete:
+      tags: [Scans]
+      summary: Cancel a running scan
+      operationId: cancelScan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Scan cancelled
+        "404":
+          description: Scan not found
+
+  /api/v1/scans/{id}/report:
+    get:
+      tags: [Scans, Reports]
+      summary: Get scan report (JSON)
+      operationId: getScanReport
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Scan report data
+    post:
+      tags: [Scans, Reports]
+      summary: Generate and download scan report
+      operationId: generateScanReport
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  enum: [json, csv, html]
+                  default: json
+      responses:
+        "200":
+          description: Report file
+          content:
+            application/json:
+              schema:
+                type: string
+            text/csv:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+
+  /api/v1/scans/{id}/fixes:
+    get:
+      tags: [Scans]
+      summary: Get recommended fixes for scan findings
+      operationId: getScanFixes
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Remediation suggestions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fixes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        package:
+                          type: string
+                        current:
+                          type: string
+                        cve:
+                          type: string
+                        severity:
+                          type: string
+                        action:
+                          type: string
+
+  # ── Findings ────────────────────────────────────────────────────────────────
+  /api/v1/findings:
+    get:
+      tags: [Findings]
+      summary: List findings with filters
+      operationId: listFindings
+      parameters:
+        - in: query
+          name: severity
+          schema:
+            type: string
+            enum: [Critical, High, Medium, Low, Info]
+        - in: query
+          name: scan_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: active
+          schema:
+            type: boolean
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: page_size
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Paginated finding list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  findings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Finding'
+                  total:
+                    type: integer
+
+  /api/v1/findings/{id}:
+    get:
+      tags: [Findings]
+      summary: Get finding detail
+      operationId: getFinding
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Finding detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Finding'
+
+  /api/v1/findings/{id}/status:
+    patch:
+      tags: [Findings]
+      summary: Update finding status
+      operationId: updateFindingStatus
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                active:
+                  type: boolean
+                false_p:
+                  type: boolean
+                duplicate:
+                  type: boolean
+                out_of_scope:
+                  type: boolean
+      responses:
+        "200":
+          description: Status updated
+
+  /api/v1/findings/{id}/accept-risk:
+    post:
+      tags: [Findings]
+      summary: Accept risk for a finding
+      operationId: acceptRisk
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                justification:
+                  type: string
+                expiry_days:
+                  type: integer
+                  default: 90
+      responses:
+        "200":
+          description: Risk accepted
+
+  /api/v1/findings/summary:
+    get:
+      tags: [Findings]
+      summary: Get findings summary (counts by severity)
+      operationId: findingsSummary
+      responses:
+        "200":
+          description: Summary counts by severity
+
+  # ── Dashboard ───────────────────────────────────────────────────────────────
+  /api/v1/dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Get aggregated security dashboard stats
+      operationId: getDashboard
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
+
+  /api/v1/dashboard/timeline:
+    get:
+      tags: [Dashboard]
+      summary: Scan activity timeline (last 30 days)
+      operationId: getDashboardTimeline
+      responses:
+        "200":
+          description: Daily scan counts
+
+  /api/v1/dashboard/top-vulnerabilities:
+    get:
+      tags: [Dashboard]
+      summary: Top CVEs by number of affected hosts
+      operationId: getTopVulnerabilities
+      responses:
+        "200":
+          description: Top CVEs ranked by affected hosts
+
+  /api/v1/dashboard/scan-activity:
+    get:
+      tags: [Dashboard]
+      summary: Hourly scan activity (last 24h)
+      operationId: getScanActivity
+      responses:
+        "200":
+          description: Hourly scan counts
+
+  # ── CVE / Vulnerability ──────────────────────────────────────────────────────
+  /api/v1/cves/{id}:
+    get:
+      tags: [Vulnerabilities]
+      summary: Get CVE details from database
+      operationId: getCVE
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "CVE-2021-44228"
+      responses:
+        "200":
+          description: CVE detail with CVSS scores, references, and affected packages
+        "404":
+          description: CVE not found
+
+  /api/v1/cves:
+    get:
+      tags: [Vulnerabilities]
+      summary: Search CVEs
+      operationId: searchCVEs
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Search query (CVE ID, keyword)
+        - in: query
+          name: severity
+          schema:
+            type: string
+            enum: [CRITICAL, HIGH, MEDIUM, LOW]
+        - in: query
+          name: min_score
+          schema:
+            type: number
+      responses:
+        "200":
+          description: CVE search results
+
+  # ── Products ────────────────────────────────────────────────────────────────
+  /api/v1/products:
+    get:
+      tags: [Products]
+      summary: List products
+      operationId: listProducts
+      responses:
+        "200":
+          description: Product list
+    post:
+      tags: [Products]
+      summary: Create a product
+      operationId: createProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                product_type:
+                  type: integer
+      responses:
+        "201":
+          description: Product created
+
+  /api/v1/engagements:
+    post:
+      tags: [Products]
+      summary: Create an engagement
+      operationId: createEngagement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                name:
+                  type: string
+                target_start:
+                  type: string
+                  format: date
+                target_end:
+                  type: string
+                  format: date
+      responses:
+        "201":
+          description: Engagement created
+
+  # ── Reports ─────────────────────────────────────────────────────────────────
+  /api/v1/reports:
+    get:
+      tags: [Reports]
+      summary: List generated reports
+      operationId: listReports
+      responses:
+        "200":
+          description: Report list
+    post:
+      tags: [Reports]
+      summary: Generate a report for a scan
+      operationId: generateReport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scan_id]
+              properties:
+                scan_id:
+                  type: string
+                  format: uuid
+                format:
+                  type: string
+                  enum: [json, csv, html]
+                  default: json
+      responses:
+        "201":
+          description: Report generation queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+
+  /api/v1/reports/{id}:
+    get:
+      tags: [Reports]
+      summary: Get report metadata
+      operationId: getReport
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+
+  /api/v1/reports/{id}/download:
+    get:
+      tags: [Reports]
+      summary: Download report file
+      operationId: downloadReport
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report file (format depends on report type)
+          content:
+            application/json:
+              schema:
+                type: string
+            text/csv:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+
+  # ── Agent ────────────────────────────────────────────────────────────────────
+  /agent/download:
+    get:
+      tags: [Agent]
+      security: []
+      summary: Download OpenVulnScan agent script
+      operationId: downloadAgent
+      responses:
+        "200":
+          description: Python agent script
+          content:
+            text/x-python:
+              schema:
+                type: string
+
+  /agent/report:
+    post:
+      tags: [Agent]
+      security: []
+      summary: Submit agent package inventory report
+      description: |
+        Agents submit package lists which are enriched via OSV API.
+        Findings are created automatically for vulnerable packages.
+      operationId: submitAgentReport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentReportRequest'
+            example:
+              hostname: prod-server-01
+              os_info: "Ubuntu 22.04.3 LTS"
+              packages:
+                - name: log4j
+                  version: "2.14.0"
+                  ecosystem: Maven
+                - name: openssl
+                  version: "1.1.1t"
+                  ecosystem: Debian
+      responses:
+        "200":
+          description: Report accepted for enrichment
+
+  /api/v1/agent/reports:
+    get:
+      tags: [Agent]
+      summary: List submitted agent reports
+      operationId: listAgentReports
+      responses:
+        "200":
+          description: Agent report list
+
+  # ── Notifications ────────────────────────────────────────────────────────────
+  /api/v1/notifications/webhooks:
+    get:
+      tags: [Notifications]
+      summary: List webhook endpoints
+      operationId: listWebhooks
+      responses:
+        "200":
+          description: Webhook list
+    post:
+      tags: [Notifications]
+      summary: Register a webhook endpoint
+      operationId: createWebhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, events]
+              properties:
+                url:
+                  type: string
+                  format: uri
+                events:
+                  type: array
+                  items:
+                    type: string
+                  example: ["scan.completed", "finding.created.critical"]
+                secret:
+                  type: string
+                  description: HMAC signing secret
+      responses:
+        "201":
+          description: Webhook registered
+
+  # ── SIEM ─────────────────────────────────────────────────────────────────────
+  /api/v1/siem/config:
+    get:
+      tags: [SIEM]
+      summary: Get SIEM/Syslog configuration
+      operationId: getSIEMConfig
+      responses:
+        "200":
+          description: Current SIEM configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SIEMConfig'
+    post:
+      tags: [SIEM]
+      summary: Update SIEM/Syslog configuration
+      operationId: updateSIEMConfig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SIEMConfig'
+      responses:
+        "200":
+          description: Configuration updated
+
+  /api/v1/siem/test:
+    post:
+      tags: [SIEM]
+      summary: Send test syslog message to SIEM
+      operationId: testSIEM
+      responses:
+        "200":
+          description: Test message sent
+        "500":
+          description: Connection failed
+
+  # ── Admin ────────────────────────────────────────────────────────────────────
+  /api/v1/admin/status:
+    get:
+      tags: [Admin]
+      summary: Get goroutine service status (admin only)
+      operationId: adminStatus
+      responses:
+        "200":
+          description: Service status map
+
+  /api/v1/admin/services:
+    get:
+      tags: [Admin]
+      summary: Health check all goroutine services (admin only)
+      operationId: adminServices
+      responses:
+        "200":
+          description: Health status per service
+
+  # ── Ingestion ────────────────────────────────────────────────────────────────
+  /api/v1/ingestion/status:
+    get:
+      tags: [Ingestion]
+      summary: Get ingestion service status
+      operationId: ingestionStatus
+      responses:
+        "200":
+          description: Ingestion service status
+
+  /api/v1/ingestion/sync:
+    post:
+      tags: [Ingestion]
+      summary: Trigger manual OSV sync (for testing)
+      operationId: triggerIngestionSync
+      responses:
+        "200":
+          description: Sync triggered
+
+# ── Tags ─────────────────────────────────────────────────────────────────────
+tags:
+  - name: System
+    description: Health and readiness checks
+  - name: Auth
+    description: Authentication and authorization
+  - name: Scans
+    description: Vulnerability scan management
+  - name: Findings
+    description: Security finding management
+  - name: Dashboard
+    description: Aggregated statistics and analytics
+  - name: Vulnerabilities
+    description: CVE database queries
+  - name: Products
+    description: Product and engagement management
+  - name: Reports
+    description: Report generation and download
+  - name: Agent
+    description: Endpoint agent management
+  - name: Notifications
+    description: Webhook and notification management
+  - name: SIEM
+    description: SIEM/Syslog integration
+  - name: Ingestion
+    description: Data ingestion and OSV enrichment
+  - name: Admin
+    description: Administrative operations (admin role required)

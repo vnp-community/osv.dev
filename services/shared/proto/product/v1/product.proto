@@ -1,0 +1,109 @@
+syntax = "proto3";
+package product.v1;
+option go_package = "github.com/defectdojo/proto/product/v1;productv1";
+
+import "google/protobuf/timestamp.proto";
+
+// ProductService manages the DefectDojo product hierarchy:
+// ProductType → Product → Engagement → Test
+service ProductService {
+  // Called by Scan Orchestrator (auto-create context pipeline)
+  rpc GetOrCreateProduct(GetOrCreateProductRequest) returns (GetOrCreateProductResponse);
+  rpc GetOrCreateEngagement(GetOrCreateEngagementRequest) returns (GetOrCreateEngagementResponse);
+  rpc GetOrCreateTest(GetOrCreateTestRequest) returns (GetOrCreateTestResponse);
+  rpc UpdateEngagementTimestamps(UpdateEngagementTimestampsRequest) returns (UpdateEngagementTimestampsResponse);
+
+  // Called by Notification Service
+  rpc GetProductMembers(GetProductMembersRequest) returns (GetProductMembersResponse);
+
+  // Standard lookups
+  rpc GetProduct(GetProductRequest) returns (GetProductResponse);
+  rpc GetEngagement(GetEngagementRequest) returns (GetEngagementResponse);
+  rpc GetTest(GetTestRequest) returns (GetTestResponse);
+}
+
+message GetOrCreateProductRequest {
+  string name = 1;
+  string product_type_name = 2;
+  string requestor_user_id = 3;
+}
+
+message GetOrCreateProductResponse {
+  string product_id = 1;
+  string product_type_id = 2;
+  bool created = 3;
+}
+
+message GetOrCreateEngagementRequest {
+  string product_id = 1;
+  string name = 2;
+  string engagement_type = 3;  // "Interactive" | "CI/CD"
+  string version = 4;
+  string build_id = 5;
+  string commit_hash = 6;
+  string branch_tag = 7;
+  bool deduplication_on_engagement = 8;
+}
+
+message GetOrCreateEngagementResponse {
+  string engagement_id = 1;
+  bool created = 2;
+}
+
+message GetOrCreateTestRequest {
+  string engagement_id = 1;
+  string scan_type = 2;
+  string title = 3;
+  string version = 4;
+  string build_id = 5;
+  string commit_hash = 6;
+  string branch_tag = 7;
+}
+
+message GetOrCreateTestResponse {
+  string test_id = 1;
+  bool created = 2;
+}
+
+message UpdateEngagementTimestampsRequest {
+  string engagement_id = 1;
+  google.protobuf.Timestamp last_scan_at = 2;
+}
+
+message UpdateEngagementTimestampsResponse {}
+
+message GetProductMembersRequest {
+  string product_id = 1;
+}
+
+message GetProductMembersResponse {
+  repeated ProductMember members = 1;
+}
+
+message ProductMember {
+  string user_id = 1;
+  string email = 2;
+  string role = 3;
+}
+
+message GetProductRequest { string product_id = 1; }
+message GetProductResponse {
+  string product_id = 1;
+  string product_type_id = 2;
+  string name = 3;
+}
+
+message GetEngagementRequest { string engagement_id = 1; }
+message GetEngagementResponse {
+  string engagement_id = 1;
+  string product_id = 2;
+  string name = 3;
+  string status = 4;
+}
+
+message GetTestRequest { string test_id = 1; }
+message GetTestResponse {
+  string test_id = 1;
+  string engagement_id = 2;
+  string scan_type = 3;
+}

@@ -1,0 +1,110 @@
+# GlobalCVE Monolithic App — Configuration
+
+server:
+  # API Gateway (single external entry point)
+  gateway_port: 8080
+  # Internal HTTP ports (for health checks and direct access)
+  cvesearch_port: 8081
+  cvesync_port: 8082
+  kevservice_port: 8083
+  notification_port: 8084
+  read_timeout: 30s
+  write_timeout: 30s
+  shutdown_timeout: 15s
+
+database:
+  url: "${DATABASE_URL}"
+  max_open_conns: 50
+  max_idle_conns: 10
+  conn_timeout: 10s
+
+redis:
+  url: "${REDIS_URL}"
+  pool_size: 20
+  dial_timeout: 5s
+
+opensearch:
+  url: "${OPENSEARCH_URL}"
+  index: "cves"
+  timeout: 10s
+
+nats:
+  url: "${NATS_URL}"
+  # NATS JetStream streams
+  stream_cve: "CVE_EVENTS"
+  stream_kev: "KEV_EVENTS"
+  stream_alert: "ALERT_EVENTS"
+
+rate_limit:
+  max_requests: 60
+  window: 60s
+
+cors:
+  allowed_origins:
+    - "https://globalcve.xyz"
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+
+auth:
+  jwt_secret: "${JWT_SECRET}"
+  api_keys_enabled: true
+
+cache:
+  search_ttl: 300     # 5 minutes
+  single_ttl: 3600    # 1 hour
+  kev_ttl: 3600
+  check_ttl: 300
+
+sources:
+  nvd:
+    api_key: "${NVD_API_KEY}"
+    base_url: "https://api.nvd.nist.gov/rest/json"
+    rate_limit_ms: 100
+    page_size: 2000
+    timeout: 60s
+  circl:
+    base_url: "https://cve.circl.lu/api"
+    timeout: 30s
+  jvn:
+    feed_url: "https://jvndb.jvn.jp/en/rss/jvndb.rdf"
+    timeout: 15s
+  exploitdb:
+    csv_url: "https://gitlab.com/exploit-database/exploitdb/-/raw/main/files_exploits.csv"
+    timeout: 60s
+  cveorg:
+    release_url: "https://github.com/CVEProject/cvelistV5/releases/latest/download/deltaLog.json"
+    timeout: 30s
+  epss:
+    url: "https://epss.cyentia.com/epss_scores-current.csv.gz"
+    timeout: "5m"
+  capec:
+    url: "https://capec.mitre.org/data/xml/capec_latest.xml"
+    timeout: 30s
+  cwe:
+    url: "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip"
+    timeout: 30s
+
+cisa:
+  kev_url: "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
+  sync_interval: "6h"
+  timeout: 30s
+
+scheduler:
+  enabled: true
+  nvd_cve_cron: "0 0 */2 * * *"       # every 2 hours
+  jvn_cron: "0 0 * * * *"              # every 1 hour
+  circl_cron: "0 0 */6 * * *"          # every 6 hours
+  exploitdb_cron: "0 0 2 * * *"        # 2am daily
+  cveorg_cron: "0 0 */12 * * *"        # every 12 hours
+  epss_cron: "0 0 3 * * *"             # 3am daily
+  cpe_cron: "0 0 4 * * 0"              # Sunday 4am
+  capec_cwe_cron: "0 0 5 * * 0"        # Sunday 5am
+  kev_cron: "0 0 */6 * * *"            # every 6 hours
+
+observability:
+  log_level: "info"
+  metrics_port: 9090
+  tracing_endpoint: "${OTEL_ENDPOINT}"
+
+migrations:
+  dir: "./migrations"

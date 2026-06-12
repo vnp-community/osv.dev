@@ -1,0 +1,45 @@
+linters:
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - gosimple
+    - ineffassign
+    - unused
+    - gofmt
+    - goimports
+    - misspell
+    - revive
+    - nolintlint
+    - bodyclose
+    - contextcheck
+    - durationcheck
+    - nilerr
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/globalcve/mono
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+      - name: unused-parameter
+        severity: warning
+  errcheck:
+    check-type-assertions: false
+    check-blank: false
+
+run:
+  timeout: 5m
+  tests: true
+  go: "1.23"
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosimple
+    - text: "Error return value of .*(Close|Write|Shutdown). is not checked"
+      linters:
+        - errcheck
