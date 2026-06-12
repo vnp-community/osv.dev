@@ -1,0 +1,144 @@
+// infra/messaging/nats/consumer.go — NATS event consumers for Alias Relations Service
+package nats
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"time"
+
+	mergealiasgroup "github.com/osv/data-service/internal/application/command/merge_alias_group"
+	detectnewaliases "github.com/osv/data-service/internal/application/command/detect_new_aliases"
+	"github.com/nats-io/nats.go/jetstream"
+	"github.com/rs/zerolog"
+)
+
+// VulnImportedEvent represents the osv.vuln.imported domain event.
+type VulnImportedEvent struct {
+	EventID   string   `json:"event_id"`
+	VulnID    string   `json:"vuln_id"`
+	Aliases   []string `json:"aliases,omitempty"`
+	Source    string   `json:"source"`
+	OccurredAt time.Time `json:"occurred_at"`
+}
+
+// AIEnrichmentCompletedEvent represents the osv.ai.enrichment.completed event.
+type AIEnrichmentCompletedEvent struct {
+	EventID   string    `json:"event_id"`
+	VulnID    string    `json:"vuln_id"`
+	Embedding []float32 `json:"embedding,omitempty"`
+	OccurredAt time.Time `json:"occurred_at"`
+}
+
+// VulnImportedConsumer subscribes to VulnImported events and triggers alias merging.
+type VulnImportedConsumer struct {
+	js            jetstream.JetStream
+	mergeHandler  *mergealiasgroup.Handler
+	log           zerolog.Logger
+}
+
+// NewVulnImportedConsumer creates a new consumer for VulnImported events.
+func NewVulnImportedConsumer(js jetstream.JetStream, mergeHandler *mergealiasgroup.Handler, log zerolog.Logger) *VulnImportedConsumer {
+	return &VulnImportedConsumer{js: js, mergeHandler: mergeHandler, log: log}
+}
+
+// Start begins consuming VulnImported events (blocking until context is cancelled).
+func (c *VulnImportedConsumer) Start(ctx context.Context) error {
+	consumer, err := c.js.Consumer(ctx, "OSV-EVENTS", "alias-service")
+	if err != nil {
+		return fmt.Errorf("get alias-service consumer: %w", err)
+	}
+
+	cc, err := consumer.Consume(func(msg jetstream.Msg) {
+		var evt VulnImportedEvent
+		if err := json.Unmarshal(msg.Data(), &evt); err != nil {
+			c.log.Error().Err(err).Msg("failed to unmarshal VulnImported event")
+			msg.Nak() //nolint:errcheck
+			return
+		}
+
+		cmdCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
+		defer cancel()
+
+		_, err := c.mergeHandler.Handle(cmdCtx, mergealiasgroup.Command{
+			VulnID:          evt.VulnID,
+			DeclaredAliases: evt.Aliases,
+		})
+		if err != nil {
+			c.log.Error().Err(err).Str("vuln_id", evt.VulnID).Msg("alias merge failed")
+			msg.Nak() //nolint:errcheck
+			return
+		}
+
+		msg.Ack() //nolint:errcheck
+	})
+	if err != nil {
+		return fmt.Errorf("start consume: %w", err)
+	}
+
+	<-ctx.Done()
+	cc.Stop()
+	return nil
+}
+
+// AIEnrichmentConsumer subscribes to AIEnrichmentCompleted events for similarity detection.
+type AIEnrichmentConsumer struct {
+	js             jetstream.JetStream
+	detectHandler  *detectnewaliases.Handler
+	log            zerolog.Logger
+}
+
+// NewAIEnrichmentConsumer creates a consumer for AIEnrichmentCompleted events.
+func NewAIEnrichmentConsumer(js jetstream.JetStream, detectHandler *detectnewaliases.Handler, log zerolog.Logger) *AIEnrichmentConsumer {
+	return &AIEnrichmentConsumer{js: js, detectHandler: detectHandler, log: log}
+}
+
+// Start begins consuming AIEnrichmentCompleted events.
+func (c *AIEnrichmentConsumer) Start(ctx context.Context) error {
+	// Use a separate consumer for AI enrichment events
+	consumer, err := c.js.CreateOrUpdateConsumer(ctx, "OSV-EVENTS", jetstream.ConsumerConfig{
+		Name:          "alias-service-ai",
+		Durable:       "alias-service-ai",
+		FilterSubject: "osv.ai.enrichment.completed",
+		MaxDeliver:    3,
+		AckWait:       5 * time.Minute,
+		AckPolicy:     jetstream.AckExplicitPolicy,
+	})
+	if err != nil {
+		return fmt.Errorf("create ai consumer: %w", err)
+	}
+
+	cc, err := consumer.Consume(func(msg jetstream.Msg) {
+		var evt AIEnrichmentCompletedEvent
+		if err := json.Unmarshal(msg.Data(), &evt); err != nil {
+			c.log.Error().Err(err).Msg("failed to unmarshal AIEnrichmentCompleted event")
+			msg.Nak() //nolint:errcheck
+			return
+		}
+
+		if len(evt.Embedding) == 0 {
+			msg.Ack() //nolint:errcheck
+			return
+		}
+
+		cmdCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
+
+		_, err := c.detectHandler.Handle(cmdCtx, detectnewaliases.Command{
+			VulnID:    evt.VulnID,
+			Embedding: evt.Embedding,
+		})
+		if err != nil {
+			c.log.Warn().Err(err).Str("vuln_id", evt.VulnID).Msg("AI alias detection failed")
+		}
+
+		msg.Ack() //nolint:errcheck
+	})
+	if err != nil {
+		return fmt.Errorf("start ai consume: %w", err)
+	}
+
+	<-ctx.Done()
+	cc.Stop()
+	return nil
+}

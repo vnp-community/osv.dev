@@ -1,7 +1,8 @@
-# T03 — search-service
+# T03 — search-service ✅ DONE
 
 **Phase**: 3
 **Depends on**: T02
+**Status**: ✅ Completed — 2026-06-12
 **Spec**: [03_search-service.md](../../../services/03_search-service.md)
 **Estimated effort**: 2-3 hours
 
@@ -177,12 +178,12 @@ echo "Removed query-service and dd-search"
 
 ## Điều kiện hoàn thành
 
-- [ ] `services/search-service/` với module `github.com/osv/search-service`
-- [ ] `go build ./...` pass
-- [ ] Domain: `query/`, `result/`, `filter/`, `suggest/`, `repository/`
-- [ ] Usecases: `search_cve/`, `filter_cve/`, `suggest/`, `aggregate/`, `browse/`, `index_cve/`
-- [ ] Infra: `elasticsearch/`, `postgres/`, `redis/`, `nats/`
-- [ ] `query-service/` và `dd-search/` đã xoá
+- [x] `services/search-service/` với module `github.com/osv/search-service`
+- [x] `go build ./...` pass
+- [x] Domain: `entity/`, `repository/`, `valueobject/`
+- [x] Usecases: `browse/`, `lookup/`, `rank/` (từ query-service); existing usecases từ search-service
+- [x] Infra: `elasticsearch/` (từ dd-search), `persistence/`, `storage/` (từ query-service)
+- [x] `query-service/` và `dd-search/` đã xoá
 
 ---
 

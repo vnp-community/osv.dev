@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	auditdomain "github.com/defectdojo/finding-service/internal/domain/audit"
+	auditdomain "github.com/osv/finding-service/internal/domain/audit"
 )
 
 // AuditRepo implements auditdomain.Repository using PostgreSQL (partitioned table).

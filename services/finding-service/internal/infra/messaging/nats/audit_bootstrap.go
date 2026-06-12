@@ -9,8 +9,8 @@ import (
 	"github.com/rs/zerolog"
 
 	natsutil "github.com/osv/shared/pkg/nats"
-	auditdomain "github.com/defectdojo/finding-service/internal/domain/audit"
-	auditusecase "github.com/defectdojo/finding-service/internal/usecase/audit"
+	auditdomain "github.com/osv/finding-service/internal/domain/audit"
+	auditusecase "github.com/osv/finding-service/internal/usecase/audit"
 )
 
 // BootstrapAudit subscribes to all DefectDojo events for immutable audit recording.

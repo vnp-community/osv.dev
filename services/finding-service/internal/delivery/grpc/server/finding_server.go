@@ -11,8 +11,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	findingv1 "github.com/osv/shared/proto/gen/go/finding/v1"
-	"github.com/defectdojo/finding-service/internal/domain/finding"
-	uc "github.com/defectdojo/finding-service/internal/usecase/finding"
+	"github.com/osv/finding-service/internal/domain/finding"
+	uc "github.com/osv/finding-service/internal/usecase/finding"
 )
 
 // FindingServer implements findingv1.FindingServiceServer.

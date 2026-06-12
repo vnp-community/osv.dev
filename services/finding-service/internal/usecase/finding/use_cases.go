@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	natsutil "github.com/osv/shared/pkg/nats"
-	"github.com/defectdojo/finding-service/internal/domain/finding"
+	"github.com/osv/finding-service/internal/domain/finding"
 )
 
 // ─── BatchCreateFindings ─────────────────────────────────────────────────────

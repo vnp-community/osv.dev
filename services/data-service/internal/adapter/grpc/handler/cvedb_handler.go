@@ -1,0 +1,241 @@
+package handler
+
+import (
+	"context"
+	"io"
+
+	"github.com/osv/data-service/internal/adapter/grpc/mapper"
+	"github.com/osv/data-service/internal/usecase/backupdb"
+	"github.com/osv/data-service/internal/usecase/exportdb"
+	"github.com/osv/data-service/internal/usecase/importdb"
+	"github.com/osv/data-service/internal/usecase/initdb"
+	"github.com/osv/data-service/internal/usecase/lookupcves"
+	"github.com/osv/data-service/internal/usecase/populatedb"
+	pb "github.com/osv/shared/proto/gen/go/cvedb/v1"
+	"github.com/rs/zerolog"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+// CVEDBHandler implements the pb.CVEDBServiceServer gRPC interface.
+// It wires together all CVEDB use cases and exposes them over gRPC.
+type CVEDBHandler struct {
+	pb.UnimplementedCVEDBServiceServer
+
+	lookupUC   *lookupcves.UseCase
+	populateUC *populatedb.UseCase
+	initUC     *initdb.UseCase
+	importUC   *importdb.UseCase
+	exportUC   *exportdb.UseCase
+	backupUC   *backupdb.UseCase
+	log        zerolog.Logger
+}
+
+// New creates a new CVEDBHandler with all use cases injected.
+func New(
+	lookupUC *lookupcves.UseCase,
+	populateUC *populatedb.UseCase,
+	initUC *initdb.UseCase,
+	importUC *importdb.UseCase,
+	exportUC *exportdb.UseCase,
+	backupUC *backupdb.UseCase,
+	log zerolog.Logger,
+) *CVEDBHandler {
+	return &CVEDBHandler{
+		lookupUC:   lookupUC,
+		populateUC: populateUC,
+		initUC:     initUC,
+		importUC:   importUC,
+		exportUC:   exportUC,
+		backupUC:   backupUC,
+		log:        log,
+	}
+}
+
+// LookupCVEs looks up CVEs for a list of products.
+// Maps proto ProductInfo → domain ProductQuery and returns results per product.
+func (h *CVEDBHandler) LookupCVEs(ctx context.Context, req *pb.LookupCVEsRequest) (*pb.LookupCVEsResponse, error) {
+	products := make([]lookupcves.ProductQuery, 0, len(req.GetProducts()))
+	for _, p := range req.GetProducts() {
+		products = append(products, mapper.ProductInfoFromProto(p))
+	}
+
+	out, err := h.lookupUC.Execute(ctx, lookupcves.Input{
+		Products:           products,
+		MinScore:           float64(req.GetMinScore()),
+		MinEPSSPercentile:  float64(req.GetMinEpssPercentile()),
+		MinEPSSProbability: float64(req.GetMinEpssProbability()),
+		CheckExploits:      req.GetCheckExploits(),
+		CheckMetrics:       req.GetCheckMetrics(),
+		DisabledSources:    req.GetDisabledSources(),
+		TriageData:         mapper.TriageDataFromProto(req.GetTriageData()),
+		FilterTriage:       req.GetFilterTriage(),
+		NoScan:             req.GetNoScan(),
+	})
+	if err != nil {
+		h.log.Error().Err(err).Msg("LookupCVEs failed")
+		return nil, status.Errorf(codes.Internal, "lookup: %v", err)
+	}
+
+	// Build []*ProductCVEs response
+	results := make([]*pb.ProductCVEs, 0, len(out.Results))
+	for product, cves := range out.Results {
+		pbCVEs := make([]*pb.CVEData, 0, len(cves))
+		for _, c := range cves {
+			pbCVEs = append(pbCVEs, mapper.CVEDataToProto(c))
+		}
+		results = append(results, &pb.ProductCVEs{
+			Product: &pb.ProductInfo{
+				Vendor:  product.Vendor,
+				Product: product.Product,
+				Version: product.Version,
+				Purl:    product.PURL,
+			},
+			Cves: pbCVEs,
+		})
+	}
+
+	return &pb.LookupCVEsResponse{
+		Results:         results,
+		TotalCves:       int32(out.TotalCVEs),
+		ProductsScanned: int32(out.ProductsWithCVE),
+	}, nil
+}
+
+// PopulateDB receives CVE data batches and writes them to the local database.
+func (h *CVEDBHandler) PopulateDB(ctx context.Context, req *pb.PopulateDBRequest) (*pb.PopulateDBResponse, error) {
+	batches := make([]populatedb.CVEDataBatch, 0, len(req.GetBatches()))
+	for _, b := range req.GetBatches() {
+		batches = append(batches, mapper.CVEDataBatchFromProto(b))
+	}
+
+	out, err := h.populateUC.Execute(ctx, populatedb.Input{Batches: batches})
+	if err != nil {
+		h.log.Error().Err(err).Msg("PopulateDB failed")
+		return nil, status.Errorf(codes.Internal, "populate: %v", err)
+	}
+
+	return &pb.PopulateDBResponse{
+		SeveritiesInserted: int32(out.TotalSeverities),
+		RangesInserted:     int32(out.TotalRanges),
+		MetricsInserted:    int32(out.TotalMetrics),
+		Purl2CpesInserted:  int32(out.TotalPURL2CPEs),
+	}, nil
+}
+
+// InitDB initializes or rebuilds the CVE database schema.
+func (h *CVEDBHandler) InitDB(ctx context.Context, req *pb.InitDBRequest) (*pb.InitDBResponse, error) {
+	out, err := h.initUC.Execute(ctx, initdb.Input{ForceRebuild: req.GetForceRebuild()})
+	if err != nil {
+		h.log.Error().Err(err).Msg("InitDB failed")
+		return nil, status.Errorf(codes.Internal, "init: %v", err)
+	}
+	return &pb.InitDBResponse{SchemaVersion: out.SchemaVersion}, nil
+}
+
+// ImportDB receives a database file via client streaming and imports it.
+// All chunks are buffered in memory before import; for large files consider
+// streaming directly to disk in a future implementation.
+func (h *CVEDBHandler) ImportDB(stream pb.CVEDBService_ImportDBServer) error {
+	ctx := stream.Context()
+	var chunks []byte
+	var verifyChecksum bool
+	var expectedSHA256 string
+
+	for {
+		chunk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return status.Errorf(codes.Internal, "recv: %v", err)
+		}
+		chunks = append(chunks, chunk.GetData()...)
+		// Use pgp_signature field as SHA256 hex (re-used field, compatible with existing proto)
+		if chunk.GetVerifyPgp() && len(chunk.GetPgpSignature()) > 0 {
+			verifyChecksum = true
+			expectedSHA256 = string(chunk.GetPgpSignature())
+		}
+		if chunk.GetLastChunk() {
+			break
+		}
+	}
+
+	out, err := h.importUC.Execute(ctx, importdb.Input{
+		FileBytes:      chunks,
+		VerifyChecksum: verifyChecksum,
+		ExpectedSHA256: expectedSHA256,
+	})
+	if err != nil {
+		h.log.Error().Err(err).Msg("ImportDB failed")
+		return stream.SendAndClose(&pb.ImportDBResponse{
+			Success: false,
+			Error:   err.Error(),
+		})
+	}
+
+	return stream.SendAndClose(&pb.ImportDBResponse{
+		Success:         true,
+		RecordsImported: int32(out.RecordsImported),
+	})
+}
+
+// ExportDB exports the CVE database in 1MB chunks via server streaming.
+func (h *CVEDBHandler) ExportDB(req *pb.ExportDBRequest, stream pb.CVEDBService_ExportDBServer) error {
+	ctx := stream.Context()
+
+	out, err := h.exportUC.Execute(ctx, exportdb.Input{
+		Format:          req.GetFormat(),
+		Year:            int(req.GetYear()),
+		IncludeChecksum: req.GetSignPgp(), // reuse sign_pgp field for checksum flag
+	})
+	if err != nil {
+		h.log.Error().Err(err).Msg("ExportDB failed")
+		return status.Errorf(codes.Internal, "export: %v", err)
+	}
+
+	const chunkSize = 1 << 20 // 1MB
+	data := out.Bytes
+	for i := 0; i < len(data); i += chunkSize {
+		end := i + chunkSize
+		if end > len(data) {
+			end = len(data)
+		}
+		if err := stream.Send(&pb.ExportDBChunk{
+			Data:      data[i:end],
+			LastChunk: end == len(data),
+		}); err != nil {
+			return status.Errorf(codes.Internal, "send chunk: %v", err)
+		}
+	}
+	return nil
+}
+
+// BackupDB creates a backup or restores from the most recent backup.
+func (h *CVEDBHandler) BackupDB(ctx context.Context, req *pb.BackupDBRequest) (*pb.BackupDBResponse, error) {
+	out, err := h.backupUC.Execute(ctx, backupdb.Input{
+		Rollback: req.GetRollback(),
+	})
+	if err != nil {
+		h.log.Error().Err(err).Msg("BackupDB failed")
+		return nil, status.Errorf(codes.Internal, "backup: %v", err)
+	}
+	return &pb.BackupDBResponse{
+		Success:    true,
+		BackupPath: out.BackupPath,
+	}, nil
+}
+
+// GetDBStatus returns current database statistics.
+func (h *CVEDBHandler) GetDBStatus(ctx context.Context, _ *pb.GetDBStatusRequest) (*pb.GetDBStatusResponse, error) {
+	out, err := h.initUC.Execute(ctx, initdb.Input{})
+	if err != nil {
+		h.log.Warn().Err(err).Msg("GetDBStatus: DB not ready")
+		return &pb.GetDBStatusResponse{
+			SchemaVersion: "",
+		}, nil
+	}
+	return &pb.GetDBStatusResponse{
+		SchemaVersion: out.SchemaVersion,
+	}, nil
+}

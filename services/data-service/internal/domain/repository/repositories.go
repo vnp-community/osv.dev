@@ -1,0 +1,37 @@
+package repository
+
+import (
+	"context"
+	"github.com/google/uuid"
+	"github.com/osv/data-service/internal/domain/entity"
+)
+
+// CVEFilter defines filtering for listing CVEs.
+type CVEFilter struct {
+	Severity     *entity.Severity
+	MinCVSS      float64
+	Ecosystem    string
+	PublishedAfter *string // RFC3339
+	Page         int
+	PageSize     int
+}
+
+// CVERepository defines persistence operations for CVE records.
+type CVERepository interface {
+	Upsert(ctx context.Context, cve *entity.CVE) error
+	FindByCVEID(ctx context.Context, cveID string) (*entity.CVE, error)
+	FindByIDs(ctx context.Context, cveIDs []string) ([]*entity.CVE, error)
+	List(ctx context.Context, filter CVEFilter) ([]*entity.CVE, int64, error)
+	SearchSemantic(ctx context.Context, embedding []float32, limit int, threshold float64) ([]*entity.CVE, error)
+	UpdateEmbedding(ctx context.Context, cveID string, embedding []float32, model string) error
+	FindWithoutEmbedding(ctx context.Context, limit int) ([]*entity.CVE, error)
+}
+
+// PackageCVECacheRepository caches OSV package lookups to avoid redundant API calls.
+type PackageCVECacheRepository interface {
+	Get(ctx context.Context, ecosystem, packageName, version string) ([]string, bool, error)
+	Set(ctx context.Context, ecosystem, packageName, version string, cveIDs []string) error
+}
+
+// ensure uuid import is used
+var _ = uuid.Nil

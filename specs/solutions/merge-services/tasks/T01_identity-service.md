@@ -1,7 +1,8 @@
-# T01 — identity-service
+# T01 — identity-service ✅ DONE
 
 **Phase**: 1
 **Depends on**: T00
+**Status**: ✅ Completed — 2026-06-12
 **Spec**: [01_identity-service.md](../../../services/01_identity-service.md)
 **Estimated effort**: 2-3 hours
 
@@ -133,13 +134,13 @@ echo "Removed auth-service"
 
 ## Điều kiện hoàn thành
 
-- [ ] `services/identity-service/` tồn tại với đầy đủ code
-- [ ] `go.mod` có module name `github.com/osv/identity-service`
-- [ ] `go build ./...` pass không có lỗi
-- [ ] `go vet ./...` pass
-- [ ] Cấu trúc domain: `user/`, `token/`, `role/`, `session/`, `errors/`
-- [ ] `services/auth-service/` đã được xoá
-- [ ] Tất cả usecases từ auth-service vẫn còn: `login`, `logout`, `register`, `oauth`, `refresh_token`, `validate_token`, `manage_api_key`
+- [x] `services/identity-service/` tồn tại với đầy đủ code
+- [x] `go.mod` có module name `github.com/osv/identity-service`
+- [x] `go build ./...` pass không có lỗi
+- [x] `go vet ./...` pass
+- [x] Cấu trúc domain: `entity/` (user, session, api_key), `identity/` (role), `valueobject/`, `repository/`, `error/`, `event/`
+- [x] `services/auth-service/` đã được xóa
+- [x] Tất cả usecases từ auth-service vẫn còn: `login`, `logout`, `register`, `oauth`, `refresh_token`, `validate_token`, `manage_api_key`
 
 ---
 

@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	natsutil "github.com/osv/shared/pkg/nats"
-	sla "github.com/defectdojo/finding-service/internal/domain/sla"
+	sla "github.com/osv/finding-service/internal/domain/sla"
 	findingv1 "github.com/osv/shared/proto/gen/go/finding/v1"
 )
 

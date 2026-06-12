@@ -8,7 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/google/uuid"
-	"github.com/defectdojo/finding-service/internal/domain/finding"
+	"github.com/osv/finding-service/internal/domain/finding"
 )
 
 // FindingRepo implements finding.Repository using pgxpool.

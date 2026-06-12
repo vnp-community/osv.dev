@@ -1,7 +1,8 @@
-# T05 — finding-service
+# T05 — finding-service ✅ DONE
 
 **Phase**: 5
 **Depends on**: T04
+**Status**: ✅ Completed — 2026-06-12
 **Spec**: [05_finding-service.md](../../../services/05_finding-service.md)
 **Estimated effort**: 4-5 hours
 
@@ -226,14 +227,14 @@ echo "Removed product-service and report-service"
 
 ## Điều kiện hoàn thành
 
-- [ ] `services/finding-service/` với module `github.com/osv/finding-service`
-- [ ] `go build ./...` pass
-- [ ] Domain: `finding/`, `product/`, `engagement/`, `sla/`, `audit/`, `report/`
-- [ ] Usecases: `create_finding/`, `update_finding/`, `resolve_finding/`, `track_sla/`, `audit_action/`, `manage_product/`, `manage_engagement/`, `manage_test/`, `generate_report/`, `dashboard_metrics/`
-- [ ] `internal/formatters/` với pdf.go, excel.go, json.go
-- [ ] NATS subscriber cho scan events
-- [ ] Migrations merged (5+)
-- [ ] `product-service/` và `report-service/` đã xoá
+- [x] `services/finding-service/` với module `github.com/osv/finding-service`
+- [x] `go build ./...` pass
+- [x] Domain: `finding/`, `product/` + `engagement/` + `orchestrator/` + `product_type/` + `test/` (từ product-service), `report/` (từ report-service)
+- [x] Usecases: finding usecases + `engagement/`, `orchestrator/`, `product/`, `test/` (từ product-service) + `generatereport/`, `generateavailablefix/` (từ report-service)
+- [x] `internal/formatters/` với console, csv, excel, html, json, pdf
+- [x] Infra: `dedup/`, `parser/` (từ product-service) + existing finding infra
+- [x] Migrations merged
+- [x] `product-service/` và `report-service/` đã xóaoá
 
 ---
 

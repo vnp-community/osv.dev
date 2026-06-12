@@ -1,4 +1,4 @@
-module github.com/defectdojo/finding-service
+module github.com/osv/finding-service
 
 go 1.26.3
 

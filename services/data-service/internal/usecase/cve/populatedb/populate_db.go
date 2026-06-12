@@ -1,0 +1,112 @@
+package populatedb
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/osv/data-service/internal/domain/entity"
+	"github.com/osv/data-service/internal/domain/repository"
+)
+
+// CVEDataBatch holds a batch of CVE data from a single data source.
+type CVEDataBatch struct {
+	Source     string               // NVD|OSV|GAD|REDHAT|CURL|EPSS|PURL2CPE
+	Severities []entity.CVESeverity // CVE severity records
+	Ranges     []entity.CVERange    // Version range records
+	Metrics    []entity.CVEMetric   // EPSS metric records
+	PURL2CPEs  []entity.PURL2CPE    // Package URL → CPE mappings
+}
+
+// Input for PopulateDB use case.
+type Input struct {
+	// Batches is an ordered list of data batches to insert.
+	// NVD data should be first (mirrors Python cve-bin-tool priority behavior).
+	Batches []CVEDataBatch
+}
+
+// Output summarizes the populate operation.
+type Output struct {
+	SourcesProcessed []string
+	TotalSeverities  int
+	TotalRanges      int
+	TotalMetrics     int
+	TotalPURL2CPEs   int
+	Errors           []string // non-fatal errors (e.g. partial source failure)
+}
+
+// UseCase implements the PopulateDB operation.
+// It receives batches from DataSync and upserts them into the local CVE database.
+type UseCase struct {
+	cveRepo    repository.CVEBinToolRepository
+	metricRepo repository.MetricRepository
+	purl2cpe   repository.PURL2CPERepository
+}
+
+// New creates a new PopulateDB use case.
+func New(
+	cveRepo repository.CVEBinToolRepository,
+	metricRepo repository.MetricRepository,
+	purl2cpe repository.PURL2CPERepository,
+) *UseCase {
+	return &UseCase{
+		cveRepo:    cveRepo,
+		metricRepo: metricRepo,
+		purl2cpe:   purl2cpe,
+	}
+}
+
+// Execute processes all data batches in order.
+// NVD takes priority: its data should be inserted first to ensure
+// that other sources' updates override NVD where appropriate.
+func (uc *UseCase) Execute(ctx context.Context, in Input) (*Output, error) {
+	out := &Output{}
+
+	for _, batch := range in.Batches {
+		if err := ctx.Err(); err != nil {
+			return out, err
+		}
+
+		if err := uc.processBatch(ctx, batch); err != nil {
+			// Record error but continue with other batches
+			out.Errors = append(out.Errors, fmt.Sprintf("[%s] %v", batch.Source, err))
+			continue
+		}
+
+		out.SourcesProcessed = append(out.SourcesProcessed, batch.Source)
+		out.TotalSeverities += len(batch.Severities)
+		out.TotalRanges += len(batch.Ranges)
+		out.TotalMetrics += len(batch.Metrics)
+		out.TotalPURL2CPEs += len(batch.PURL2CPEs)
+	}
+
+	return out, nil
+}
+
+// processBatch upserts all records from a single source batch.
+func (uc *UseCase) processBatch(ctx context.Context, batch CVEDataBatch) error {
+	if len(batch.Severities) > 0 {
+		if err := uc.cveRepo.UpsertSeverities(ctx, batch.Severities); err != nil {
+			return fmt.Errorf("upsert severities: %w", err)
+		}
+	}
+
+	if len(batch.Ranges) > 0 {
+		if err := uc.cveRepo.UpsertRanges(ctx, batch.Ranges); err != nil {
+			return fmt.Errorf("upsert ranges: %w", err)
+		}
+	}
+
+	if len(batch.Metrics) > 0 && uc.metricRepo != nil {
+		if err := uc.metricRepo.UpsertMetrics(ctx, batch.Metrics); err != nil {
+			return fmt.Errorf("upsert metrics: %w", err)
+		}
+	}
+
+	if len(batch.PURL2CPEs) > 0 && uc.purl2cpe != nil {
+		if err := uc.purl2cpe.UpsertMappings(ctx, batch.PURL2CPEs); err != nil {
+			return fmt.Errorf("upsert purl2cpe: %w", err)
+		}
+	}
+
+	return nil
+}

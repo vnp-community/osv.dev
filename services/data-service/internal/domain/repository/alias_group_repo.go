@@ -1,0 +1,43 @@
+// domain/repository/alias_group_repo.go
+package repository
+
+import (
+	"context"
+
+	aliasgroup "github.com/osv/data-service/internal/domain/aggregate/alias_group"
+)
+
+// AliasGroupRepository defines persistence operations for AliasGroup.
+type AliasGroupRepository interface {
+	// GetByMemberID finds the group that contains the given vuln ID.
+	// Returns (nil, nil) if no group is found.
+	GetByMemberID(ctx context.Context, vulnID string) (*aliasgroup.AliasGroup, error)
+
+	// GetByGroupID retrieves an AliasGroup by its group ID.
+	GetByGroupID(ctx context.Context, groupID string) (*aliasgroup.AliasGroup, error)
+
+	// Save persists an AliasGroup (create or update).
+	Save(ctx context.Context, group *aliasgroup.AliasGroup) error
+
+	// Delete removes an AliasGroup by ID (used when merging groups).
+	Delete(ctx context.Context, groupID string) error
+
+	// DeleteMember removes the member index entry for a vuln ID.
+	DeleteMember(ctx context.Context, vulnID string) error
+}
+
+// UpstreamGroupRepository defines persistence operations for UpstreamGroup.
+type UpstreamGroupRepository interface {
+	// GetByVulnID retrieves upstream/downstream relationships for a vuln.
+	GetByVulnID(ctx context.Context, vulnID string) (*UpstreamGroupData, error)
+
+	// Save persists upstream/downstream relationships.
+	Save(ctx context.Context, data *UpstreamGroupData) error
+}
+
+// UpstreamGroupData is a DTO for upstream relationships (avoid circular import).
+type UpstreamGroupData struct {
+	VulnID     string
+	Upstream   []string
+	Downstream []string
+}

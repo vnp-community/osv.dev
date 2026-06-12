@@ -1,7 +1,8 @@
-# T00 — Setup Workspace
+# T00 — Setup Workspace ✅ DONE
 
 **Phase**: 0 — Prerequisites
 **Depends on**: nothing
+**Status**: ✅ Completed — 2026-06-12
 **Estimated effort**: 15 minutes
 
 ---
@@ -68,10 +69,10 @@ ls -la /Users/binhnt/Lab/sec/cve/osv.dev/services/
 
 ## Điều kiện hoàn thành
 
-- [ ] Git commit snapshot thành công
-- [ ] 8 thư mục skeleton được tạo
-- [ ] Mỗi thư mục có đủ `cmd/server/`, `internal/`, `migrations/`
-- [ ] `git status` sạch
+- [x] Git commit snapshot thành công — tagged `pre-merge-snapshot`
+- [x] 8 thư mục skeleton được tạo
+- [x] Mỗi thư mục có đủ `cmd/server/`, `internal/`, `migrations/`
+- [x] `git status` sạch
 
 ---
 

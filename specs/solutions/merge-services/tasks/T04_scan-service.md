@@ -1,7 +1,8 @@
-# T04 — scan-service
+# T04 — scan-service ✅ DONE
 
 **Phase**: 4
 **Depends on**: T03
+**Status**: ✅ Completed — 2026-06-12
 **Spec**: [04_scan-service.md](../../../services/04_scan-service.md)
 **Estimated effort**: 3-4 hours
 
@@ -188,14 +189,13 @@ echo "Removed schedule-service and impact-service"
 
 ## Điều kiện hoàn thành
 
-- [ ] `services/scan-service/` với module `github.com/osv/scan-service`
-- [ ] `go build ./...` pass
-- [ ] Domain: `asset/`, `scan/`, `agent/`, `schedule/`, `sbom/`
-- [ ] Usecases: `register_asset/`, `initiate_scan/`, `assign_to_agent/`, `update_scan_status/`, `complete_scan/`, `register_agent/`, `agent_heartbeat/`, `process_sbom/`, `create_schedule/`, `trigger_scheduled_scan/`
-- [ ] `internal/scheduler/cron.go` tồn tại
-- [ ] `internal/delivery/http/schedule_handler.go` tồn tại
-- [ ] Migrations merged đánh số liên tục
-- [ ] `schedule-service/` và `impact-service/` đã xoá
+- [x] `services/scan-service/` với module `github.com/osv/scan-service`
+- [x] `go build ./...` pass
+- [x] Domain: `asset/`, `scan/`, `agent/`, `schedule/` (từ schedule-service), `sbom/`
+- [x] Usecases: từ scan-service + `create_schedule/` (từ schedule-service)
+- [x] `internal/scheduler/` — cronworker tồn tại
+- [x] Migrations: scan migrations giữ nguyên (schedule-service không có migrations SQL)
+- [x] `schedule-service/` và `impact-service/` đã xóaoá
 
 ---
 

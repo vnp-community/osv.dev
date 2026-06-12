@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	natsutil "github.com/osv/shared/pkg/nats"
-	audit "github.com/defectdojo/finding-service/internal/domain/audit"
+	audit "github.com/osv/finding-service/internal/domain/audit"
 )
 
 // RecordEventUseCase persists every DefectDojo event as an immutable audit record.

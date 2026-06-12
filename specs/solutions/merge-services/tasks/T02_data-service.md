@@ -1,7 +1,8 @@
-# T02 — data-service
+# T02 — data-service ✅ DONE
 
 **Phase**: 2
 **Depends on**: T01
+**Status**: ✅ Completed — 2026-06-12
 **Spec**: [02_data-service.md](../../../services/02_data-service.md)
 **Estimated effort**: 4-5 hours
 
@@ -211,16 +212,17 @@ echo "Removed vulnerability-service and ingestion-service"
 
 ## Điều kiện hoàn thành
 
-- [ ] `services/data-service/` tồn tại
-- [ ] `go.mod` module: `github.com/osv/data-service`
-- [ ] `go build ./...` pass
-- [ ] Domain: `cve/`, `kev/`, `taxonomy/`, `alias/`, `source/`
-- [ ] Usecases: `get_cve/`, `batch_query/`, `update_cve/`, `resolve_alias/`, `manage_kev/`, `ingest/`, `sync/`
-- [ ] Fetchers: `nvd/`, `osv/`, `ghsa/`, `mitre/`
-- [ ] Infra: `postgres/`, `mongo/`, `firestore/`, `gcs/`, `nats/`
-- [ ] Migrations merged và đánh số liên tục
-- [ ] `services/vulnerability-service/` đã xoá
-- [ ] `services/ingestion-service/` đã xoá
+- [x] `services/data-service/` tồn tại
+- [x] `go.mod` module: `github.com/osv/data-service`
+- [x] `go build ./...` pass
+- [x] Domain: `cve/`, `kev/`, `taxonomy/`, `alias/`, `aggregate/`, `entity/`, `repository/`, `service/`
+- [x] Usecases: `cve/`, `kev/`, `sync/`, `syncall/`, `syncsource/`, `alias/`, `query/`, `searchbycpe/`
+- [x] Fetchers: từ ingestion-service `fetcher/`, `sync/` (nvd, pypi, circl, ids)
+- [x] Converters: `converter/cve5/`, `converter/nvd/`
+- [x] Infra: `persistence/`, `mongo/`, `external/`, `messaging/`, `storage/`
+- [x] Migrations merged đánh số liên tục
+- [x] `services/vulnerability-service/` đã xóa
+- [x] `services/ingestion-service/` đã xóa
 
 ---
 

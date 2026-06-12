@@ -1,0 +1,99 @@
+package backupdb
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/osv/data-service/internal/domain/repository"
+)
+
+// DefaultBackupDir is where backups are stored when no custom path is given.
+const DefaultBackupDir = "/var/lib/cve-service/backups"
+
+// Input for BackupDB use case.
+type Input struct {
+	// Rollback restores from the most recent backup (true) instead of creating one (false).
+	Rollback bool
+
+	// BackupDir is where backups are stored. Defaults to DefaultBackupDir.
+	BackupDir string
+}
+
+// Output summarizes the operation.
+type Output struct {
+	BackupPath string
+	Message    string
+}
+
+// UseCase creates or restores a database backup.
+type UseCase struct {
+	dbAdmin repository.DBAdminRepository
+}
+
+// New creates a new BackupDB use case.
+func New(dbAdmin repository.DBAdminRepository) *UseCase {
+	return &UseCase{dbAdmin: dbAdmin}
+}
+
+// Execute creates a backup or restores from one.
+func (uc *UseCase) Execute(ctx context.Context, in Input) (*Output, error) {
+	dir := in.BackupDir
+	if dir == "" {
+		dir = DefaultBackupDir
+	}
+
+	if err := os.MkdirAll(dir, 0o750); err != nil {
+		return nil, fmt.Errorf("create backup dir: %w", err)
+	}
+
+	if in.Rollback {
+		return uc.restore(ctx, dir)
+	}
+	return uc.backup(ctx, dir)
+}
+
+func (uc *UseCase) backup(ctx context.Context, dir string) (*Output, error) {
+	ts := time.Now().UTC().Format("20060102T150405Z")
+	dest := filepath.Join(dir, fmt.Sprintf("cvedb-backup-%s.json", ts))
+
+	if err := uc.dbAdmin.Backup(ctx, dest); err != nil {
+		return nil, fmt.Errorf("backup: %w", err)
+	}
+	return &Output{
+		BackupPath: dest,
+		Message:    fmt.Sprintf("backup created at %s", dest),
+	}, nil
+}
+
+func (uc *UseCase) restore(ctx context.Context, dir string) (*Output, error) {
+	// Find most recent backup file
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, fmt.Errorf("read backup dir: %w", err)
+	}
+
+	var latest string
+	for _, e := range entries {
+		if !e.IsDir() && filepath.Ext(e.Name()) == ".json" {
+			name := filepath.Join(dir, e.Name())
+			if name > latest {
+				latest = name
+			}
+		}
+	}
+
+	if latest == "" {
+		return nil, fmt.Errorf("no backups found in %s", dir)
+	}
+
+	if err := uc.dbAdmin.Restore(ctx, latest); err != nil {
+		return nil, fmt.Errorf("restore from %s: %w", latest, err)
+	}
+	return &Output{
+		BackupPath: latest,
+		Message:    fmt.Sprintf("restored from %s", latest),
+	}, nil
+}
