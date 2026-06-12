@@ -7,7 +7,7 @@ import (
 	"iter"
 
 	"cloud.google.com/go/datastore"
-	"github.com/osv/pkg/models"
+	"github.com/osv/shared/pkg/models"
 	"github.com/ossf/osv-schema/bindings/go/osvconstants"
 	"google.golang.org/api/iterator"
 )

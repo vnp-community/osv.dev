@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/osv/pkg/domain"
+	"github.com/osv/shared/pkg/domain"
 )
 
 func TestWriteError_NotFound(t *testing.T) {

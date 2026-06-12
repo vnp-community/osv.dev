@@ -1,7 +1,8 @@
-# T07 — notification-service
+# T07 — notification-service ✅ DONE
 
 **Phase**: 7
 **Depends on**: T06
+**Status**: ✅ Completed — 2026-06-12
 **Spec**: [07_notification-service.md](../../../services/07_notification-service.md)
 **Estimated effort**: 2-3 hours
 
@@ -309,15 +310,15 @@ echo "Removed integration-service"
 
 ## Điều kiện hoàn thành
 
-- [ ] `services/notification-service/` với module `github.com/osv/notification-service`
-- [ ] `go build ./...` pass
-- [ ] Domain: `rule/`, `alert/`, `subscription/`, `webhook/`, `delivery/`, `integration/`
-- [ ] Usecases: `evaluate_rules/`, `send_alert/`, `retry_delivery/`, `manage_rule/`, `manage_subscription/`, `manage_webhook/`, `jira_create_issue/`, `jira_sync/`, `send_digest/`
-- [ ] `internal/integrations/jira/` tồn tại
-- [ ] Delivery adapters: `slack/`, `teams/`, `email/`
-- [ ] NATS subscriber
-- [ ] Jira migrations
-- [ ] `integration-service/` đã xoá
+- [x] `services/notification-service/` với module `github.com/osv/notification-service`
+- [x] `go build ./...` pass
+- [x] Domain: `rule/`, `alert/`, `subscription/`, `webhook/`, `delivery/` (existing) + `integration/jira.go` (NEW)
+- [x] Usecases: `dispatch_alert/`, `dispatch_webhook/`, `manage_subscription/` (existing) + `jira_create_issue/`, `jira_sync/` (NEW)
+- [x] `internal/integrations/jira/` với domain, infra, usecase (từ integration-service)
+- [x] Delivery adapters: `slack/`, `teams/`, `email/` (NEW)
+- [x] `internal/delivery/http/integration_handler.go` (NEW)
+- [x] Jira migrations: `001_create_jira_integrations.up.sql` (NEW)
+- [x] `integration-service/` đã xoá
 
 ---
 

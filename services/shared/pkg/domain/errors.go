@@ -1,5 +1,5 @@
 // Package domain — shared sentinel errors for cve-search services.
-// Import as: "github.com/osv/pkg/domain"
+// Import as: "github.com/osv/shared/pkg/domain"
 // Usage: fmt.Errorf("cve %s: %w", id, domain.ErrNotFound)
 package domain
 

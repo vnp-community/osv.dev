@@ -1,4 +1,4 @@
-package entity
+package schedule
 
 import (
 	"time"
@@ -68,4 +68,20 @@ func (s *Schedule) RecordRun(nextRun time.Time) {
 	s.LastRunAt = &now
 	s.NextRunAt = &nextRun
 	s.UpdatedAt = now
+}
+
+// Repository defines CRUD operations for Schedule entities
+type Repository interface {
+	Save(ctx interface{}, s *Schedule) error
+	Create(ctx interface{}, s *Schedule) error
+	GetByID(ctx interface{}, id string) (*Schedule, error)
+	List(ctx interface{}, filter ScheduleFilter) ([]*Schedule, error)
+	Update(ctx interface{}, s *Schedule) error
+	Delete(ctx interface{}, id string) error
+}
+
+// ScheduleFilter provides filtering options for listing schedules
+type ScheduleFilter struct {
+	Status ScheduleStatus
+	Type   ScheduleType
 }

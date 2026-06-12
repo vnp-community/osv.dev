@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/osv/pkg/clients"
+	"github.com/osv/shared/pkg/clients"
 )
 
 // mockObject stores the data and metadata for a simulated GCS object.

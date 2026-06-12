@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/osv/pkg/clients/nvd"
+	"github.com/osv/shared/pkg/clients/nvd"
 )
 
 func TestGetCVE_Success(t *testing.T) {

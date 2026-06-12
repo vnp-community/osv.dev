@@ -7,7 +7,7 @@ import (
 	"slices"
 
 	"cloud.google.com/go/datastore"
-	"github.com/osv/pkg/models"
+	"github.com/osv/shared/pkg/models"
 )
 
 type RelationsStore struct {

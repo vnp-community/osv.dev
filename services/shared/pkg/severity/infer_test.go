@@ -3,7 +3,7 @@ package severity_test
 import (
 	"testing"
 
-	"github.com/osv/pkg/severity"
+	"github.com/osv/shared/pkg/severity"
 )
 
 func ptr(f float64) *float64 { return &f }

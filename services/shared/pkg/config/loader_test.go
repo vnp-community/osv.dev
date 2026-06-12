@@ -18,7 +18,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/osv/pkg/config"
+	"github.com/osv/shared/pkg/config"
 )
 
 type testConfig struct {

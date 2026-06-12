@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/ossf/osv-schema/bindings/go/osvconstants"
 	"github.com/ossf/osv-schema/bindings/go/osvschema"
-	"github.com/osv/pkg/clients/api"
+	"github.com/osv/shared/pkg/clients/api"
 	"osv.dev/bindings/go/internal/testhelper"
 	"osv.dev/bindings/go/osvdev"
 )

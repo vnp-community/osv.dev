@@ -4,7 +4,7 @@ package cwe_test
 import (
 	"testing"
 
-	"github.com/osv/pkg/cwe"
+	"github.com/osv/shared/pkg/cwe"
 )
 
 func TestGet(t *testing.T) {

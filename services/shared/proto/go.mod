@@ -1,4 +1,4 @@
-module github.com/osv/proto
+module github.com/osv/shared/proto
 
 go 1.26.3
 

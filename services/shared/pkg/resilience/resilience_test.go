@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/osv/pkg/resilience"
+	"github.com/osv/shared/pkg/resilience"
 )
 
 // ── Circuit Breaker Tests ─────────────────────────────────────────────────────

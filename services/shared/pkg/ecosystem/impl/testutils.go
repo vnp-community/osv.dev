@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/osv/pkg/testutil"
+	"github.com/osv/shared/pkg/testutil"
 )
 
 // getTestProvider sets up an isolated Provider with a VCR client for testing.

@@ -63,3 +63,17 @@ type SearchCache interface {
 
 // SearchIndexRepo is an alias for SearchIndexRepository for backward compatibility.
 type SearchIndexRepo = SearchIndexRepository
+
+// VulnerabilityReader defines read operations for vulnerability data from Firestore.
+// Must match the implementation in infra/persistence/firestore/vulnerability_reader.go
+type VulnerabilityReader interface {
+	GetByID(ctx context.Context, id string) (*entity.VulnerabilityReadModel, error)
+	QueryBySemver(ctx context.Context, ecosystem, project, normalizedVersion, cursor string, limit int) ([]*entity.VulnerabilityReadModel, string, error)
+	QueryByCommit(ctx context.Context, commitHash, cursor string, limit int) ([]*entity.VulnerabilityReadModel, string, error)
+}
+
+// VulnerabilityCache provides caching for vulnerability full records.
+type VulnerabilityCache interface {
+	Get(ctx context.Context, key string) (*entity.VulnerabilityReadModel, error)
+	Set(ctx context.Context, key string, vuln *entity.VulnerabilityReadModel, ttl interface{}) error
+}

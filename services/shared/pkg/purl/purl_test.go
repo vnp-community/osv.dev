@@ -17,7 +17,7 @@ package purl_test
 import (
 	"testing"
 
-	"github.com/osv/pkg/purl"
+	"github.com/osv/shared/pkg/purl"
 )
 
 func TestParse(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/osv/pkg/resilience"
+	"github.com/osv/shared/pkg/resilience"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/osv/pkg/health"
+	"github.com/osv/shared/pkg/health"
 )
 
 func TestCheckerFunc_OK(t *testing.T) {

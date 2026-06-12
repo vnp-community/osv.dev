@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	ecosystem "github.com/osv/pkg/ecosystem/impl"
+	ecosystem "github.com/osv/shared/pkg/ecosystem/impl"
 	"github.com/ossf/osv-schema/bindings/go/osvschema"
 )
 

@@ -1,3 +1,4 @@
+package factory
 
 func init() {
 	// BackendElasticsearch is added by dd-search merge.

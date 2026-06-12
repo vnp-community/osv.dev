@@ -135,3 +135,18 @@ const OpenSearchIndexMapping = `{
     }
   }
 }`
+
+// VulnerabilityReadModel is the read-optimized view of a vulnerability stored in Firestore
+type VulnerabilityReadModel struct {
+	ID          string   `firestore:"id"`
+	CVEID       string   `firestore:"cve_id"`
+	Title       string   `firestore:"title"`
+	Description string   `firestore:"description"`
+	Severity    string   `firestore:"severity"`
+	CVSSScore   float64  `firestore:"cvss_score"`
+	Published   string   `firestore:"published"`
+	Ecosystems  []string `firestore:"ecosystems"`
+	IsKEV       bool     `firestore:"is_kev"`
+	GCSPath     string   `firestore:"gcs_path"`
+	FullRecord  interface{} `firestore:"-"` // populated lazily from GCS (*osvschema.Vulnerability)
+}

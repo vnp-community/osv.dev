@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/osv/scan-service/internal/domain/schedule"
-	schedrepo "github.com/osv/scan-service/internal/domain/schedule"
+	
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
@@ -23,11 +23,11 @@ type Command struct {
 
 // Handler orchestrates the creation of a new Schedule.
 type Handler struct {
-	repo schedrepo.Repository
+	repo schedule.Repository
 }
 
 // NewHandler creates a new create_schedule handler.
-func NewHandler(repo schedrepo.Repository) *Handler {
+func NewHandler(repo schedule.Repository) *Handler {
 	return &Handler{repo: repo}
 }
 

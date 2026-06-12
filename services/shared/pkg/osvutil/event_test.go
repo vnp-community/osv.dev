@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/osv/pkg/ecosystem"
+	"github.com/osv/shared/pkg/ecosystem"
 )
 
 type mockEcosystem struct {

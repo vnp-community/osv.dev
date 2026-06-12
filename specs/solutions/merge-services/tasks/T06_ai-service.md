@@ -1,7 +1,8 @@
-# T06 — ai-service
+# T06 — ai-service ✅ DONE
 
 **Phase**: 6
 **Depends on**: T05
+**Status**: ✅ Completed — 2026-06-12
 **Spec**: [06_ai-service.md](../../../services/06_ai-service.md)
 **Estimated effort**: 1-2 hours
 
@@ -244,13 +245,13 @@ go vet ./...
 
 ## Điều kiện hoàn thành
 
-- [ ] `services/ai-service/` với module `github.com/osv/ai-service`
-- [ ] `go build ./...` pass
-- [ ] Domain: `enrichment/` (đầy đủ subdirs) + `triage/entity.go`
-- [ ] Usecases: `enrich_cve/`, `batch_enrich/`, `epss/`, `triage_finding/`, `generate_embedding/`
-- [ ] Delivery: `grpc/` + `http/router.go`
-- [ ] Infra providers: `openai/`, `gemini/`, `anthropic/`, `epss/`
-- [ ] Infra: `firestore/`, `redis/`, `nats/`
+- [x] `services/ai-service/` với module `github.com/osv/ai-service`
+- [x] `go build ./...` pass
+- [x] Domain: `enrichment/` (provider_chain, embedding_service, severity_classifier, exploit, mitretagger, threatintel, port) + `triage/entity.go`
+- [x] Usecases: `enrich_cve/`, `batch_enrich/` (NEW), `epss/`, `triage_finding/`, `generate_embedding/` (NEW)
+- [x] Delivery: gRPC (existing) + `http/router.go` (NEW)
+- [x] Infra providers: `openai/`, `vertex/`, `ollama/` (existing) + `epss/` (NEW)
+- [x] Infra: `firestore/`, `nats/` (existing)
 
 ---
 

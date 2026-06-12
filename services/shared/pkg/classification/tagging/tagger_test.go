@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/osv/pkg/classification/tagging"
+	"github.com/osv/shared/pkg/classification/tagging"
 )
 
 func TestTagsFromCWEs(t *testing.T) {

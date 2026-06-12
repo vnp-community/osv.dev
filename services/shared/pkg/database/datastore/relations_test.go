@@ -8,8 +8,8 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/google/go-cmp/cmp"
-	"github.com/osv/pkg/models"
-	"github.com/osv/pkg/testutil"
+	"github.com/osv/shared/pkg/models"
+	"github.com/osv/shared/pkg/testutil"
 )
 
 func TestRelationsStore_GetAliases(t *testing.T) {

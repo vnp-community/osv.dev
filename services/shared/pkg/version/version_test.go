@@ -3,7 +3,7 @@ package version_test
 import (
 	"testing"
 
-	"github.com/osv/pkg/version"
+	"github.com/osv/shared/pkg/version"
 )
 
 func TestVersionCompare(t *testing.T) {

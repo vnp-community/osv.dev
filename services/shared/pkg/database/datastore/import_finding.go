@@ -9,7 +9,7 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
-	"github.com/osv/pkg/models"
+	"github.com/osv/shared/pkg/models"
 	"google.golang.org/api/iterator"
 )
 

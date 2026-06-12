@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/datastore"
-	db "github.com/osv/pkg/database/datastore"
-	"github.com/osv/pkg/models"
+	db "github.com/osv/shared/pkg/database/datastore"
+	"github.com/osv/shared/pkg/models"
 )
 
 func main() {

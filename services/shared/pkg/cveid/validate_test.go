@@ -3,7 +3,7 @@ package cveid_test
 import (
 	"testing"
 
-	"github.com/osv/pkg/cveid"
+	"github.com/osv/shared/pkg/cveid"
 )
 
 func TestIsValid(t *testing.T) {

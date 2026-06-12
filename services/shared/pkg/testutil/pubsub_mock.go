@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"cloud.google.com/go/pubsub/v2"
-	"github.com/osv/pkg/clients"
+	"github.com/osv/shared/pkg/clients"
 )
 
 type MockPublishResult struct {

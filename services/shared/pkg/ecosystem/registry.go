@@ -19,7 +19,7 @@ import (
 	"sort"
 	"sync"
 
-	pkgerrors "github.com/osv/pkg/errors"
+	pkgerrors "github.com/osv/shared/pkg/errors"
 )
 
 // stubHelper is used for ecosystems that are registered but lack full implementation.

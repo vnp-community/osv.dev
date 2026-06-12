@@ -9,8 +9,8 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/osv/pkg/models"
-	"github.com/osv/pkg/testutil"
+	"github.com/osv/shared/pkg/models"
+	"github.com/osv/shared/pkg/testutil"
 )
 
 func TestSourceRepositoryStore_Update(t *testing.T) {

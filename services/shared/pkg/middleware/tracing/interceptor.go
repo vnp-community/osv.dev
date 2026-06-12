@@ -27,7 +27,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const instrumentationName = "github.com/osv/pkg/middleware/tracing"
+const instrumentationName = "github.com/osv/shared/pkg/middleware/tracing"
 
 // UnaryServerInterceptor returns a gRPC unary server interceptor that
 // creates an OpenTelemetry span for each RPC call.

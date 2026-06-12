@@ -1,7 +1,8 @@
-# T09 — Shared Layer Update
+# T09 — Shared Layer Update ✅ DONE
 
 **Phase**: 9
 **Depends on**: T08
+**Status**: ✅ Completed — 2026-06-12
 **Estimated effort**: 30 minutes
 
 ---
@@ -100,10 +101,10 @@ done
 
 ## Điều kiện hoàn thành
 
-- [ ] `shared/pkg/go.mod`: `module github.com/osv/shared/pkg`
-- [ ] Tất cả 8 services có `replace github.com/osv/shared/pkg => ../shared/pkg`
-- [ ] Không còn reference đến `github.com/osv/pkg` trong bất kỳ file nào
-- [ ] `go build ./...` pass cho tất cả 8 services
+- [x] `shared/pkg/go.mod`: `module github.com/osv/shared/pkg`
+- [x] Tất cả 8 services có `replace github.com/osv/shared/pkg => ../shared/pkg`
+- [x] Không còn reference đến `github.com/osv/pkg` trong bất kỳ file nào
+- [x] `go build ./...` pass cho tất cả 8 services (package conflicts fixed)
 
 ---
 

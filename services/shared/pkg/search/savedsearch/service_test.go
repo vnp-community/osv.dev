@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/osv/pkg/search/savedsearch"
+	"github.com/osv/shared/pkg/search/savedsearch"
 )
 
 // ---- Mock SearchExecutor ----

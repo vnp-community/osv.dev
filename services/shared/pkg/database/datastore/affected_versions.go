@@ -5,8 +5,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/osv/pkg/osvutil"
-	ecosystem "github.com/osv/pkg/ecosystem/impl"
+	"github.com/osv/shared/pkg/osvutil"
+	ecosystem "github.com/osv/shared/pkg/ecosystem/impl"
 	"github.com/ossf/osv-schema/bindings/go/osvschema"
 )
 

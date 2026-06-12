@@ -9,7 +9,7 @@ import (
 	tcmongo "github.com/testcontainers/testcontainers-go/modules/mongodb"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	pkgmongo "github.com/osv/pkg/database/mongodb"
+	pkgmongo "github.com/osv/shared/pkg/database/mongodb"
 )
 
 // StartMongoDB starts a MongoDB testcontainer and returns a connected *mongo.Database.

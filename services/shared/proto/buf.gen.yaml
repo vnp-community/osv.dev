@@ -4,7 +4,9 @@ plugins:
     out: gen/go
     opt:
       - paths=source_relative
+      - module=github.com/osv/shared/proto
   - remote: buf.build/grpc/go
     out: gen/go
     opt:
       - paths=source_relative
+      - module=github.com/osv/shared/proto

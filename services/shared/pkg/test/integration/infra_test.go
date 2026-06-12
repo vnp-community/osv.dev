@@ -22,8 +22,8 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/redis"
 	"github.com/rs/zerolog"
 
-	"github.com/osv/pkg/health"
-	"github.com/osv/pkg/resilience"
+	"github.com/osv/shared/pkg/health"
+	"github.com/osv/shared/pkg/resilience"
 )
 
 // TestRedisProber_Integration verifies Redis health prober against a real Redis container.

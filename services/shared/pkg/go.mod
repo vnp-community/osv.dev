@@ -1,4 +1,4 @@
-module github.com/osv/pkg
+module github.com/osv/shared/pkg
 
 go 1.26.3
 

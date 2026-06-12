@@ -1,0 +1,9 @@
+# Upstream gRPC service addresses for gateway-service
+upstreams:
+  identity-service:     "${IDENTITY_SERVICE_ADDR:-identity-service:50051}"
+  data-service:         "${DATA_SERVICE_ADDR:-data-service:50052}"
+  search-service:       "${SEARCH_SERVICE_ADDR:-search-service:50053}"
+  scan-service:         "${SCAN_SERVICE_ADDR:-scan-service:50054}"
+  finding-service:      "${FINDING_SERVICE_ADDR:-finding-service:50055}"
+  ai-service:           "${AI_SERVICE_ADDR:-ai-service:50056}"
+  notification-service: "${NOTIFICATION_SERVICE_ADDR:-notification-service:50057}"

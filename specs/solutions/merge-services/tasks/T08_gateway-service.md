@@ -1,7 +1,8 @@
-# T08 — gateway-service
+# T08 — gateway-service ✅ DONE
 
 **Phase**: 8
 **Depends on**: T07
+**Status**: ✅ Completed — 2026-06-12
 **Spec**: [08_gateway-service.md](../../../services/08_gateway-service.md)
 **Estimated effort**: 1-2 hours
 
@@ -256,13 +257,13 @@ echo "Removed unified-gateway"
 
 ## Điều kiện hoàn thành
 
-- [ ] `services/gateway-service/` với module `github.com/osv/gateway-service`
-- [ ] `go build ./...` pass
-- [ ] `config/routes.yaml` với mapping đầy đủ tất cả 8 services
-- [ ] `config/upstreams.yaml` với tất cả service addresses
-- [ ] Domain: `auth/`, `policy/`, `entity/`
-- [ ] BFF aggregator tồn tại
-- [ ] `unified-gateway/` đã xoá
+- [x] `services/gateway-service/` với module `github.com/osv/gateway-service`
+- [x] `go build ./...` pass
+- [x] `config/routes.yaml` với mapping đầy đủ tất cả 8 services
+- [x] `config/upstreams.yaml` với tất cả service addresses
+- [x] Domain: `auth/`, `policy/`, `entity/` (từ unified-gateway)
+- [x] BFF aggregator `internal/bff/dashboard.go` (NEW)
+- [x] `unified-gateway/` đã xoá
 
 ---
 
