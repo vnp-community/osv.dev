@@ -49,4 +49,5 @@ require (
 )
 
 replace github.com/osv/shared/pkg => ../shared/pkg
+
 replace github.com/osv/shared/proto => ../shared/proto

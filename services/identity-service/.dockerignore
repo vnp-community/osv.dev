@@ -1,0 +1,15 @@
+# .dockerignore — exclude non-essential files from Docker build context
+*.md
+*.test
+*_test.go
+.git
+.gitignore
+.github/
+specs/
+deploy/
+docs/
+*.log
+tmp/
+.env
+.env.*
+!.env.example

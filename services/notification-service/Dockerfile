@@ -1,5 +1,5 @@
 # ============================================
-# identity-service — Multi-stage Docker Build
+# notification-service — Multi-stage Docker Build
 # ============================================
 
 # Stage 1: Builder
@@ -14,13 +14,13 @@ COPY services/shared/pkg ./services/shared/pkg
 COPY services/shared/proto ./services/shared/proto
 
 # Copy service go.mod + go.sum for dependency caching
-COPY services/identity-service/go.mod services/identity-service/go.sum ./services/identity-service/
+COPY services/notification-service/go.mod services/notification-service/go.sum ./services/notification-service/
 
-WORKDIR /build/services/identity-service
+WORKDIR /build/services/notification-service
 RUN go mod download
 
 # Copy service source code
-COPY services/identity-service/ .
+COPY services/notification-service/ .
 
 # Build binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
@@ -34,8 +34,8 @@ COPY --from=builder /bin/service /service
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
-EXPOSE 8081
-EXPOSE 50051
+EXPOSE 8087
+EXPOSE 50057
 
 USER nonroot:nonroot
 

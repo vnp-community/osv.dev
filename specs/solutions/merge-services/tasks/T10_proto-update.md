@@ -248,12 +248,12 @@ echo "Proto generated code builds successfully"
 
 ## Điều kiện hoàn thành
 
-- [ ] Proto tồn tại cho: `auth`, `cve`, `datasync`, `search`, `scan`, `scanner`, `finding`, `product`, `reporter`, `ai`, `notification`
-- [ ] `search.proto` với `SearchService`
-- [ ] `ai.proto` với `AIEnrichmentService`
-- [ ] `notification.proto` với `NotificationService`
-- [ ] `buf generate` chạy thành công
-- [ ] `go build ./gen/...` pass
+- [x] Proto tồn tại cho: `auth`, `cve`, `datasync`, `search`, `scan`, `scanner`, `finding`, `product`, `reporter`, `ai`, `notification`
+- [x] `search/v1/search.proto` với `SearchService` (Search, Suggest, Aggregate, IndexCVE)
+- [x] `ai/v1/ai.proto` với `AIEnrichmentService` (EnrichCVE, GetEPSS, TriageFinding, GenerateEmbedding, BatchEnrich)
+- [x] `notification/v1/notification.proto` với `NotificationService`
+- [x] `buf.gen.yaml` và `buf.yaml` đã cập nhật module name `github.com/osv/shared/proto`
+- [x] `go build ./...` pass cho shared/proto
 
 ---
 
