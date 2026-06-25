@@ -9,21 +9,22 @@ import (
 
 // Test represents a single scan run within an Engagement.
 type Test struct {
-	ID           uuid.UUID
-	EngagementID uuid.UUID
-	ScanType     string // e.g. "Trivy Scan", "Bandit Scan", "SARIF"
-	Title        string
-	Description  string
-	TargetStart  time.Time
-	TargetEnd    *time.Time
-	LeadID       *uuid.UUID
-	Version      string
-	BuildID      string
-	CommitHash   string
-	BranchTag    string
-	Tags         []string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID             uuid.UUID
+	EngagementID   uuid.UUID
+	ScanType       string // e.g. "Trivy Scan", "Bandit Scan", "SARIF"
+	Title          string
+	Description    string
+	TargetStart    time.Time
+	TargetEnd      *time.Time
+	LeadID         *uuid.UUID
+	Version        string
+	BuildID        string
+	CommitHash     string
+	BranchTag      string
+	PercentComplete int // 0-100
+	Tags           []string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 // New creates a new Test with required fields.

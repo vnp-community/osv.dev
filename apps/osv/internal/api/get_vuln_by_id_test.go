@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/osv/pkg/models"
+	"github.com/osv/shared/pkg/models"
 	"github.com/ossf/osv-schema/bindings/go/osvschema"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/testing/protocmp"
 
-	pb "github.com/osv/pkg/clients/api"
+	pb "github.com/osv/shared/pkg/clients/api"
 )
 
 type mockVulnerabilityStore struct {

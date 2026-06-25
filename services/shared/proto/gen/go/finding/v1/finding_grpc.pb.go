@@ -19,14 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	FindingService_BatchCreateFindings_FullMethodName     = "/finding.v1.FindingService/BatchCreateFindings"
-	FindingService_CloseOldFindings_FullMethodName        = "/finding.v1.FindingService/CloseOldFindings"
-	FindingService_FindByHashCode_FullMethodName          = "/finding.v1.FindingService/FindByHashCode"
-	FindingService_ReactivateFindings_FullMethodName      = "/finding.v1.FindingService/ReactivateFindings"
-	FindingService_ApplyTags_FullMethodName               = "/finding.v1.FindingService/ApplyTags"
-	FindingService_BatchUpdateSLADates_FullMethodName     = "/finding.v1.FindingService/BatchUpdateSLADates"
-	FindingService_ListFindingsForSLACheck_FullMethodName = "/finding.v1.FindingService/ListFindingsForSLACheck"
-	FindingService_ListFindingsForReport_FullMethodName   = "/finding.v1.FindingService/ListFindingsForReport"
+	FindingService_BatchCreateFindings_FullMethodName       = "/finding.v1.FindingService/BatchCreateFindings"
+	FindingService_CloseOldFindings_FullMethodName          = "/finding.v1.FindingService/CloseOldFindings"
+	FindingService_FindByHashCode_FullMethodName            = "/finding.v1.FindingService/FindByHashCode"
+	FindingService_ReactivateFindings_FullMethodName        = "/finding.v1.FindingService/ReactivateFindings"
+	FindingService_ApplyTags_FullMethodName                 = "/finding.v1.FindingService/ApplyTags"
+	FindingService_BatchUpdateSLADates_FullMethodName       = "/finding.v1.FindingService/BatchUpdateSLADates"
+	FindingService_ListFindingsForSLACheck_FullMethodName   = "/finding.v1.FindingService/ListFindingsForSLACheck"
+	FindingService_ListFindingsForReport_FullMethodName     = "/finding.v1.FindingService/ListFindingsForReport"
+	FindingService_GetOrCreateEngagement_FullMethodName     = "/finding.v1.FindingService/GetOrCreateEngagement"
+	FindingService_GetOrCreateTest_FullMethodName           = "/finding.v1.FindingService/GetOrCreateTest"
+	FindingService_CheckProductPermission_FullMethodName    = "/finding.v1.FindingService/CheckProductPermission"
+	FindingService_ExistsFalsePositiveByHash_FullMethodName = "/finding.v1.FindingService/ExistsFalsePositiveByHash"
+	FindingService_GetSeverityCounts_FullMethodName         = "/finding.v1.FindingService/GetSeverityCounts"
+	FindingService_CountFindings_FullMethodName             = "/finding.v1.FindingService/CountFindings"
 )
 
 // FindingServiceClient is the client API for FindingService service.
@@ -48,6 +54,13 @@ type FindingServiceClient interface {
 	ListFindingsForSLACheck(ctx context.Context, in *ListFindingsForSLACheckRequest, opts ...grpc.CallOption) (*ListFindingsForSLACheckResponse, error)
 	// Called by Report Service (server-streaming to avoid OOM on large result sets)
 	ListFindingsForReport(ctx context.Context, in *ListFindingsForReportRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[FindingProto], error)
+	// CR-DD-001: Product context operations (called by scan-service for auto-context)
+	GetOrCreateEngagement(ctx context.Context, in *GetOrCreateEngagementRequest, opts ...grpc.CallOption) (*GetOrCreateEngagementResponse, error)
+	GetOrCreateTest(ctx context.Context, in *GetOrCreateTestRequest, opts ...grpc.CallOption) (*GetOrCreateTestResponse, error)
+	CheckProductPermission(ctx context.Context, in *CheckProductPermissionRequest, opts ...grpc.CallOption) (*CheckProductPermissionResponse, error)
+	ExistsFalsePositiveByHash(ctx context.Context, in *ExistsFalsePositiveByHashRequest, opts ...grpc.CallOption) (*ExistsFalsePositiveByHashResponse, error)
+	GetSeverityCounts(ctx context.Context, in *GetSeverityCountsRequest, opts ...grpc.CallOption) (*GetSeverityCountsResponse, error)
+	CountFindings(ctx context.Context, in *CountFindingsRequest, opts ...grpc.CallOption) (*CountFindingsResponse, error)
 }
 
 type findingServiceClient struct {
@@ -147,6 +160,66 @@ func (c *findingServiceClient) ListFindingsForReport(ctx context.Context, in *Li
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type FindingService_ListFindingsForReportClient = grpc.ServerStreamingClient[FindingProto]
 
+func (c *findingServiceClient) GetOrCreateEngagement(ctx context.Context, in *GetOrCreateEngagementRequest, opts ...grpc.CallOption) (*GetOrCreateEngagementResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetOrCreateEngagementResponse)
+	err := c.cc.Invoke(ctx, FindingService_GetOrCreateEngagement_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *findingServiceClient) GetOrCreateTest(ctx context.Context, in *GetOrCreateTestRequest, opts ...grpc.CallOption) (*GetOrCreateTestResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetOrCreateTestResponse)
+	err := c.cc.Invoke(ctx, FindingService_GetOrCreateTest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *findingServiceClient) CheckProductPermission(ctx context.Context, in *CheckProductPermissionRequest, opts ...grpc.CallOption) (*CheckProductPermissionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckProductPermissionResponse)
+	err := c.cc.Invoke(ctx, FindingService_CheckProductPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *findingServiceClient) ExistsFalsePositiveByHash(ctx context.Context, in *ExistsFalsePositiveByHashRequest, opts ...grpc.CallOption) (*ExistsFalsePositiveByHashResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExistsFalsePositiveByHashResponse)
+	err := c.cc.Invoke(ctx, FindingService_ExistsFalsePositiveByHash_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *findingServiceClient) GetSeverityCounts(ctx context.Context, in *GetSeverityCountsRequest, opts ...grpc.CallOption) (*GetSeverityCountsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSeverityCountsResponse)
+	err := c.cc.Invoke(ctx, FindingService_GetSeverityCounts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *findingServiceClient) CountFindings(ctx context.Context, in *CountFindingsRequest, opts ...grpc.CallOption) (*CountFindingsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CountFindingsResponse)
+	err := c.cc.Invoke(ctx, FindingService_CountFindings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FindingServiceServer is the server API for FindingService service.
 // All implementations must embed UnimplementedFindingServiceServer
 // for forward compatibility.
@@ -166,6 +239,13 @@ type FindingServiceServer interface {
 	ListFindingsForSLACheck(context.Context, *ListFindingsForSLACheckRequest) (*ListFindingsForSLACheckResponse, error)
 	// Called by Report Service (server-streaming to avoid OOM on large result sets)
 	ListFindingsForReport(*ListFindingsForReportRequest, grpc.ServerStreamingServer[FindingProto]) error
+	// CR-DD-001: Product context operations (called by scan-service for auto-context)
+	GetOrCreateEngagement(context.Context, *GetOrCreateEngagementRequest) (*GetOrCreateEngagementResponse, error)
+	GetOrCreateTest(context.Context, *GetOrCreateTestRequest) (*GetOrCreateTestResponse, error)
+	CheckProductPermission(context.Context, *CheckProductPermissionRequest) (*CheckProductPermissionResponse, error)
+	ExistsFalsePositiveByHash(context.Context, *ExistsFalsePositiveByHashRequest) (*ExistsFalsePositiveByHashResponse, error)
+	GetSeverityCounts(context.Context, *GetSeverityCountsRequest) (*GetSeverityCountsResponse, error)
+	CountFindings(context.Context, *CountFindingsRequest) (*CountFindingsResponse, error)
 	mustEmbedUnimplementedFindingServiceServer()
 }
 
@@ -199,6 +279,24 @@ func (UnimplementedFindingServiceServer) ListFindingsForSLACheck(context.Context
 }
 func (UnimplementedFindingServiceServer) ListFindingsForReport(*ListFindingsForReportRequest, grpc.ServerStreamingServer[FindingProto]) error {
 	return status.Error(codes.Unimplemented, "method ListFindingsForReport not implemented")
+}
+func (UnimplementedFindingServiceServer) GetOrCreateEngagement(context.Context, *GetOrCreateEngagementRequest) (*GetOrCreateEngagementResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetOrCreateEngagement not implemented")
+}
+func (UnimplementedFindingServiceServer) GetOrCreateTest(context.Context, *GetOrCreateTestRequest) (*GetOrCreateTestResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetOrCreateTest not implemented")
+}
+func (UnimplementedFindingServiceServer) CheckProductPermission(context.Context, *CheckProductPermissionRequest) (*CheckProductPermissionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckProductPermission not implemented")
+}
+func (UnimplementedFindingServiceServer) ExistsFalsePositiveByHash(context.Context, *ExistsFalsePositiveByHashRequest) (*ExistsFalsePositiveByHashResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ExistsFalsePositiveByHash not implemented")
+}
+func (UnimplementedFindingServiceServer) GetSeverityCounts(context.Context, *GetSeverityCountsRequest) (*GetSeverityCountsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSeverityCounts not implemented")
+}
+func (UnimplementedFindingServiceServer) CountFindings(context.Context, *CountFindingsRequest) (*CountFindingsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CountFindings not implemented")
 }
 func (UnimplementedFindingServiceServer) mustEmbedUnimplementedFindingServiceServer() {}
 func (UnimplementedFindingServiceServer) testEmbeddedByValue()                        {}
@@ -358,6 +456,114 @@ func _FindingService_ListFindingsForReport_Handler(srv interface{}, stream grpc.
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type FindingService_ListFindingsForReportServer = grpc.ServerStreamingServer[FindingProto]
 
+func _FindingService_GetOrCreateEngagement_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrCreateEngagementRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FindingServiceServer).GetOrCreateEngagement(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FindingService_GetOrCreateEngagement_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FindingServiceServer).GetOrCreateEngagement(ctx, req.(*GetOrCreateEngagementRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FindingService_GetOrCreateTest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrCreateTestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FindingServiceServer).GetOrCreateTest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FindingService_GetOrCreateTest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FindingServiceServer).GetOrCreateTest(ctx, req.(*GetOrCreateTestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FindingService_CheckProductPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckProductPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FindingServiceServer).CheckProductPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FindingService_CheckProductPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FindingServiceServer).CheckProductPermission(ctx, req.(*CheckProductPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FindingService_ExistsFalsePositiveByHash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExistsFalsePositiveByHashRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FindingServiceServer).ExistsFalsePositiveByHash(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FindingService_ExistsFalsePositiveByHash_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FindingServiceServer).ExistsFalsePositiveByHash(ctx, req.(*ExistsFalsePositiveByHashRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FindingService_GetSeverityCounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSeverityCountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FindingServiceServer).GetSeverityCounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FindingService_GetSeverityCounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FindingServiceServer).GetSeverityCounts(ctx, req.(*GetSeverityCountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FindingService_CountFindings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CountFindingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FindingServiceServer).CountFindings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FindingService_CountFindings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FindingServiceServer).CountFindings(ctx, req.(*CountFindingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FindingService_ServiceDesc is the grpc.ServiceDesc for FindingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -392,6 +598,30 @@ var FindingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListFindingsForSLACheck",
 			Handler:    _FindingService_ListFindingsForSLACheck_Handler,
+		},
+		{
+			MethodName: "GetOrCreateEngagement",
+			Handler:    _FindingService_GetOrCreateEngagement_Handler,
+		},
+		{
+			MethodName: "GetOrCreateTest",
+			Handler:    _FindingService_GetOrCreateTest_Handler,
+		},
+		{
+			MethodName: "CheckProductPermission",
+			Handler:    _FindingService_CheckProductPermission_Handler,
+		},
+		{
+			MethodName: "ExistsFalsePositiveByHash",
+			Handler:    _FindingService_ExistsFalsePositiveByHash_Handler,
+		},
+		{
+			MethodName: "GetSeverityCounts",
+			Handler:    _FindingService_GetSeverityCounts_Handler,
+		},
+		{
+			MethodName: "CountFindings",
+			Handler:    _FindingService_CountFindings_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

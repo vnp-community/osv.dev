@@ -1,0 +1,67 @@
+[
+  {
+    "_id": "5fbb6748-9c5a-4d75-8d18-e91e98dc4215",
+    "finding_id": "e995ea8f-3427-433f-b1b4-b85d931da21d",
+    "jira_configuration_id": "d5ea545a-d90b-4c0b-a8d2-0cdc82057819",
+    "jira_id": "10000",
+    "jira_key": "SECSCAN-101",
+    "jira_url": "https://company.atlassian.net/browse/SECSCAN-101",
+    "jira_status": "In Review",
+    "jira_priority": "High",
+    "synced": true,
+    "last_sync_at": "2026-06-17T11:07:40Z",
+    "sync_error": null
+  },
+  {
+    "_id": "8429c722-75dd-4799-a7a9-229622af2c43",
+    "finding_id": "267a8919-e290-440d-8024-70622c0b2b9a",
+    "jira_configuration_id": "a9f04245-e141-4cbf-859f-acfd522b28a1",
+    "jira_id": "10001",
+    "jira_key": "VULN-102",
+    "jira_url": "https://company.atlassian.net/browse/VULN-102",
+    "jira_status": "To Do",
+    "jira_priority": "High",
+    "synced": true,
+    "last_sync_at": "2026-06-21T11:07:40Z",
+    "sync_error": null
+  },
+  {
+    "_id": "ce57fe5d-dd92-4d79-a10a-ff075133580d",
+    "finding_id": "90d38c9c-29f5-42d2-832b-229c5076885b",
+    "jira_configuration_id": "4956e304-458a-4a2c-850f-829399486b85",
+    "jira_id": "10002",
+    "jira_key": "SECSCAN-103",
+    "jira_url": "https://company.atlassian.net/browse/SECSCAN-103",
+    "jira_status": "Done",
+    "jira_priority": "High",
+    "synced": true,
+    "last_sync_at": "2026-06-17T11:07:40Z",
+    "sync_error": null
+  },
+  {
+    "_id": "6bd23a7f-e305-4179-8142-ee31ef3097cd",
+    "finding_id": "43fda2b5-befa-44ac-ae71-6f5858b99625",
+    "jira_configuration_id": "d5ea545a-d90b-4c0b-a8d2-0cdc82057819",
+    "jira_id": "10003",
+    "jira_key": "SECSCAN-104",
+    "jira_url": "https://company.atlassian.net/browse/SECSCAN-104",
+    "jira_status": "In Progress",
+    "jira_priority": "Highest",
+    "synced": true,
+    "last_sync_at": "2026-06-21T11:07:40Z",
+    "sync_error": null
+  },
+  {
+    "_id": "26ce474a-f660-4776-9983-c7d694c09d20",
+    "finding_id": "0efae4f9-6dba-4039-8f37-0c7f2394bf84",
+    "jira_configuration_id": "a9f04245-e141-4cbf-859f-acfd522b28a1",
+    "jira_id": "10004",
+    "jira_key": "VULN-105",
+    "jira_url": "https://company.atlassian.net/browse/VULN-105",
+    "jira_status": "In Review",
+    "jira_priority": "Highest",
+    "synced": true,
+    "last_sync_at": "2026-06-17T11:07:40Z",
+    "sync_error": null
+  }
+]

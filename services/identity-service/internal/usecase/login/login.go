@@ -23,17 +23,19 @@ type Request struct {
 	Email     string
 	Password  string
 	TOTPCode  string // optional; required when MFA is enabled
-	IPAddress string
-	UserAgent string
+	IPAddress  string
+	UserAgent  string
+	RememberMe bool
 }
 
 // Response is the output DTO for a successful login.
 type Response struct {
-	AccessToken  string
-	RefreshToken string
-	ExpiresIn    int // seconds until access token expires
-	UserID       string
-	Role         string
+	AccessToken      string
+	RefreshToken     string
+	ExpiresIn        int // seconds until access token expires
+	RefreshExpiresIn int // seconds until refresh token expires
+	UserID           string
+	Role             string
 }
 
 // UseCase orchestrates the login flow:
@@ -104,7 +106,11 @@ func (uc *UseCase) Execute(ctx context.Context, req Request) (*Response, error) 
 		if req.TOTPCode == "" {
 			return nil, domainerr.ErrMFARequired
 		}
-		if !crypto.ValidateTOTP(user.MFATOTPSecret, req.TOTPCode) {
+		secret := ""
+		if user.MFATOTPSecret != nil {
+			secret = *user.MFATOTPSecret
+		}
+		if !crypto.ValidateTOTP(secret, req.TOTPCode) {
 			return nil, domainerr.ErrInvalidMFACode
 		}
 	}
@@ -124,24 +130,31 @@ func (uc *UseCase) Execute(ctx context.Context, req Request) (*Response, error) 
 	}
 
 	// Step 8: Create session
+	expiresIn := 24 * time.Hour
+	if req.RememberMe {
+		expiresIn = 30 * 24 * time.Hour
+	}
+	sessionExpiresAt := time.Now().UTC().Add(expiresIn)
+
 	session := &entity.Session{
 		UserID:           user.ID,
 		RefreshTokenHash: pgRepo.HashRefreshToken(refreshToken),
-		TokenFamily:      uuid.New().String(),
+		TokenFamily:      uuid.New(),
 		IPAddress:        extractIP(req.IPAddress),
 		UserAgent:        req.UserAgent,
-		ExpiresAt:        time.Now().UTC().Add(7 * 24 * time.Hour),
+		ExpiresAt:        sessionExpiresAt,
 	}
 	if err := uc.sessionRepo.Create(ctx, session); err != nil {
 		return nil, err
 	}
 
 	return &Response{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		ExpiresIn:    int((15 * time.Minute).Seconds()),
-		UserID:       user.ID.String(),
-		Role:         user.Role,
+		AccessToken:      accessToken,
+		RefreshToken:     refreshToken,
+		ExpiresIn:        int((15 * time.Minute).Seconds()),
+		RefreshExpiresIn: int(expiresIn.Seconds()),
+		UserID:           user.ID.String(),
+		Role:             user.Role,
 	}, nil
 }
 

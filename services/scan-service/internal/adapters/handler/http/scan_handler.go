@@ -158,10 +158,16 @@ func errResp(code, msg string) map[string]string {
 
 // NewRouter builds the scan service router.
 func NewRouter(h *ScanHandler, log zerolog.Logger) http.Handler {
+	return NewRouterWithStats(h, nil, log)
+}
+
+// NewRouterWithStats builds the router with an optional StatsHandler.
+// When statsH is nil, /api/v1/scans/stats endpoints return zeros (graceful degradation).
+func NewRouterWithStats(h *ScanHandler, statsH *StatsHandler, log zerolog.Logger) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID, middleware.RealIP, middleware.Recoverer)
 	r.Use(middleware.Timeout(30 * time.Second))
-	r.Use(cors.Handler(cors.Options{AllowedOrigins: []string{"*"}, AllowedMethods: []string{"GET","POST","DELETE","OPTIONS"}}))
+	r.Use(cors.Handler(cors.Options{AllowedOrigins: []string{"*"}, AllowedMethods: []string{"GET", "POST", "DELETE", "OPTIONS"}}))
 
 	r.Get("/health/live", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
@@ -173,9 +179,21 @@ func NewRouter(h *ScanHandler, log zerolog.Logger) http.Handler {
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Post("/scans", h.CreateScan)
 		r.Get("/scans", h.ListScans)
+
+		// Stats routes — literal paths BEFORE wildcard {id}
+		// CR-008: /stats/weekly MUST come before /stats to avoid being shadowed
+		sh := statsH
+		if sh == nil {
+			sh = &StatsHandler{repo: nil} // graceful no-op
+		}
+		r.Get("/scans/stats/weekly", sh.GetWeeklyActivity)
+		r.Get("/scans/stats", sh.GetStats)
+
 		r.Get("/scans/{id}", h.GetScan)
 		r.Delete("/scans/{id}", h.CancelScan)
 		r.Get("/scans/{id}/findings", h.GetFindings)
 	})
 	return r
 }
+
+

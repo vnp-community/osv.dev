@@ -1,0 +1,140 @@
+--- services/gateway-service/internal/bff/handlers/handler_ui_api.go
++++ services/gateway-service/internal/bff/handlers/handler_ui_api.go
+@@ -183,9 +183,9 @@
+ 	// ─────────────────────────────────────────────────────────────────
+ 	// Administration & Integration endpoints
+ 	// ─────────────────────────────────────────────────────────────────
+-	r.Get("/api/v1/admin/settings", h.AdminSettings)
+-	r.Patch("/api/v1/admin/settings", h.AdminSettingsUpdate)
+-	r.Put("/api/v1/admin/settings", h.AdminSettingsUpdate) // CR-012: PUT alias for PATCH
++	r.Get("/api/v1/admin/settings", h.AdminSettingsGet)
++	r.Patch("/api/v1/admin/settings", h.AdminSettingsUpdate)
++	r.Put("/api/v1/admin/settings", h.AdminSettingsUpdate)
+ 	r.Get("/api/v1/admin/roles", h.AdminRoles)
+ 	r.Get("/api/v1/admin/health", h.AdminHealth)
+ 	r.Get("/api/v1/admin/users", h.AdminUserList)
+@@ -216,9 +216,14 @@
+ 	r.Post("/api/v2/alerts/{id}/read", h.AlertMarkRead)
+ 
+ 	// Integrations (Jira)
+-	r.Get("/api/v1/jira/config", h.JiraConfigGet)
+-	r.Post("/api/v1/jira/config", h.JiraConfigSet)
+-	r.Post("/api/v1/jira/config/test", h.JiraConfigTest)
++	r.Get("/api/v2/jira-configurations", h.JiraConfigList)
++	r.Post("/api/v2/jira-configurations", h.JiraConfigCreate)
++	r.Post("/api/v2/jira-configurations/bulk", h.JiraConfigBulk)
++	r.Get("/api/v2/jira-configurations/{id}", h.JiraConfigGet)
++	r.Post("/api/v2/jira-configurations/{id}/test", h.JiraConfigTest)
++	r.Put("/api/v2/jira-configurations/{id}", h.JiraConfigUpdate)
++	r.Get("/api/v2/jira-issues", h.JiraIssueList)
++	r.Post("/api/v2/jira-issues", h.JiraIssueCreate)
+ 
+ 	// ─────────────────────────────────────────────────────────────────
+ 	// Advanced Search endpoints (CR-UI-011)
+@@ -226,11 +231,14 @@
+ 	r.Get("/api/v2/cves", h.CVESearch)
+ 	r.Get("/api/v2/cves/{id}", h.CVEDetail)
+ 	r.Post("/api/v2/cves/search", h.CVEFullTextSearch)
++	r.Get("/api/v1/search/recent", h.SearchRecent)
++	r.Post("/api/v1/search/history", h.SearchHistoryRecord)
+ 
+ 	// ─────────────────────────────────────────────────────────────────
+ 	// AI Center endpoints (CR-UI-008)
+ 	// ─────────────────────────────────────────────────────────────────
+ 	r.Get("/api/v1/ai/triage/queue", h.AITriageQueue)
++	r.Post("/api/v1/ai/triage/bulk-seed", h.AITriageBulkSeed)
+ 	r.Post("/api/v1/ai/triage/{findingId}", h.AITriage)
+ 	r.Post("/api/v1/ai/triage/{findingId}/review", h.AITriageReview)
+ 	r.Get("/api/v1/ai/enrichment", h.AIEnrichmentList)
+@@ -238,6 +246,7 @@
+ 	r.Post("/api/v1/ai/enrichment/trigger", h.AIEnrichmentTrigger)
++	r.Post("/api/v1/ai/enrichment/batch", h.AIEnrichmentBatch)
+ 
+ 	// Dashboard stats (fan-out)
+ 	r.Get("/api/v1/stats", h.DashboardStats)
+@@ -949,15 +958,15 @@
+ // Returns the typed platform settings schema (4 sections).
+ // Tries identity-service first; falls back to scan-service (which hosts SettingsBFF);
+ // finally returns a default empty-but-valid settings structure.
+-func (h *UIAPIHandler) AdminSettings(w http.ResponseWriter, r *http.Request) {
+-	// Try scan-service first (hosts SettingsBFF via apps/osv embedded BFF on :8088)
+-	req, err := http.NewRequestWithContext(r.Context(), "GET", h.scanServiceURL+"/api/v1/admin/settings", nil)
++func (h *UIAPIHandler) AdminSettingsGet(w http.ResponseWriter, r *http.Request) {
++	// Try identity-service first
++	req, err := http.NewRequestWithContext(r.Context(), "GET", h.identityServiceURL+"/api/v1/admin/settings", nil)
+ 	if err == nil {
+ 		req.Header.Set("Authorization", r.Header.Get("Authorization"))
+ 		req.Header.Set("X-User-ID", r.Header.Get("X-User-ID"))
+ 		if resp, err := h.httpClient.Do(req); err == nil && resp.StatusCode == http.StatusOK {
+ 			defer resp.Body.Close()
+ 			w.Header().Set("Content-Type", "application/json")
+ 			w.WriteHeader(http.StatusOK)
+ 			io.Copy(w, resp.Body) //nolint:errcheck
+ 			return
+@@ -1015,28 +1024,42 @@
+ }
+ 
+ func (h *UIAPIHandler) AdminSettingsUpdate(w http.ResponseWriter, r *http.Request) {
+-	// Try scan-service first (hosts SettingsBFF)
+-	req, err := http.NewRequestWithContext(r.Context(), "PATCH", h.scanServiceURL+"/api/v1/admin/settings", r.Body)
+-	if err == nil {
+-		req.Header.Set("Authorization", r.Header.Get("Authorization"))
+-		req.Header.Set("Content-Type", r.Header.Get("Content-Type"))
+-		if resp, err := h.httpClient.Do(req); err == nil {
+-			defer resp.Body.Close()
+-			w.Header().Set("Content-Type", "application/json")
+-			w.WriteHeader(resp.StatusCode)
+-			io.Copy(w, resp.Body) //nolint:errcheck
+-			return
+-		}
+-	}
+-	respondJSON(w, http.StatusOK, map[string]interface{}{"message": "settings updated"})
++	h.proxyRequest(w, r, h.identityServiceURL+"/api/v1/admin/settings")
+ }
+ 
++func (h *UIAPIHandler) JiraConfigList(w http.ResponseWriter, r *http.Request) {
++	h.proxyRequest(w, r, h.notificationServiceURL+"/api/v2/jira-configurations")
++}
++func (h *UIAPIHandler) JiraConfigCreate(w http.ResponseWriter, r *http.Request) {
++	h.proxyRequest(w, r, h.notificationServiceURL+"/api/v2/jira-configurations")
++}
++func (h *UIAPIHandler) JiraConfigBulk(w http.ResponseWriter, r *http.Request) {
++	h.proxyRequest(w, r, h.notificationServiceURL+"/api/v2/jira-configurations/bulk")
++}
+ func (h *UIAPIHandler) JiraConfigGet(w http.ResponseWriter, r *http.Request) {
+-	h.proxyRequest(w, r, h.jiraServiceURL+"/api/v1/jira/config")
++	id := chi.URLParam(r, "id")
++	h.proxyRequest(w, r, h.notificationServiceURL+"/api/v2/jira-configurations/"+id)
++}
++func (h *UIAPIHandler) JiraConfigTest(w http.ResponseWriter, r *http.Request) {
++	id := chi.URLParam(r, "id")
++	h.proxyRequest(w, r, h.notificationServiceURL+"/api/v2/jira-configurations/"+id+"/test")
++}
++func (h *UIAPIHandler) JiraConfigUpdate(w http.ResponseWriter, r *http.Request) {
++	id := chi.URLParam(r, "id")
++	h.proxyRequest(w, r, h.notificationServiceURL+"/api/v2/jira-configurations/"+id)
+ }
+-
+-func (h *UIAPIHandler) JiraConfigSet(w http.ResponseWriter, r *http.Request) {
+-	h.proxyRequest(w, r, h.jiraServiceURL+"/api/v1/jira/config")
++func (h *UIAPIHandler) JiraIssueList(w http.ResponseWriter, r *http.Request) {
++	h.proxyRequest(w, r, h.notificationServiceURL+"/api/v2/jira-issues")
+ }
+-
+-func (h *UIAPIHandler) JiraConfigTest(w http.ResponseWriter, r *http.Request) {
+-	h.proxyRequest(w, r, h.jiraServiceURL+"/api/v1/jira/config/test")
++func (h *UIAPIHandler) JiraIssueCreate(w http.ResponseWriter, r *http.Request) {
++	h.proxyRequest(w, r, h.notificationServiceURL+"/api/v2/jira-issues")
++}
++func (h *UIAPIHandler) SearchRecent(w http.ResponseWriter, r *http.Request) {
++	h.proxyRequest(w, r, h.searchServiceURL+"/api/v1/search/recent")
++}
++func (h *UIAPIHandler) SearchHistoryRecord(w http.ResponseWriter, r *http.Request) {
++	h.proxyRequest(w, r, h.searchServiceURL+"/api/v1/search/history")
++}
++func (h *UIAPIHandler) AITriageBulkSeed(w http.ResponseWriter, r *http.Request) {
++	h.proxyRequest(w, r, h.aiServiceURL+"/api/v1/ai/triage/bulk-seed")
++}
++func (h *UIAPIHandler) AIEnrichmentBatch(w http.ResponseWriter, r *http.Request) {
++	h.proxyRequest(w, r, h.aiServiceURL+"/api/v1/ai/enrichment/batch")
++}

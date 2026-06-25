@@ -63,6 +63,84 @@ func (c *Client) Search(ctx context.Context, params *repository.SearchParams) (*
 	return parseSearchResponse(resp)
 }
 
+// SearchCVEs performs a CVE-oriented search using SearchCVEsRequest.
+// Adapts SearchCVEsRequest (from the SDK-based client signature) to the HTTP-based query builder.
+func (c *Client) SearchCVEs(ctx context.Context, req *SearchCVEsRequest) ([]*entity.CVE, int64, error) {
+	if req == nil {
+		req = &SearchCVEsRequest{}
+	}
+
+	must := []interface{}{}
+	filter := []interface{}{}
+
+	if req.Query != "" {
+		must = append(must, map[string]interface{}{
+			"multi_match": map[string]interface{}{
+				"query":  req.Query,
+				"fields": []string{"description^2", "id^3", "vendors", "products"},
+			},
+		})
+	}
+	if len(req.Severity) > 0 {
+		filter = append(filter, map[string]interface{}{
+			"terms": map[string]interface{}{"severity": req.Severity},
+		})
+	}
+	if req.MinEPSS != nil {
+		filter = append(filter, map[string]interface{}{
+			"range": map[string]interface{}{"epss": map[string]interface{}{"gte": *req.MinEPSS}},
+		})
+	}
+	if req.IsKEV != nil {
+		filter = append(filter, map[string]interface{}{
+			"term": map[string]interface{}{"is_kev": *req.IsKEV},
+		})
+	}
+
+	boolQ := map[string]interface{}{"must": must, "filter": filter}
+	if len(must) == 0 {
+		boolQ["must"] = []interface{}{map[string]interface{}{"match_all": map[string]interface{}{}}}
+	}
+
+	query := map[string]interface{}{
+		"query": map[string]interface{}{"bool": boolQ},
+		"from":  req.Page * req.Limit,
+		"size":  req.Limit,
+	}
+
+	body, _ := json.Marshal(query)
+	url := fmt.Sprintf("%s/%s/_search", c.baseURL, c.index)
+	data, err := c.doRequest(ctx, http.MethodPost, url, body)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var result struct {
+		Hits struct {
+			Total struct{ Value int64 } `json:"total"`
+			Hits  []struct {
+				Source *entity.CVE `json:"_source"`
+			} `json:"hits"`
+		} `json:"hits"`
+	}
+	if err := json.Unmarshal(data, &result); err != nil {
+		return nil, 0, err
+	}
+
+	if len(result.Hits.Hits) == 0 {
+		return []*entity.CVE{}, 0, nil
+	}
+
+	cves := make([]*entity.CVE, 0, len(result.Hits.Hits))
+	for _, h := range result.Hits.Hits {
+		if h.Source != nil {
+			cves = append(cves, h.Source)
+		}
+	}
+	return cves, result.Hits.Total.Value, nil
+}
+
+
 // Upsert indexes or updates a vulnerability document.
 func (c *Client) Upsert(ctx context.Context, doc *entity.SearchDocument) error {
 	body, err := json.Marshal(doc)
@@ -76,6 +154,67 @@ func (c *Client) Upsert(ctx context.Context, doc *entity.SearchDocument) error {
 	}
 	return nil
 }
+
+// IndexCVE indexes or updates a single CVE document.
+func (c *Client) IndexCVE(ctx context.Context, cve *entity.CVE) error {
+	data, err := json.Marshal(cve)
+	if err != nil {
+		return err
+	}
+	url := fmt.Sprintf("%s/%s/_doc/%s", c.baseURL, c.index, cve.ID)
+	if _, err := c.doRequest(ctx, http.MethodPut, url, data); err != nil {
+		return fmt.Errorf("index cve %s: %w", cve.ID, err)
+	}
+	return nil
+}
+
+// BulkIndex indexes multiple CVEs using the bulk API.
+func (c *Client) BulkIndex(ctx context.Context, cves []*entity.CVE) error {
+	var buf strings.Builder
+	for _, cve := range cves {
+		meta := fmt.Sprintf(`{"index":{"_index":"%s","_id":"%s"}}`, c.index, cve.ID)
+		data, _ := json.Marshal(cve)
+		buf.WriteString(meta + "\n")
+		buf.WriteString(string(data) + "\n")
+	}
+	url := fmt.Sprintf("%s/_bulk", c.baseURL)
+	if _, err := c.doRequest(ctx, http.MethodPost, url, []byte(buf.String())); err != nil {
+		return fmt.Errorf("bulk index: %w", err)
+	}
+	return nil
+}
+
+// GetAggregations returns faceted aggregations for dashboard stats.
+func (c *Client) GetAggregations(ctx context.Context) (map[string]interface{}, error) {
+	query := map[string]interface{}{
+		"size": 0,
+		"aggs": map[string]interface{}{
+			"by_severity": map[string]interface{}{
+				"terms": map[string]interface{}{"field": "severity", "size": 10},
+			},
+			"top_vendors": map[string]interface{}{
+				"terms": map[string]interface{}{"field": "vendors", "size": 10},
+			},
+			"top_cwe": map[string]interface{}{
+				"terms": map[string]interface{}{"field": "cwe", "size": 10},
+			},
+		},
+	}
+	body, _ := json.Marshal(query)
+	url := fmt.Sprintf("%s/%s/_search", c.baseURL, c.index)
+	data, err := c.doRequest(ctx, http.MethodPost, url, body)
+	if err != nil {
+		return nil, err
+	}
+	var result map[string]interface{}
+	json.Unmarshal(data, &result) //nolint:errcheck
+	if aggs, ok := result["aggregations"].(map[string]interface{}); ok {
+		return aggs, nil
+	}
+	return map[string]interface{}{}, nil
+}
+
+
 
 // MarkWithdrawn sets the is_withdrawn flag to true for a vulnerability.
 func (c *Client) MarkWithdrawn(ctx context.Context, vulnID string) error {

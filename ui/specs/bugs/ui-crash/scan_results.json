@@ -1,0 +1,1240 @@
+[
+  {
+    "path": "/dashboard",
+    "label": "Dashboard — Main",
+    "url": "https://c12.openledger.vn/dashboard",
+    "final_url": "https://c12.openledger.vn/dashboard",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/dashboard/executive",
+    "label": "Dashboard — Executive Overview",
+    "url": "https://c12.openledger.vn/dashboard/executive",
+    "final_url": "https://c12.openledger.vn/dashboard/executive",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/dashboard/risk",
+    "label": "Dashboard — Risk Overview",
+    "url": "https://c12.openledger.vn/dashboard/risk",
+    "final_url": "https://c12.openledger.vn/dashboard/risk",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/dashboard/sla",
+    "label": "Dashboard — SLA Dashboard",
+    "url": "https://c12.openledger.vn/dashboard/sla",
+    "final_url": "https://c12.openledger.vn/dashboard/sla",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/cve/search",
+    "label": "CVE Intel — CVE Search",
+    "url": "https://c12.openledger.vn/cve/search",
+    "final_url": "https://c12.openledger.vn/cve/search",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/cve/kev",
+    "label": "CVE Intel — KEV Catalog",
+    "url": "https://c12.openledger.vn/cve/kev",
+    "final_url": "https://c12.openledger.vn/cve/kev",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/cve/semantic",
+    "label": "CVE Intel — Semantic Search",
+    "url": "https://c12.openledger.vn/cve/semantic",
+    "final_url": "https://c12.openledger.vn/cve/semantic",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/cve/epss",
+    "label": "CVE Intel — EPSS Analytics",
+    "url": "https://c12.openledger.vn/cve/epss",
+    "final_url": "https://c12.openledger.vn/cve/epss",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/cve/vendors",
+    "label": "CVE Intel — Vendor Catalog",
+    "url": "https://c12.openledger.vn/cve/vendors",
+    "final_url": "https://c12.openledger.vn/cve/vendors",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/cve/cwe",
+    "label": "CVE Intel — CWE Library",
+    "url": "https://c12.openledger.vn/cve/cwe",
+    "final_url": "https://c12.openledger.vn/cve/cwe",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 4,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'map')\n    at children (https://c12.openledger.vn/assets/CWELibrary-BEI2jiIT.js:1:1034)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'map')\n    at children (https://c12.openledger.vn/assets/CWELibrary-BEI2jiIT.js:1:1034)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of undefined (reading 'map')\n    at children (https://c12.openledger.vn/assets/CWELibrary-BEI2jiIT.js:1:1034)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of undefined (reading 'map')\n    at children (https://c12.openledger.vn/assets/CWELibrary-BEI2jiIT.js:1:1034)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'map')\n    at children (https://c12.openledger.vn/assets/CWELibrary-BEI2jiIT.js:1:1034)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'map')\n    at children (https://c12.openledger.vn/assets/CWELibrary-BEI2jiIT.js:1:1034)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of undefined (reading 'map')\n    at children (https://c12.openledger.vn/assets/CWELibrary-BEI2jiIT.js:1:1034)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of undefined (reading 'map')\n    at children (https://c12.openledger.vn/assets/CWELibrary-BEI2jiIT.js:1:1034)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ]
+  },
+  {
+    "path": "/cve/capec",
+    "label": "CVE Intel — CAPEC Library",
+    "url": "https://c12.openledger.vn/cve/capec",
+    "final_url": "https://c12.openledger.vn/cve/capec",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/scans",
+    "label": "Scanning — Scan Dashboard",
+    "url": "https://c12.openledger.vn/scans",
+    "final_url": "https://c12.openledger.vn/scans",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 3,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/scans/stats/weekly', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/scans/stats/weekly', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/scans/stats/weekly', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/scans/stats/weekly', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/scans/stats/weekly', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/scans/stats/weekly', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/scans/new",
+    "label": "Scanning — New Scan Wizard",
+    "url": "https://c12.openledger.vn/scans/new",
+    "final_url": "https://c12.openledger.vn/scans/new",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/scans/running",
+    "label": "Scanning — Running Scans",
+    "url": "https://c12.openledger.vn/scans/running",
+    "final_url": "https://c12.openledger.vn/scans/running",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/scans/history",
+    "label": "Scanning — Scan History",
+    "url": "https://c12.openledger.vn/scans/history",
+    "final_url": "https://c12.openledger.vn/scans/history",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/findings",
+    "label": "Findings — All Findings",
+    "url": "https://c12.openledger.vn/findings",
+    "final_url": "https://c12.openledger.vn/findings",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 3,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 500 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/findings?page=1&pageSize=50', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 500 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/findings?page=1&pageSize=50', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 500 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/findings?page=1&pageSize=50', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 500 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/findings?page=1&pageSize=50', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 500 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/findings?page=1&pageSize=50', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 500 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/findings?page=1&pageSize=50', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/findings/risk-acceptance",
+    "label": "Findings — Risk Acceptance Center",
+    "url": "https://c12.openledger.vn/findings/risk-acceptance",
+    "final_url": "https://c12.openledger.vn/findings/risk-acceptance",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 3,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/risk-acceptances', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/risk-acceptances', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/risk-acceptances', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/risk-acceptances', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/risk-acceptances', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/risk-acceptances', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/assets",
+    "label": "Assets — Asset Inventory",
+    "url": "https://c12.openledger.vn/assets",
+    "final_url": "https://c12.openledger.vn/assets",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 4,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of null (reading 'filter')\n    at children (https://c12.openledger.vn/assets/AssetInventory-DyFjB9ih.js:1:3266)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of null (reading 'filter')\n    at children (https://c12.openledger.vn/assets/AssetInventory-DyFjB9ih.js:1:3266)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of null (reading 'filter')\n    at children (https://c12.openledger.vn/assets/AssetInventory-DyFjB9ih.js:1:3266)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of null (reading 'filter')\n    at children (https://c12.openledger.vn/assets/AssetInventory-DyFjB9ih.js:1:3266)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of null (reading 'filter')\n    at children (https://c12.openledger.vn/assets/AssetInventory-DyFjB9ih.js:1:3266)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of null (reading 'filter')\n    at children (https://c12.openledger.vn/assets/AssetInventory-DyFjB9ih.js:1:3266)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of null (reading 'filter')\n    at children (https://c12.openledger.vn/assets/AssetInventory-DyFjB9ih.js:1:3266)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of null (reading 'filter')\n    at children (https://c12.openledger.vn/assets/AssetInventory-DyFjB9ih.js:1:3266)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ]
+  },
+  {
+    "path": "/products",
+    "label": "Product Security",
+    "url": "https://c12.openledger.vn/products",
+    "final_url": "https://c12.openledger.vn/products",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 4,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'flatMap')\n    at children (https://c12.openledger.vn/assets/ProductSecurity-DLEnEWyR.js:1:1697)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'flatMap')\n    at children (https://c12.openledger.vn/assets/ProductSecurity-DLEnEWyR.js:1:1697)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of undefined (reading 'flatMap')\n    at children (https://c12.openledger.vn/assets/ProductSecurity-DLEnEWyR.js:1:1697)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of undefined (reading 'flatMap')\n    at children (https://c12.openledger.vn/assets/ProductSecurity-DLEnEWyR.js:1:1697)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'flatMap')\n    at children (https://c12.openledger.vn/assets/ProductSecurity-DLEnEWyR.js:1:1697)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'flatMap')\n    at children (https://c12.openledger.vn/assets/ProductSecurity-DLEnEWyR.js:1:1697)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of undefined (reading 'flatMap')\n    at children (https://c12.openledger.vn/assets/ProductSecurity-DLEnEWyR.js:1:1697)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of undefined (reading 'flatMap')\n    at children (https://c12.openledger.vn/assets/ProductSecurity-DLEnEWyR.js:1:1697)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ]
+  },
+  {
+    "path": "/ai/triage",
+    "label": "AI Center — AI Triage Queue",
+    "url": "https://c12.openledger.vn/ai/triage",
+    "final_url": "https://c12.openledger.vn/ai/triage",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 3,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/triage/queue', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/triage/queue', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/triage/queue', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/triage/queue', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/triage/queue', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/triage/queue', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/ai/enrichment",
+    "label": "AI Center — AI Enrichment",
+    "url": "https://c12.openledger.vn/ai/enrichment",
+    "final_url": "https://c12.openledger.vn/ai/enrichment",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 3,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/enrichment', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/enrichment', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/enrichment', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/enrichment', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/enrichment', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 503 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/ai/enrichment', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/reports",
+    "label": "Reports — Report Center",
+    "url": "https://c12.openledger.vn/reports",
+    "final_url": "https://c12.openledger.vn/reports",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 6,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports/templates', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports/templates', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports/templates', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports/templates', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports/templates', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/reports/templates', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/notifications",
+    "label": "Notifications — Notification Center",
+    "url": "https://c12.openledger.vn/notifications",
+    "final_url": "https://c12.openledger.vn/notifications",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 3,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/notifications', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/notifications', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/notifications', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/notifications', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/notifications', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/notifications', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/integrations/api-keys",
+    "label": "Integrations — API Key Management",
+    "url": "https://c12.openledger.vn/integrations/api-keys",
+    "final_url": "https://c12.openledger.vn/integrations/api-keys",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 3,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/api-keys', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/api-keys', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/api-keys', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/api-keys', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/api-keys', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/api-keys', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/integrations/webhooks",
+    "label": "Integrations — Webhook Events",
+    "url": "https://c12.openledger.vn/integrations/webhooks",
+    "final_url": "https://c12.openledger.vn/integrations/webhooks",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 4,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'find')\n    at children (https://c12.openledger.vn/assets/WebhookEvents-8Y0JYtM0.js:1:2380)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'find')\n    at children (https://c12.openledger.vn/assets/WebhookEvents-8Y0JYtM0.js:1:2380)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of undefined (reading 'find')\n    at children (https://c12.openledger.vn/assets/WebhookEvents-8Y0JYtM0.js:1:2380)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of undefined (reading 'find')\n    at children (https://c12.openledger.vn/assets/WebhookEvents-8Y0JYtM0.js:1:2380)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'find')\n    at children (https://c12.openledger.vn/assets/WebhookEvents-8Y0JYtM0.js:1:2380)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'find')\n    at children (https://c12.openledger.vn/assets/WebhookEvents-8Y0JYtM0.js:1:2380)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of undefined (reading 'find')\n    at children (https://c12.openledger.vn/assets/WebhookEvents-8Y0JYtM0.js:1:2380)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of undefined (reading 'find')\n    at children (https://c12.openledger.vn/assets/WebhookEvents-8Y0JYtM0.js:1:2380)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ]
+  },
+  {
+    "path": "/admin/users",
+    "label": "Admin — User Management",
+    "url": "https://c12.openledger.vn/admin/users",
+    "final_url": "https://c12.openledger.vn/admin/users",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/admin/roles",
+    "label": "Admin — RBAC Management",
+    "url": "https://c12.openledger.vn/admin/roles",
+    "final_url": "https://c12.openledger.vn/admin/roles",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 26,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)\n    at https://c12.openledger.vn/assets/index-BfRpI07a.js:41:34502",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36948)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)\n    at https://c12.openledger.vn/assets/index-BfRpI07a.js:41:34502",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      },
+      {
+        "type": "error",
+        "text": "Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render Error: Minified React error #31; visit https://reactjs.org/docs/error-decoder.html?invariant=31&args[]=object%20with%20keys%20%7Bdescription%2C%20label%2C%20value%7D for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:6312)\n    at Et (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:11598)\n    at Xt (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:1479)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:46176)\n    at ch (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40095)\n    at Ig (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:40023)\n    at Ls (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:39876)\n    at zu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:36191)\n    at sh (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:37003)\n    at qr (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:3273)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ]
+  },
+  {
+    "path": "/admin/audit",
+    "label": "Admin — Audit Logs",
+    "url": "https://c12.openledger.vn/admin/audit",
+    "final_url": "https://c12.openledger.vn/admin/audit",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 3,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/audit-log', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/audit-log', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/audit-log', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/audit-log', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/audit-log', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/audit-log', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/admin/health",
+    "label": "Admin — System Health",
+    "url": "https://c12.openledger.vn/admin/health",
+    "final_url": "https://c12.openledger.vn/admin/health",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 4,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'includes')\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:994\n    at Array.find (<anonymous>)\n    at A (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:984)\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4634\n    at Array.map (<anonymous>)\n    at children (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4618)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'includes')\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:994\n    at Array.find (<anonymous>)\n    at A (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:984)\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4634\n    at Array.map (<anonymous>)\n    at children (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4618)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of undefined (reading 'includes')\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:994\n    at Array.find (<anonymous>)\n    at A (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:984)\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4634\n    at Array.map (<anonymous>)\n    at children (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4618)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of undefined (reading 'includes')\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:994\n    at Array.find (<anonymous>)\n    at A (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:984)\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4634\n    at Array.map (<anonymous>)\n    at children (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4618)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'includes')\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:994\n    at Array.find (<anonymous>)\n    at A (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:984)\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4634\n    at Array.map (<anonymous>)\n    at children (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4618)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "Error handled by React Router default ErrorBoundary: TypeError: Cannot read properties of undefined (reading 'includes')\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:994\n    at Array.find (<anonymous>)\n    at A (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:984)\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4634\n    at Array.map (<anonymous>)\n    at children (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4618)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 1328, 'lineNumber': 52, 'columnNumber': 1328}"
+      },
+      {
+        "type": "error",
+        "text": "TypeError: Cannot read properties of undefined (reading 'includes')\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:994\n    at Array.find (<anonymous>)\n    at A (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:984)\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4634\n    at Array.map (<anonymous>)\n    at children (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4618)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 40, 'column': 160, 'lineNumber': 40, 'columnNumber': 160}"
+      },
+      {
+        "type": "error",
+        "text": "React Router caught the following error during render TypeError: Cannot read properties of undefined (reading 'includes')\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:994\n    at Array.find (<anonymous>)\n    at A (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:984)\n    at https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4634\n    at Array.map (<anonymous>)\n    at children (https://c12.openledger.vn/assets/SystemHealth-BF--TRmg.js:1:4618)\n    at f (https://c12.openledger.vn/assets/QueryBoundary-D1KgYtbP.js:1:2415)\n    at fu (https://c12.openledger.vn/assets/index-BfRpI07a.js:39:17267)\n    at xu (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:3158)\n    at ph (https://c12.openledger.vn/assets/index-BfRpI07a.js:41:45245)",
+        "location": "{'url': 'https://c12.openledger.vn/assets/index-BfRpI07a.js', 'line': 52, 'column': 2489, 'lineNumber': 52, 'columnNumber': 2489}"
+      }
+    ]
+  },
+  {
+    "path": "/admin/settings",
+    "label": "Admin — System Settings",
+    "url": "https://c12.openledger.vn/admin/settings",
+    "final_url": "https://c12.openledger.vn/admin/settings",
+    "session_lost": false,
+    "status": "ERROR",
+    "real_error_count": 3,
+    "auth_error_count": 0,
+    "real_errors": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/admin/settings', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/admin/settings', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/admin/settings', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ],
+    "auth_errors": [],
+    "all_logs": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/admin/settings', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/admin/settings', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 ()",
+        "location": "{'url': 'https://c12.openledger.vn/api/v1/admin/settings', 'line': 0, 'column': 0, 'lineNumber': 0, 'columnNumber': 0}"
+      }
+    ]
+  },
+  {
+    "path": "/profile",
+    "label": "User — Profile",
+    "url": "https://c12.openledger.vn/profile",
+    "final_url": "https://c12.openledger.vn/profile",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  },
+  {
+    "path": "/onboarding",
+    "label": "User — Onboarding",
+    "url": "https://c12.openledger.vn/onboarding",
+    "final_url": "https://c12.openledger.vn/onboarding",
+    "session_lost": false,
+    "status": "OK",
+    "real_error_count": 0,
+    "auth_error_count": 0,
+    "real_errors": [],
+    "auth_errors": [],
+    "all_logs": []
+  }
+]

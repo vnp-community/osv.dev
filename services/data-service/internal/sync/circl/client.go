@@ -76,16 +76,15 @@ func convert(r circlCVE) *entity.CVE {
 	cve := &entity.CVE{
 		ID:          r.ID,
 		Description: r.Summary,
-		Source:      entity.SourceCIRCL,
+		Source:      "CIRCL",
 		Link:        "https://cve.circl.lu/cve/" + r.ID,
 	}
 	if t, err := time.Parse("2006-01-02 15:04:05.000000", r.Published); err == nil {
-		cve.Published = &t
+		cve.Published = t
 	}
 	if r.Cvss > 0 {
-		score := r.Cvss
-		cve.CVSSScore = &score
+		cve.CVSS = r.Cvss
+		cve.Severity = entity.SeverityFromCVSS(r.Cvss)
 	}
-	cve.InferSeverity("")
 	return cve
 }

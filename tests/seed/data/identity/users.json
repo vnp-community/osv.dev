@@ -1,0 +1,112 @@
+[
+  {
+    "_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "email": "admin@company.com",
+    "username": "admin",
+    "password": "AdminPass123!",
+    "role": "admin",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  },
+  {
+    "_id": "da1291e1-57d8-4edb-9932-0b287daff906",
+    "email": "bob1@company.com",
+    "username": "bob1",
+    "password": "Pass1Secure!",
+    "role": "readonly",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  },
+  {
+    "_id": "772b94cd-abc0-496a-a042-c0ed9ea8344a",
+    "email": "carol2@company.com",
+    "username": "carol2",
+    "password": "Pass2Secure!",
+    "role": "admin",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  },
+  {
+    "_id": "87e4d75c-fcd2-42b1-a421-40006be2e34f",
+    "email": "dave3@company.com",
+    "username": "dave3",
+    "password": "Pass3Secure!",
+    "role": "readonly",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  },
+  {
+    "_id": "88fd1dfd-d706-4c4a-8074-715ec3e347dc",
+    "email": "eve4@company.com",
+    "username": "eve4",
+    "password": "Pass4Secure!",
+    "role": "user",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  },
+  {
+    "_id": "62d887af-5f61-4bcd-ae4d-d2c14f4b6082",
+    "email": "frank5@company.com",
+    "username": "frank5",
+    "password": "Pass5Secure!",
+    "role": "user",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  },
+  {
+    "_id": "3f07415e-4e43-47ba-91e7-75c4bc8a0766",
+    "email": "grace6@company.com",
+    "username": "grace6",
+    "password": "Pass6Secure!",
+    "role": "user",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  },
+  {
+    "_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "email": "hank7@company.com",
+    "username": "hank7",
+    "password": "Pass7Secure!",
+    "role": "user",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  },
+  {
+    "_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "email": "iris8@company.com",
+    "username": "iris8",
+    "password": "Pass8Secure!",
+    "role": "admin",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  },
+  {
+    "_id": "1c973b81-d8db-4e2e-b0b1-f61c9cd87536",
+    "email": "jack9@company.com",
+    "username": "jack9",
+    "password": "Pass9Secure!",
+    "role": "readonly",
+    "is_active": true,
+    "is_verified": true,
+    "login_attempts": 0,
+    "is_locked": false
+  }
+]

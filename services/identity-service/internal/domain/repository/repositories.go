@@ -9,8 +9,18 @@ import (
 	"github.com/osv/identity-service/internal/domain/entity"
 )
 
+// UserFilter defines criteria for listing users.
+type UserFilter struct {
+	Role     string
+	IsActive string
+	Query    string
+	Page     int
+	PageSize int
+}
+
 // UserRepository defines persistence operations for User entities.
 type UserRepository interface {
+	List(ctx context.Context, filter UserFilter) ([]*entity.User, int, error)
 	Create(ctx context.Context, user *entity.User) error
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.User, error)
 	FindByEmail(ctx context.Context, email string) (*entity.User, error)
@@ -18,7 +28,39 @@ type UserRepository interface {
 	Update(ctx context.Context, user *entity.User) error
 	UpdateLastLogin(ctx context.Context, id uuid.UUID) error
 	Delete(ctx context.Context, id uuid.UUID) error
+
+	// MFA management
+	UpdateMFA(ctx context.Context, userID uuid.UUID, enabled bool, encryptedSecret string) error
+
+	// Pending TOTP secret (stored before user confirms the code)
+	StorePendingTOTPSecret(ctx context.Context, userID uuid.UUID, secret string) error
+	GetPendingTOTPSecret(ctx context.Context, userID uuid.UUID) (string, error)
+
+	// Activate TOTP: sets mfa_enabled=true, stores confirmed secret, clears pending
+	ActivateTOTP(ctx context.Context, userID uuid.UUID, secret string) error
+
+	// Disable TOTP: sets mfa_enabled=false, clears secret
+	DisableTOTP(ctx context.Context, userID uuid.UUID) error
+
+	// ── SEED-001: Admin bulk-create & role assignment ─────────────────────────
+
+	// CreateDirect inserts a user with a pre-hashed password.
+	// Returns ErrEmailAlreadyExists on duplicate email.
+	CreateDirect(ctx context.Context, user *entity.User, hashedPassword string) error
+
+	// CreateBulk inserts multiple users in a single transaction.
+	// Partial failures are captured per-item; the transaction is committed on success.
+	CreateBulk(ctx context.Context, inputs []entity.UserCreateInput) ([]entity.UserCreateResult, error)
+
+	// AssignRole upserts a global or product-scoped role for a user.
+	AssignRole(ctx context.Context, assignment entity.RoleAssignment) error
+
+	// Activate sets is_active=true and is_verified=true for the given user.
+	// [FIX TASK-HC-014] Used by AcceptInvite to activate invited users.
+	Activate(ctx context.Context, userID uuid.UUID) error
 }
+
+
 
 // SessionRepository defines persistence operations for Session entities.
 type SessionRepository interface {
@@ -27,7 +69,7 @@ type SessionRepository interface {
 	RevokeByID(ctx context.Context, id uuid.UUID) error
 	// RevokeByFamily revokes all sessions in a token family.
 	// Called on replay attack detection.
-	RevokeByFamily(ctx context.Context, family string) error
+	RevokeByFamily(ctx context.Context, family uuid.UUID) error
 	// RevokeByUserID revokes all sessions for a user (logout all devices).
 	RevokeByUserID(ctx context.Context, userID uuid.UUID) error
 	CleanExpired(ctx context.Context) error

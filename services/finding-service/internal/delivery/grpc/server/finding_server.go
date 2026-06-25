@@ -254,3 +254,71 @@ func toFindingProto(f *finding.Finding) *findingv1.FindingProto {
 	_ = time.Now() // silence import
 	return proto
 }
+
+// ExistsFalsePositiveByHash checks if a false-positive finding with this hash exists.
+// Used by the deduplication engine to auto-mark recurring FPs.
+func (s *FindingServer) ExistsFalsePositiveByHash(ctx context.Context, req *findingv1.ExistsFalsePositiveByHashRequest) (*findingv1.ExistsFalsePositiveByHashResponse, error) {
+	productID, err := uuid.Parse(req.ProductId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid product_id")
+	}
+	exists, err := s.repo.ExistsFalsePositiveByHash(ctx, req.HashCode, productID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "exists_fp_by_hash: %v", err)
+	}
+	return &findingv1.ExistsFalsePositiveByHashResponse{Exists: exists}, nil
+}
+
+// GetSeverityCounts returns aggregate finding counts per severity for a product.
+// Used by the dashboard and report generation.
+func (s *FindingServer) GetSeverityCounts(ctx context.Context, req *findingv1.GetSeverityCountsRequest) (*findingv1.GetSeverityCountsResponse, error) {
+	productID, err := uuid.Parse(req.ProductId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid product_id")
+	}
+	counts, err := s.repo.GetSeverityCounts(ctx, productID, req.ActiveOnly)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "get_severity_counts: %v", err)
+	}
+	resp := &findingv1.GetSeverityCountsResponse{
+		Critical: int32(counts["Critical"]),
+		High:     int32(counts["High"]),
+		Medium:   int32(counts["Medium"]),
+		Low:      int32(counts["Low"]),
+		Info:     int32(counts["Info"]),
+	}
+	return resp, nil
+}
+
+// CountFindings returns total findings count for a product with optional filters.
+func (s *FindingServer) CountFindings(ctx context.Context, req *findingv1.CountFindingsRequest) (*findingv1.CountFindingsResponse, error) {
+	productID, err := uuid.Parse(req.ProductId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid product_id")
+	}
+	filter := finding.FindingFilter{
+		ProductID:  &productID,
+		ActiveOnly: req.ActiveOnly,
+	}
+	res, err := s.repo.List(ctx, filter)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "count_findings: %v", err)
+	}
+	return &findingv1.CountFindingsResponse{Count: int64(res.Total)}, nil
+}
+
+// ReactivateFindings marks findings as active again (called by dedup engine).
+func (s *FindingServer) ReactivateFindings(ctx context.Context, req *findingv1.ReactivateFindingsRequest) (*findingv1.ReactivateFindingsResponse, error) {
+	ids := make([]uuid.UUID, 0, len(req.FindingIds))
+	for _, id := range req.FindingIds {
+		uid, err := uuid.Parse(id)
+		if err == nil {
+			ids = append(ids, uid)
+		}
+	}
+	if err := s.repo.BulkReactivate(ctx, ids); err != nil {
+		return nil, status.Errorf(codes.Internal, "reactivate_findings: %v", err)
+	}
+	return &findingv1.ReactivateFindingsResponse{Reactivated: int32(len(ids))}, nil
+}
+

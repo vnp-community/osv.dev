@@ -1,0 +1,1703 @@
+{
+  "summary": "checked=180, passed=9, failed=171, missing_on_server=158, field_mismatches=203",
+  "total_mismatches": 203,
+  "total_missing": 158,
+  "domains": [
+    {
+      "domain": "users",
+      "checked": 10,
+      "passed": 9,
+      "failed": 1,
+      "missing_on_server": 1,
+      "mismatches": [
+        {
+          "domain": "users",
+          "resource_id": "0fd9ca14-8cb3-4325-acb6-98bc6b3ec831",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "domain": "product_types",
+      "checked": 5,
+      "passed": 0,
+      "failed": 5,
+      "missing_on_server": 5,
+      "mismatches": [
+        {
+          "domain": "product_types",
+          "resource_id": "eba6d0ef-8eda-5b0c-ac60-594f53f7c32a",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "product_types",
+          "resource_id": "a1fa54d0-ad64-5956-aa4e-2120f4c21adf",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "product_types",
+          "resource_id": "10a4476f-69fb-5a22-8031-77dc690eebc4",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "product_types",
+          "resource_id": "dcd60bd2-7be0-5b59-8827-d8ff7702d3b5",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "product_types",
+          "resource_id": "98275ba8-5455-5334-9776-2b95a73fb6b0",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "domain": "products",
+      "checked": 10,
+      "passed": 0,
+      "failed": 10,
+      "missing_on_server": 10,
+      "mismatches": [
+        {
+          "domain": "products",
+          "resource_id": "e5ae4546-b8a9-4953-ac39-88c1b59b3cb0",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "products",
+          "resource_id": "47a69a03-7839-400a-bc2c-b258bd4cda88",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "products",
+          "resource_id": "114de041-fe5c-4cf5-b597-167308dff490",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "products",
+          "resource_id": "caaaca50-2b12-4e1d-8feb-78c2f62dbf91",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "products",
+          "resource_id": "e9e04a72-9462-4f44-bfda-ceaa1130f0ba",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "products",
+          "resource_id": "c9c47dc3-1515-4f50-adeb-bfa2cf0b37e7",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "products",
+          "resource_id": "12afd275-beed-4e5f-bab0-294f8c5ec206",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "products",
+          "resource_id": "64680392-2216-4afc-908e-70cce99b365b",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "products",
+          "resource_id": "baf2634c-44d5-42df-8f6f-1593f5f2c3ba",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "products",
+          "resource_id": "f9488aa8-3b9b-449a-bb0a-f291a7708a29",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "domain": "engagements",
+      "checked": 20,
+      "passed": 0,
+      "failed": 20,
+      "missing_on_server": 20,
+      "mismatches": [
+        {
+          "domain": "engagements",
+          "resource_id": "6d96b4a3-ced5-4534-befd-b586bb4b7bb8",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "8d8749d8-9d88-4bc5-8c72-ebf6a10dcc3b",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "73214926-3b77-4261-91ad-f2866c38dab0",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "f07cd0ee-e609-4605-a662-71fcf0d7549d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "4c1b6de2-91f9-4a92-9116-d26f735f1a85",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "f082e5f8-0ae1-4aab-920b-4414db901e33",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "75f910b7-7dae-455b-8449-cb74853ca3bf",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "b89d9355-5640-42ea-a671-2360b2d4ab4d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "d31587cf-fc4d-4ac5-8258-787b5e0783ea",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "3747fa33-2440-4160-b401-cb066a03239d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "fb993afc-ac0c-4251-9751-aa9fa220f843",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "54824f59-acbf-4d90-bfd7-4555a6f355d1",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "6a5668a1-17a1-48fd-9811-d5bfdfa77d7f",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "7db139ab-327b-4df5-93b9-751cc91a9e73",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "7b52144a-f141-4b9c-95d2-6f774cfd83cb",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "2f54a35b-ad5a-421a-8513-f1eff2c51c41",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "64ebea94-ab3a-41c4-a82b-17e871260d09",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "615b59a9-5888-4808-a549-c3206f13334c",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "263c41f1-948f-4143-a5c1-db81dd7d5e39",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "engagements",
+          "resource_id": "f26ac424-e1f2-4088-8039-ed814b29a2b7",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "domain": "findings",
+      "checked": 120,
+      "passed": 0,
+      "failed": 120,
+      "missing_on_server": 120,
+      "mismatches": [
+        {
+          "domain": "findings",
+          "resource_id": "cd125159-4f7b-49a8-b6d3-792ec3b5d2c0",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e5b9c77c-1733-4e24-8e04-29b5c96a9db6",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "ab2f16ad-0aae-4043-ac0d-272b06e57b6b",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "33158426-6e9d-4a1b-bc49-7eb709275dea",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "65ce0d97-ee80-4d9d-bd79-abab39649f34",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "9be2426d-bac2-4829-a1d0-0b01396af77e",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "f11b47b5-8edc-4183-8f69-4316008378eb",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "00536d07-fa2e-4680-ab9b-5b49fe82966a",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "66c922f6-1824-423b-8be5-82a0cdf39b1d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "c37082e0-8239-4a8d-991c-f28ec735ccaf",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "30e4fc3e-dd9f-4631-8c51-9cf39ba02943",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "96d71e75-1ca8-4c12-9aa6-1206b3462d18",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "aa35bdaa-939a-418e-92e7-7028e77de68b",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "29ce1feb-3e82-4d61-ae1d-b637051e4a5c",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "4c6af6e3-2ecc-4190-aa62-c0e9afa66b6f",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "bdae36b9-914f-45a9-859e-94bac29cca0e",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "76d076dc-9094-449b-a3ad-52b431b2b7a8",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "c62f8101-0822-41ff-a113-9b51bc80de4a",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "7387f677-e0fe-461a-8599-3ee3a74c5192",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "9c88d0de-4bb6-4141-a22d-3a8976a0ee3c",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e43821e6-578f-4ea7-a3ac-04fa5b9b0fcf",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e8c66107-a6b3-4d13-8272-a86c8c40cd20",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "39f364aa-e831-4b44-bfee-7fa533b1f049",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "cce60a6c-c27a-4bab-ab83-845ca53f6801",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "00ca2bbe-e924-456a-9bd3-bca1c7862c71",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "233e8c60-6e9d-4c49-8e1f-5a806cf6aa32",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "d379144f-d783-4291-922c-49d88a6f77df",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "b3b5e0eb-2089-4fa0-b06e-bbc1c2cededb",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "bd010cfc-b804-458a-8ed5-b963a3090b58",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "8b194c6c-1bf8-4e16-a322-dee64608768b",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "776f248e-6c44-49ae-b3a9-25d189e24ba7",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "c8bb1f12-619b-4a7e-b3a2-52f6e153db96",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e19944ae-cc99-43cd-9962-1007b921907c",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "fc1835c4-7e65-4d0f-b4b6-cf453767554d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "596ad000-f748-421f-be27-a653e30582f0",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "796a86ad-2f1b-4c4f-bc9f-452ce8936d15",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "69b0beca-6396-465a-9dc1-273d36acfd6d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "ae5af2ad-efbd-47e9-9323-6978e2427879",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "ee44410a-177c-4c7d-b035-930c5acc3c8a",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "dde7a00e-d21a-49d3-b8d3-17f9d9caff7d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "60994345-e865-40ae-b1f2-a5fd6b65c47d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "402ce30c-2d8f-42b1-b191-4f7c8666b42d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "cf11ad45-633b-41d4-b544-76572f747093",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "8061aae8-4d20-4611-b308-17348547991e",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e310789e-9eae-4983-9223-e346647b896d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "39afed77-bfb1-4914-aa40-dd27b6e94ceb",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "9ea66493-1cb4-4cfa-a020-e37cab7cddb8",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "b1617b67-91a1-4a27-988e-ba214c96683d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e99c07f7-ffdd-4243-ae45-ccaed8c74ef1",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e8883a22-9c56-4635-a279-0f4b17395e13",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e99c07f7-ffdd-4243-ae45-ccaed8c74ef1",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "7890a14b-db38-4088-8213-c6b2452508b8",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "ae6032d5-8906-4b01-992e-c085f317ea97",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "a8429f45-256f-4b9d-8d0d-a94ed1d8037d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "94421e7a-e94e-4ae0-8eac-8f1ab202be5a",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "0dfc804e-9740-4c5b-ae70-dd597e2409c7",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "4e3e53b8-8d7f-40a6-be8a-968f34ed11eb",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "0201d2af-a7dd-4506-9ad5-7931496a5c15",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "ab71fa7f-cce2-4025-ba0d-9ae5bd7e445b",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e2630d28-751f-4559-b017-f943a7827b91",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "a14c71ff-805e-41b3-846c-a39d23554093",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "ac3426f9-ad37-4897-8935-7a6ef6c0eb88",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "1bac2dae-869d-4e08-95ba-078b91d1607a",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "07401421-9af0-41c1-a878-e37b18cf3a09",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "3fa8dd42-da9d-47e7-88ad-7600aed5a765",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "edc513c8-f858-44b9-a742-9f5ef0024dd9",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "b305bdad-382b-44b6-958a-6da713941a98",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "1798e182-025e-4d1f-aef5-e658238979fa",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "47e730bb-e0fd-4ac4-80a0-7a14919e60c0",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "aa367b6c-975b-4e3c-975f-0f31fc31dfc7",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "2bb5dd0d-5a46-408d-8b84-07055e3a7466",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "914d4773-6478-4c6c-886a-d26af836573e",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "58aea31d-76fe-466c-ac14-972ddc5b34e9",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "f0300535-5914-4b24-ae62-b63c35a89c46",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "3931c251-56a2-493d-9d46-e950280121ae",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "175c9eb0-120b-41e6-9ba1-07e989c429e7",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "a3eb41de-24c5-41b1-8cd3-56538c6c41e0",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e3acecff-e512-4235-b8fc-d0243b8043da",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "d3068ce5-a81e-44b5-9af5-0d6048d53714",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "6703982c-48d0-462f-af5c-89e9608e95ec",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "097f7867-97d8-42fd-8c40-a9a5f29fb341",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "0d4629c3-1b1c-4544-8bcc-3c7c852fea12",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "747f229e-f99f-493c-abb0-7f432cd68377",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "5945020f-b5e1-4576-88dd-89fad1bd3aec",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "739f753b-f8de-44c1-9d51-09bed2ce7ab8",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "78b4614e-2300-4dc2-a612-b3b1db429ed1",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "4683bcc5-6fbc-48e2-bed1-05d9df9e015b",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "0f3344fd-d406-4559-83a5-aa2a456722b7",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "47cd4dc6-6746-4104-817d-8f5eaa43e70c",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "dab907ea-d006-47f6-9167-91a6fc237918",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "538da387-4fa6-429b-8655-2862f6d3495b",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "76183f27-c404-40f1-88fc-edc4b1e747be",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "194152c6-45a6-4b87-9e04-9778e6cef147",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "7c1b282d-0d70-4a9b-97b9-500703f169b9",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "672a03fc-3960-4e41-a3ba-dba28e7d1deb",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "cf5a21b0-b3a6-4ecc-9e08-067a5f568170",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e0e3a751-e1a2-4b2d-aa3f-e57ffbaa714d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "0e36834e-0360-4f64-aec4-4a509a6ca6df",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "194a9108-ac4a-4bd2-be26-f4ea76b3e4d6",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "0bfae74b-1859-4ecc-85ab-fe0db133e856",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "90516b53-092f-4719-9230-33649c659a0f",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "7e3c9ff9-e9d3-49f2-aa4c-4bec03275d7f",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "9e76a462-b353-4dc0-a420-71d2921c656e",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "b801708a-0fe1-45ab-a62e-6446c3130f05",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "58c52dd9-eaea-42d2-9feb-a928a723316a",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "54526130-7938-448e-bccb-f70e041225d7",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "65618613-3477-4838-98b4-f81e955592c2",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "d1d43dce-1e6f-4f48-b404-a6d1579447df",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "e27dc8cf-dd46-436b-9dc2-faaded103896",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "ad7b96f0-0f73-4fec-8b98-d2b19a500c4d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "10f78f05-a329-4fbb-bcab-9c83a1a862e7",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "9f7c8c47-95d5-472e-ab8d-4c9a1462ad14",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "d6c91152-f4dc-4c6b-aab2-c1051decb89f",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "a754614d-ee79-471b-aaf7-7ddc762a723d",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "f69013cd-a5de-43ba-ae74-7170cdadecb4",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "c0e987e3-24db-42f3-80bb-d6e523ce6852",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "fff0cf9b-1f33-4d19-bbde-869221d47502",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "0f771b5f-87d6-49d4-9769-dfcaf38a3f3c",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "178507b9-e39a-4cd7-a67e-6f517beb3c3e",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        },
+        {
+          "domain": "findings",
+          "resource_id": "cefface0-b79c-492e-9932-89812d14b7f6",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "404",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "domain": "sla_configurations",
+      "checked": 3,
+      "passed": 0,
+      "failed": 3,
+      "missing_on_server": 0,
+      "mismatches": [
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "name",
+          "expected": "Standard SLA",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "critical",
+          "expected": 7,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "high",
+          "expected": 30,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "medium",
+          "expected": 90,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "low",
+          "expected": 365,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "name",
+          "expected": "Critical Assets SLA",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "critical",
+          "expected": 3,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "high",
+          "expected": 14,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "medium",
+          "expected": 60,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "low",
+          "expected": 180,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "name",
+          "expected": "Relaxed SLA",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "critical",
+          "expected": 14,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "high",
+          "expected": 60,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "medium",
+          "expected": 180,
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "sla_configurations",
+          "resource_id": "",
+          "field": "low",
+          "expected": 365,
+          "actual": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "domain": "assets",
+      "checked": 10,
+      "passed": 0,
+      "failed": 10,
+      "missing_on_server": 0,
+      "mismatches": [
+        {
+          "domain": "assets",
+          "resource_id": "9b8e0234-6419-4a65-89e1-37becf68f966",
+          "field": "ip_address",
+          "expected": "10.0.0.1",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "9b8e0234-6419-4a65-89e1-37becf68f966",
+          "field": "hostname",
+          "expected": "web-01.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "9b8e0234-6419-4a65-89e1-37becf68f966",
+          "field": "os",
+          "expected": "Alpine Linux 3.18",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "222c9a33-5457-4a52-9cb6-9ac00ba1bf86",
+          "field": "ip_address",
+          "expected": "10.0.0.2",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "222c9a33-5457-4a52-9cb6-9ac00ba1bf86",
+          "field": "hostname",
+          "expected": "db-02.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "222c9a33-5457-4a52-9cb6-9ac00ba1bf86",
+          "field": "os",
+          "expected": "Alpine Linux 3.18",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "3cce264c-856b-42fe-9244-53c66c73ff45",
+          "field": "ip_address",
+          "expected": "10.0.0.3",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "3cce264c-856b-42fe-9244-53c66c73ff45",
+          "field": "hostname",
+          "expected": "api-03.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "3cce264c-856b-42fe-9244-53c66c73ff45",
+          "field": "os",
+          "expected": "Ubuntu 22.04 LTS",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "725fa6a6-6951-4c92-89d0-dcd14bcd2379",
+          "field": "ip_address",
+          "expected": "10.0.0.4",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "725fa6a6-6951-4c92-89d0-dcd14bcd2379",
+          "field": "hostname",
+          "expected": "ci-04.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "725fa6a6-6951-4c92-89d0-dcd14bcd2379",
+          "field": "os",
+          "expected": "CentOS 8",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "51762013-122f-4d5b-afca-f6bc7f0e6c73",
+          "field": "ip_address",
+          "expected": "10.0.0.5",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "51762013-122f-4d5b-afca-f6bc7f0e6c73",
+          "field": "hostname",
+          "expected": "gw-05.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "51762013-122f-4d5b-afca-f6bc7f0e6c73",
+          "field": "os",
+          "expected": "Alpine Linux 3.18",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "e6e432ef-2054-41c3-a359-143221d35d30",
+          "field": "ip_address",
+          "expected": "10.0.0.6",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "e6e432ef-2054-41c3-a359-143221d35d30",
+          "field": "hostname",
+          "expected": "web-06.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "e6e432ef-2054-41c3-a359-143221d35d30",
+          "field": "os",
+          "expected": "Debian 11",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "c8ed41bf-c3fb-489a-8418-5747cc93464e",
+          "field": "ip_address",
+          "expected": "10.0.0.7",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "c8ed41bf-c3fb-489a-8418-5747cc93464e",
+          "field": "hostname",
+          "expected": "db-07.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "c8ed41bf-c3fb-489a-8418-5747cc93464e",
+          "field": "os",
+          "expected": "Debian 11",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "e3d7a6a5-1034-452e-90e5-f1bad003725f",
+          "field": "ip_address",
+          "expected": "10.0.0.8",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "e3d7a6a5-1034-452e-90e5-f1bad003725f",
+          "field": "hostname",
+          "expected": "api-08.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "e3d7a6a5-1034-452e-90e5-f1bad003725f",
+          "field": "os",
+          "expected": "CentOS 8",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "2bffd059-51c6-4c7f-a34b-513c42241660",
+          "field": "ip_address",
+          "expected": "10.0.0.9",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "2bffd059-51c6-4c7f-a34b-513c42241660",
+          "field": "hostname",
+          "expected": "ci-09.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "2bffd059-51c6-4c7f-a34b-513c42241660",
+          "field": "os",
+          "expected": "Ubuntu 22.04 LTS",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "c6c2b137-4890-4bf6-ab22-16c6cbeaf802",
+          "field": "ip_address",
+          "expected": "10.0.0.10",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "c6c2b137-4890-4bf6-ab22-16c6cbeaf802",
+          "field": "hostname",
+          "expected": "gw-10.internal",
+          "actual": null,
+          "note": ""
+        },
+        {
+          "domain": "assets",
+          "resource_id": "c6c2b137-4890-4bf6-ab22-16c6cbeaf802",
+          "field": "os",
+          "expected": "Ubuntu 22.04 LTS",
+          "actual": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "domain": "webhooks",
+      "checked": 2,
+      "passed": 0,
+      "failed": 2,
+      "missing_on_server": 2,
+      "mismatches": [
+        {
+          "domain": "webhooks",
+          "resource_id": "a18b16a7-3124-4fd6-bef3-ad6ff0ebc5d1",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "not_found",
+          "note": ""
+        },
+        {
+          "domain": "webhooks",
+          "resource_id": "b7e29036-4a1e-4f32-bc17-136ce55d1b0b",
+          "field": "<resource>",
+          "expected": "exists",
+          "actual": "not_found",
+          "note": ""
+        }
+      ]
+    }
+  ]
+}

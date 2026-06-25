@@ -6,17 +6,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/osv/finding-service/internal/domain/entity"
-	"github.com/osv/finding-service/internal/domain/service"
+	"github.com/osv/finding-service/internal/domain/report"
+	"github.com/osv/finding-service/internal/domain/report/service"
 	"github.com/osv/finding-service/internal/formatters"
 )
 
 // Input configures report generation.
 type Input struct {
 	// CVEData is the raw CVE data keyed by product.
-	CVEData map[entity.ProductInfo][]entity.CVEData
+	CVEData map[report.ProductInfo][]report.CVEData
 	// Formats is the list of output formats to generate.
-	Formats []entity.OutputFormat
+	Formats []report.OutputFormat
 	// ScanTarget is the scanned binary/directory path.
 	ScanTarget  string
 	// MinSeverity filters CVEs below this severity level.
@@ -31,7 +31,7 @@ type Input struct {
 
 // Output holds the generated report bytes per format.
 type Output struct {
-	Reports   map[entity.OutputFormat][]byte
+	Reports   map[report.OutputFormat][]byte
 	ExitCode  int // 0 = no CVEs after filtering, 1 = CVEs found
 	TotalCVEs int
 }
@@ -49,11 +49,11 @@ func NewUseCase(registry formatters.Registry) *UseCase {
 // Execute applies filters and generates reports in all requested formats.
 func (uc *UseCase) Execute(ctx context.Context, in Input) (*Output, error) {
 	if len(in.Formats) == 0 {
-		in.Formats = []entity.OutputFormat{entity.FormatJSON}
+		in.Formats = []report.OutputFormat{report.OutFormatJSON}
 	}
 
 	// Apply filters across all products
-	filtered := make(map[entity.ProductInfo][]entity.CVEData, len(in.CVEData))
+	filtered := make(map[report.ProductInfo][]report.CVEData, len(in.CVEData))
 	totalCVEs := 0
 	for product, cves := range in.CVEData {
 		filteredCVEs := service.FilterAndSort(cves, in.MinSeverity, in.MinScore)
@@ -61,7 +61,7 @@ func (uc *UseCase) Execute(ctx context.Context, in Input) (*Output, error) {
 		totalCVEs += len(filteredCVEs)
 	}
 
-	reportInput := entity.ReportInput{
+	reportInput := report.ReportInput{
 		CVEData:     filtered,
 		ScanTarget:  in.ScanTarget,
 		GeneratedAt: time.Now().UTC(),
@@ -76,7 +76,7 @@ func (uc *UseCase) Execute(ctx context.Context, in Input) (*Output, error) {
 		Quiet: in.Quiet,
 	}
 
-	reports := make(map[entity.OutputFormat][]byte, len(in.Formats))
+	reports := make(map[report.OutputFormat][]byte, len(in.Formats))
 	for _, format := range in.Formats {
 		formatter, ok := uc.formatters.Get(format)
 		if !ok {

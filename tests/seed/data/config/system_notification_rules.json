@@ -1,0 +1,23 @@
+{
+  "scan_added": [
+    "email",
+    "inapp"
+  ],
+  "finding_added": [
+    "inapp"
+  ],
+  "sla_breach": [
+    "email",
+    "inapp"
+  ],
+  "sla_expiring_soon": [
+    "email",
+    "inapp"
+  ],
+  "risk_acceptance_expiration": [
+    "email"
+  ],
+  "product_added": [
+    "inapp"
+  ]
+}

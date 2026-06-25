@@ -6,13 +6,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/rs/zerolog"
 )
 
-const defaultOllamaURL = "http://localhost:11434"
+// [FIX BUG-007] defaultOllamaURL removed — caller must set AI_BASE_URL env var.
+// Using localhost:11434 will fail in container deployments.
 
 // OllamaAdapter implements both EmbeddingProvider and LLMProvider using Ollama.
 type OllamaAdapter struct {
@@ -24,9 +26,12 @@ type OllamaAdapter struct {
 }
 
 // NewOllamaAdapter creates an Ollama adapter for local development/testing.
+// [FIX BUG-007] baseURL must not be empty in production — set AI_BASE_URL env var.
+// Logs a WARN when baseURL is empty (will fail at runtime for Embed/Generate calls).
 func NewOllamaAdapter(baseURL, embeddingModel, llmModel string, log zerolog.Logger) *OllamaAdapter {
 	if baseURL == "" {
-		baseURL = defaultOllamaURL
+		slog.Warn("Ollama baseURL is empty — set AI_BASE_URL env var; AI features will fail",
+			"hint", "set AI_BASE_URL=http://ollama:11434 or AI_BASE_URL=http://localhost:11434 for local dev")
 	}
 	return &OllamaAdapter{
 		baseURL:        baseURL,

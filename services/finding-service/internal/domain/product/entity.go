@@ -19,6 +19,29 @@ const (
 	BCMedium   BusinessCriticality = "medium"
 	BCLow      BusinessCriticality = "low"
 	BCVeryLow  BusinessCriticality = "very low"
+	BCNone     BusinessCriticality = "none"
+)
+
+// Platform describes the deployment platform of the product.
+type Platform string
+
+const (
+	PlatformWeb     Platform = "web"
+	PlatformMobile  Platform = "mobile"
+	PlatformDesktop Platform = "desktop"
+	PlatformAPI     Platform = "api"
+	PlatformIoT     Platform = "iot"
+)
+
+// Origin describes the origin/ownership type of the product.
+type Origin string
+
+const (
+	OriginInternal   Origin = "internal"
+	OriginContractor Origin = "contractor"
+	OriginOutsourced Origin = "outsourced"
+	OriginOpenSource Origin = "open source"
+	OriginPurchased  Origin = "purchased"
 )
 
 // Lifecycle describes the current lifecycle stage of the product.
@@ -38,13 +61,15 @@ type Product struct {
 	Description                string
 	ProdNumericGrade           int
 	BusinessCriticality        BusinessCriticality
-	Platform                   string
+	Platform                   Platform
 	Lifecycle                  Lifecycle
-	Origin                     string
+	Origin                     Origin
 	ExternalAudience           bool
 	InternetAccessible         bool
 	EnableFullRiskAcceptance   bool
 	EnableSimpleRiskAcceptance bool
+	EnableProductTagInheritance bool
+	SLAConfigurationID         *uuid.UUID
 	Tags                       []string
 	CreatedAt                  time.Time
 	UpdatedAt                  time.Time

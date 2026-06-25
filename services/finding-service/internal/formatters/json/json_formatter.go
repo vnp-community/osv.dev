@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/osv/finding-service/internal/domain/entity"
-	"github.com/osv/finding-service/internal/domain/service"
+	"github.com/osv/finding-service/internal/domain/report"
+	"github.com/osv/finding-service/internal/domain/report/service"
 	"github.com/osv/finding-service/internal/formatters"
 )
 
@@ -54,7 +54,7 @@ func (f *JSONFormatter) ContentType() string { return "application/json" }
 func (f *JSONFormatter) FileExtension() string { return ".json" }
 
 // Format renders CVE findings to flat JSON bytes.
-func (f *JSONFormatter) Format(_ context.Context, data entity.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
+func (f *JSONFormatter) Format(_ context.Context, data report.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
 	var report jsonReport
 	report.Metadata.Timestamp = timeOrNow(data.GeneratedAt)
 	report.Metadata.ScanTarget = data.ScanTarget
@@ -130,7 +130,7 @@ func (f *JSON2Formatter) ContentType() string { return "application/json" }
 func (f *JSON2Formatter) FileExtension() string { return ".json" }
 
 // Format renders CVE findings organized by product key.
-func (f *JSON2Formatter) Format(_ context.Context, data entity.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
+func (f *JSON2Formatter) Format(_ context.Context, data report.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
 	var report json2Report
 	report.Metadata.Timestamp = timeOrNow(data.GeneratedAt)
 	report.Metadata.ScanTarget = data.ScanTarget

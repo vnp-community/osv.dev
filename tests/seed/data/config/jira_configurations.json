@@ -1,0 +1,59 @@
+[
+  {
+    "_id": "d5ea545a-d90b-4c0b-a8d2-0cdc82057819",
+    "product_id": "a60da6c5-1a12-4fbd-aa3c-2f920df94e29",
+    "url": "https://company.atlassian.net",
+    "username": "jira-security-bot@company.com",
+    "api_token": "JIRA_API_TOKEN_PLACEHOLDER_1",
+    "project_key": "SECSCAN",
+    "issue_type_id": "10001",
+    "push_notes": true,
+    "push_all_issues": false,
+    "enable_deduplication": true,
+    "priority_mapping": {
+      "Critical": "Highest",
+      "High": "High",
+      "Medium": "Medium",
+      "Low": "Low",
+      "Info": "Lowest"
+    }
+  },
+  {
+    "_id": "a9f04245-e141-4cbf-859f-acfd522b28a1",
+    "product_id": "c57dbf2e-6dd4-48c6-8f55-b8932f04adf8",
+    "url": "https://company.atlassian.net",
+    "username": "jira-security-bot@company.com",
+    "api_token": "JIRA_API_TOKEN_PLACEHOLDER_2",
+    "project_key": "VULN",
+    "issue_type_id": "10003",
+    "push_notes": true,
+    "push_all_issues": false,
+    "enable_deduplication": true,
+    "priority_mapping": {
+      "Critical": "Highest",
+      "High": "High",
+      "Medium": "Medium",
+      "Low": "Low",
+      "Info": "Lowest"
+    }
+  },
+  {
+    "_id": "4956e304-458a-4a2c-850f-829399486b85",
+    "product_id": "13993f18-dce8-41cb-b340-0e9fb0d7dac3",
+    "url": "https://company.atlassian.net",
+    "username": "jira-security-bot@company.com",
+    "api_token": "JIRA_API_TOKEN_PLACEHOLDER_3",
+    "project_key": "SECSCAN",
+    "issue_type_id": "10002",
+    "push_notes": true,
+    "push_all_issues": false,
+    "enable_deduplication": true,
+    "priority_mapping": {
+      "Critical": "Highest",
+      "High": "High",
+      "Medium": "Medium",
+      "Low": "Low",
+      "Info": "Lowest"
+    }
+  }
+]

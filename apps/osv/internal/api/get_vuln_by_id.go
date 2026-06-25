@@ -6,12 +6,12 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/osv/pkg/models"
-	"github.com/osv/pkg/logger"
+	"github.com/osv/shared/pkg/models"
+	"github.com/osv/shared/pkg/logger"
 	"github.com/ossf/osv-schema/bindings/go/osvschema"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	pb "github.com/osv/pkg/clients/api"
+	pb "github.com/osv/shared/pkg/clients/api"
 )
 
 //nolint:revive // complains about 'Id' instead of 'ID', but that matches the API (the proto).

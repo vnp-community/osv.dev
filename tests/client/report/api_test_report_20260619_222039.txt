@@ -1,0 +1,718 @@
+/Users/binhnt/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+
+[1m=================================================================
+  OSV PLATFORM API — FULL TEST SUITE
+  Kiểm tra dữ liệu API có đúng theo OpenAPI spec không
+=================================================================[0m
+============================================================
+TEST CLIENT CONFIGURATION
+============================================================
+  API_BASE_URL_V1  : https://c12.openledger.vn/api/v1
+  API_BASE_URL_V2  : https://c12.openledger.vn/api/v2
+  TEST_EMAIL       : admin@openvulnscan.io
+  TEST_PASSWORD    : ******************
+  ACCESS_TOKEN     : (auto-login)
+  REQUEST_TIMEOUT  : 60s
+  VERBOSE          : True
+  SAMPLE_CVE_ID    : CVE-2021-44228
+  SAMPLE_CWE_ID    : CWE-89
+  SAMPLE_VENDOR    : apache
+============================================================
+
+[1m[95m▶ Running: Auth (login, refresh, MFA, logout)[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+AUTH API TESTS (/api/v1/auth)
+============================================================[0m
+
+[96m→ Test: Login with wrong credentials → 401[0m
+  POST   https://c12.openledger.vn/api/v1/auth/login  →  [91m401[0m  (230ms)
+[92m✓ login_wrong_credentials_returns_401_with_APIError[0m
+[96m→ Test: Login with valid credentials → 200 + LoginResponse[0m
+  POST   https://c12.openledger.vn/api/v1/auth/login  →  [92m200[0m  (138ms)
+[92m✓ login_valid_credentials_returns_200[0m
+[92m✓ login_response_expires_in_positive_int[0m
+[92m✓ login_response_access_token_present[0m
+[92m✓ login_response_user_schema_valid[0m
+[92m✓ login_response_user_role_valid_enum[0m
+[92m✓ login_response_user_permissions_is_list[0m
+[96m→ Test: POST /auth/refresh → RefreshResponse[0m
+  POST   https://c12.openledger.vn/api/v1/auth/refresh  →  [92m200[0m  (44ms)
+[92m✓ refresh_returns_200_with_RefreshResponse[0m
+[92m✓ refresh_expires_in_positive_int[0m
+[96m→ Test: GET /auth/me → { user: User }[0m
+  GET    https://c12.openledger.vn/api/v1/auth/me  →  [92m200[0m  (48ms)
+[92m✓ auth_me_returns_200[0m
+[92m✓ auth_me_user_schema_valid[0m
+[92m✓ auth_me_email_matches_login[0m
+[96m→ Test: GET /auth/mfa/setup → MFASetupResponse[0m
+  GET    https://c12.openledger.vn/api/v1/auth/mfa/setup  →  [91m404[0m  (36ms)
+[93m⚠ SKIP mfa_setup_returns_200: Endpoint not implemented (404)[0m
+[96m→ Test: POST /auth/logout → 204[0m
+  POST   https://c12.openledger.vn/api/v1/auth/logout  →  [92m204[0m  (39ms)
+[92m✓ auth_logout_returns_204[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 14
+  [92mPassed  : 13[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 1[0m
+  Time    : 0.53s
+============================================================
+
+
+[1m[95m▶ Running: Dashboard (KPIs, risk trend, SLA)[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+DASHBOARD API TESTS (/api/v1/dashboard)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+[96m→ Test: GET /dashboard → DashboardData[0m
+  GET    https://c12.openledger.vn/api/v1/dashboard  →  [92m200[0m  (69ms)
+[92m✓ dashboard_returns_200_with_DashboardData[0m
+[92m✓ dashboard_kpis_schema_valid[0m
+[92m✓ dashboard_security_grade_valid_enum[0m
+[92m✓ dashboard_security_score_0_to_100[0m
+[92m✓ dashboard_severity_distribution_schema_valid[0m
+[92m✓ dashboard_severity_total_equals_sum[0m
+[92m✓ dashboard_risk_trend_is_array[0m
+[92m✓ dashboard_product_grades_items_valid[0m
+[96m→ Test: GET /dashboard?period=90d → DashboardData[0m
+  GET    https://c12.openledger.vn/api/v1/dashboard  →  [92m200[0m  (71ms)
+[92m✓ dashboard_period_90d_returns_200_with_schema[0m
+[96m→ Test: GET /dashboard?period=1y → DashboardData[0m
+  GET    https://c12.openledger.vn/api/v1/dashboard  →  [92m200[0m  (124ms)
+[92m✓ dashboard_period_1y_returns_200[0m
+[96m→ Test: GET /dashboard?period=invalid → 400/422[0m
+  GET    https://c12.openledger.vn/api/v1/dashboard  →  [92m200[0m  (76ms)
+[93m⚠ SKIP dashboard_invalid_period_returns_4xx: Server ignores invalid period (returns 200)[0m
+[96m→ Test: GET /dashboard/sla → SLADashboardData[0m
+  GET    https://c12.openledger.vn/api/v1/dashboard/sla  →  [92m200[0m  (35ms)
+[92m✓ sla_dashboard_returns_200_with_schema[0m
+[92m✓ sla_summary_schema_valid[0m
+[92m✓ sla_compliance_percent_0_to_100[0m
+[92m✓ sla_dashboard_pagination_fields_valid[0m
+[93m⚠ SKIP sla_dashboard_with_product_id_filter: SAMPLE_PRODUCT_ID not set in .env[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 16
+  [92mPassed  : 14[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 2[0m
+  Time    : 0.75s
+============================================================
+
+
+[1m[95m▶ Running: CVE Intelligence (search, semantic, detail, export)[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+CVE INTELLIGENCE API TESTS (/api/v2/cves)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+[96m→ Test: POST /cves/search (basic, no filter) → CVESearchResponse[0m
+  POST   https://c12.openledger.vn/api/v2/cves/search  →  [92m200[0m  (42ms)
+[92m✓ cve_search_returns_200_with_CVESearchResponse[0m
+[92m✓ cve_search_pagination_valid[0m
+[92m✓ cve_search_pagination_reflects_request[0m
+[92m✓ cve_search_data_is_array[0m
+[92m✓ cve_search_items_schema_valid[0m
+[92m✓ cve_search_aggregations_schema_valid[0m
+[92m✓ aggregations_by_severity_is_object[0m
+[96m→ Test: POST /cves/search with severity filter[0m
+  POST   https://c12.openledger.vn/api/v2/cves/search  →  [92m200[0m  (36ms)
+[92m✓ cve_search_severity_filter_works[0m
+[96m→ Test: POST /cves/search with kev_only=true[0m
+  POST   https://c12.openledger.vn/api/v2/cves/search  →  [92m200[0m  (37ms)
+[92m✓ cve_search_kev_only_filter_works[0m
+[96m→ Test: POST /cves/search with sort_by=epss_desc[0m
+  POST   https://c12.openledger.vn/api/v2/cves/search  →  [92m200[0m  (33ms)
+[92m✓ cve_search_sort_epss_desc_works[0m
+[96m→ Test: POST /cves/search/semantic → SemanticSearchResponse[0m
+  POST   https://c12.openledger.vn/api/v2/cves/search/semantic  →  [92m200[0m  (38ms)
+[92m✓ semantic_search_returns_200_with_schema[0m
+[92m✓ semantic_search_embedding_ms_is_int[0m
+[96m→ Test: GET /cves/CVE-2021-44228 → CVE detail schema[0m
+  GET    https://c12.openledger.vn/api/v2/cves/CVE-2021-44228  →  [92m200[0m  (37ms)
+[92m✓ cve_detail_returns_200_with_schema[0m
+[92m✓ cve_detail_id_matches_request[0m
+[92m✓ cve_detail_affected_products_is_list[0m
+[92m✓ cve_detail_references_is_list[0m
+[96m→ Test: GET /cves/export?format=json → binary file[0m
+  GET    https://c12.openledger.vn/api/v2/cves/export  →  [92m200[0m  (59ms)
+[92m✓ cve_export_json_returns_200_with_content[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 17
+  [92mPassed  : 17[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 0[0m
+  Time    : 0.53s
+============================================================
+
+
+[1m[95m▶ Running: KEV Catalog & EPSS Analytics[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+KEV CATALOG & EPSS ANALYTICS API TESTS (/api/v2)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── KEV Catalog ──[0m
+[96m→ Test: GET /kev → KEVListResponse[0m
+  GET    https://c12.openledger.vn/api/v2/kev  →  [92m200[0m  (39ms)
+[92m✓ kev_list_returns_200_with_KEVListResponse[0m
+[92m✓ kev_list_pagination_valid[0m
+[92m✓ kev_list_stats_schema_valid[0m
+[92m✓ kev_stats_total_is_non_negative_int[0m
+[92m✓ kev_list_data_is_array[0m
+[92m✓ kev_list_items_schema_valid[0m
+[96m→ Test: GET /kev?ransomware_only=true → all entries are ransomware[0m
+  GET    https://c12.openledger.vn/api/v2/kev  →  [92m200[0m  (39ms)
+[92m✓ kev_ransomware_only_filter_works[0m
+[96m→ Test: GET /kev/stats → KEVStatsResponse[0m
+  GET    https://c12.openledger.vn/api/v2/kev/stats  →  [92m200[0m  (118ms)
+[92m✓ kev_stats_returns_200_with_KEVStatsResponse[0m
+[92m✓ kev_stats_by_vendor_is_array[0m
+[92m✓ kev_stats_recent_additions_is_array[0m
+[96m→ Test: GET /kev/ransomware → KEVListResponse[0m
+  GET    https://c12.openledger.vn/api/v2/kev/ransomware  →  [92m200[0m  (36ms)
+[92m✓ kev_ransomware_endpoint_returns_200[0m
+
+[1m── EPSS Analytics ──[0m
+[96m→ Test: GET /epss/CVE-2021-44228 → EPSSByCVEResponse[0m
+  GET    https://c12.openledger.vn/api/v2/epss/CVE-2021-44228  →  [91m404[0m  (33ms)
+[93m⚠ SKIP epss_by_cve_returns_200: CVE CVE-2021-44228 not found or endpoint not implemented[0m
+[96m→ Test: GET /epss/top → EPSSTopResponse[0m
+  GET    https://c12.openledger.vn/api/v2/epss/top  →  [92m200[0m  (40ms)
+[92m✓ epss_top_returns_200_with_schema[0m
+[92m✓ epss_top_cves_is_array[0m
+[96m→ Test: GET /epss/distribution → EPSSDistributionResponse[0m
+  GET    https://c12.openledger.vn/api/v2/epss/distribution  →  [92m200[0m  (34ms)
+[92m✓ epss_distribution_returns_200_with_schema[0m
+[92m✓ epss_distribution_mean_epss_is_number[0m
+[92m✓ epss_distribution_median_epss_is_number[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 17
+  [92mPassed  : 16[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 1[0m
+  Time    : 0.57s
+============================================================
+
+
+[1m[95m▶ Running: CWE/CAPEC Taxonomy & Vendor Browse[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+TAXONOMY & BROWSE API TESTS (/api/v2)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── CWE Taxonomy ──[0m
+[96m→ Test: GET /cwe → CWEListResponse[0m
+  GET    https://c12.openledger.vn/api/v2/cwe  →  [92m200[0m  (44ms)
+[92m✓ cwe_list_returns_200_with_CWEListResponse[0m
+[92m✓ cwe_list_pagination_valid[0m
+[92m✓ cwe_list_is_array[0m
+[96m→ Test: GET /cwe?q=injection → filtered CWEListResponse[0m
+  GET    https://c12.openledger.vn/api/v2/cwe  →  [92m200[0m  (61ms)
+[92m✓ cwe_search_returns_200_with_schema[0m
+[96m→ Test: GET /cwe/CWE-89 → CWEDetail[0m
+  GET    https://c12.openledger.vn/api/v2/cwe/CWE-89  →  [92m200[0m  (34ms)
+[92m✓ cwe_detail_CWE-89_returns_200_with_schema[0m
+[92m✓ cwe_detail_mitigations_is_list[0m
+[92m✓ cwe_detail_capec_patterns_is_list[0m
+[96m→ Test: GET /capec/CAPEC-66 → CAPECPattern[0m
+  GET    https://c12.openledger.vn/api/v2/capec/CAPEC-66  →  [91m404[0m  (40ms)
+[93m⚠ SKIP capec_detail_returns_200: CAPEC CAPEC-66 not found or endpoint not implemented[0m
+
+[1m── Vendors & Browse ──[0m
+[96m→ Test: GET /vendors → VendorsResponse[0m
+  GET    https://c12.openledger.vn/api/v2/vendors  →  [92m200[0m  (41ms)
+[92m✓ vendors_list_returns_200_with_VendorsResponse[0m
+[92m✓ vendors_is_array[0m
+[92m✓ vendors_items_are_strings[0m
+[96m→ Test: GET /vendors?q=apache → prefix search[0m
+  GET    https://c12.openledger.vn/api/v2/vendors  →  [92m200[0m  (45ms)
+[92m✓ vendors_prefix_search_works[0m
+[96m→ Test: GET /browse → paginated vendor catalog[0m
+  GET    https://c12.openledger.vn/api/v2/browse  →  [91m404[0m  (35ms)
+[93m⚠ SKIP browse_returns_200: Endpoint not implemented (404)[0m
+[96m→ Test: GET /browse/apache → vendor products[0m
+  GET    https://c12.openledger.vn/api/v2/browse/apache  →  [91m404[0m  (36ms)
+[93m⚠ SKIP browse_vendor_products_returns_200: Vendor 'apache' not found or endpoint not implemented[0m
+[96m→ Test: GET /browse/apache/log4j → CVEs list[0m
+  GET    https://c12.openledger.vn/api/v2/browse/apache/log4j  →  [91m404[0m  (33ms)
+[93m⚠ SKIP browse_product_cves_returns_200: Vendor/Product not found or endpoint not implemented[0m
+[96m→ Test: GET /dbinfo → DBInfoResponse[0m
+  GET    https://c12.openledger.vn/api/v2/dbinfo  →  [91m404[0m  (36ms)
+[93m⚠ SKIP dbinfo_returns_200: Endpoint not implemented (404)[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 16
+  [92mPassed  : 11[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 5[0m
+  Time    : 0.66s
+============================================================
+
+
+[1m[95m▶ Running: Findings, Scans, SLA Config[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+FINDINGS & SCANS API TESTS (/api/v1)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── Findings ──[0m
+[96m→ Test: GET /findings → FindingsListResponse[0m
+  GET    https://c12.openledger.vn/api/v1/findings  →  [91m500[0m  (36ms)
+[93m⚠ SKIP findings_list_returns_200: Server error 500 (possible empty DB) — skip[0m
+[96m→ Test: GET /findings?status=active → only active findings[0m
+  GET    https://c12.openledger.vn/api/v1/findings  →  [91m500[0m  (35ms)
+[93m⚠ SKIP findings_status_filter: Endpoint returned 500[0m
+[96m→ Test: GET /findings/stats → findings stats[0m
+  GET    https://c12.openledger.vn/api/v1/findings/stats  →  [91m400[0m  (34ms)
+[93m⚠ SKIP findings_stats_returns_200: Endpoint returned 400[0m
+[93m⚠ SKIP finding_detail_and_notes: SAMPLE_FINDING_ID not set in .env[0m
+
+[1m── Scans ──[0m
+[96m→ Test: GET /scans → ScansListResponse[0m
+  GET    https://c12.openledger.vn/api/v1/scans  →  [92m200[0m  (43ms)
+[92m✓ scans_list_returns_200_with_schema[0m
+[93m⚠ SKIP scans_stats_schema: stats field not in response[0m
+[96m→ Test: GET /scans/scheduled → scheduled_scans list[0m
+  GET    https://c12.openledger.vn/api/v1/scans/scheduled  →  [91m404[0m  (81ms)
+[93m⚠ SKIP scans_scheduled_returns_200: Endpoint not implemented[0m
+[93m⚠ SKIP scan_detail: SAMPLE_SCAN_ID not set in .env[0m
+
+[1m── SLA Config ──[0m
+[96m→ Test: GET /sla/config → SLA config schema[0m
+  GET    https://c12.openledger.vn/api/v1/sla/config  →  [92m200[0m  (36ms)
+[92m✓ sla_config_returns_200_with_schema[0m
+[92m✓ sla_config_global_schema[0m
+[92m✓ sla_config_days_are_positive_ints[0m
+[96m→ Test: GET /sla/overview → SLASummary schema[0m
+  GET    https://c12.openledger.vn/api/v1/sla/overview  →  [92m200[0m  (34ms)
+[92m✓ sla_overview_returns_200_with_schema[0m
+[96m→ Test: GET /risk-acceptances → risk acceptances list[0m
+  GET    https://c12.openledger.vn/api/v1/risk-acceptances  →  [91m404[0m  (33ms)
+[93m⚠ SKIP risk_acceptances_returns_200: Endpoint not implemented[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 13
+  [92mPassed  : 5[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 8[0m
+  Time    : 0.69s
+============================================================
+
+
+[1m[95m▶ Running: Assets & Products[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+ASSETS & PRODUCTS API TESTS (/api/v1)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── Assets ──[0m
+[96m→ Test: GET /assets → AssetsListResponse[0m
+  GET    https://c12.openledger.vn/api/v1/assets  →  [92m200[0m  (43ms)
+[92m✓ assets_list_returns_200_with_schema[0m
+[92m✓ assets_total_is_non_negative_int[0m
+[92m✓ assets_list_is_array[0m
+[96m→ Test: GET /assets?riskLevel=critical → filter by risk level[0m
+  GET    https://c12.openledger.vn/api/v1/assets  →  [92m200[0m  (35ms)
+[92m✓ assets_risk_level_filter_returns_200[0m
+[96m→ Test: GET /assets/tags → tags list[0m
+  GET    https://c12.openledger.vn/api/v1/assets/tags  →  [92m200[0m  (35ms)
+[92m✓ assets_tags_returns_200_with_schema[0m
+[92m✓ assets_tags_is_array[0m
+[93m⚠ SKIP asset_detail: SAMPLE_ASSET_ID not set in .env[0m
+
+[1m── Products ──[0m
+[96m→ Test: GET /products → products list[0m
+  GET    https://c12.openledger.vn/api/v1/products  →  [92m200[0m  (42ms)
+[92m✓ products_list_returns_200_with_schema[0m
+[92m✓ products_list_is_array[0m
+[96m→ Test: GET /products/grades → grades list[0m
+  GET    https://c12.openledger.vn/api/v1/products/grades  →  [91m404[0m  (36ms)
+[93m⚠ SKIP products_grades_returns_200: Endpoint not implemented[0m
+[96m→ Test: GET /products/types → types list[0m
+  GET    https://c12.openledger.vn/api/v1/products/types  →  [92m200[0m  (124ms)
+[92m✓ products_types_returns_200_with_schema[0m
+[93m⚠ SKIP product_detail_and_engagements: SAMPLE_PRODUCT_ID not set in .env[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 12
+  [92mPassed  : 9[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 3[0m
+  Time    : 0.55s
+============================================================
+
+
+[1m[95m▶ Running: Admin, Profile & Notifications[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+ADMIN & NOTIFICATIONS API TESTS (/api/v1)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── Notifications ──[0m
+[96m→ Test: GET /notifications → notifications list[0m
+  GET    https://c12.openledger.vn/api/v1/notifications  →  [91m404[0m  (50ms)
+[93m⚠ SKIP notifications_list_returns_200: Endpoint not implemented (404)[0m
+[96m→ Test: GET /notifications?read=false → only unread[0m
+  GET    https://c12.openledger.vn/api/v1/notifications  →  [91m404[0m  (34ms)
+[93m⚠ SKIP notifications_read_filter: Endpoint not implemented[0m
+[96m→ Test: GET /notifications/unread-count → { unread_count }[0m
+  GET    https://c12.openledger.vn/api/v1/notifications/unread-count  →  [91m404[0m  (34ms)
+[93m⚠ SKIP notifications_unread_count_returns_200: Endpoint not implemented[0m
+
+[1m── Profile ──[0m
+[96m→ Test: GET /profile → User schema[0m
+  GET    https://c12.openledger.vn/api/v1/profile  →  [91m404[0m  (34ms)
+[93m⚠ SKIP profile_returns_200: Endpoint not implemented[0m
+
+[1m── Admin ──[0m
+[96m→ Test: GET /admin/health → SystemHealth[0m
+  GET    https://c12.openledger.vn/api/v1/admin/health  →  [92m200[0m  (34ms)
+[92m✓ admin_health_returns_200_with_schema[0m
+[92m✓ admin_health_status_valid_enum[0m
+[92m✓ admin_health_services_is_object[0m
+[92m✓ admin_health_services_items_valid[0m
+[96m→ Test: GET /admin/users → admin users list[0m
+  GET    https://c12.openledger.vn/api/v1/admin/users  →  [92m200[0m  (49ms)
+[92m✓ admin_users_returns_200_with_schema[0m
+[92m✓ admin_users_is_array[0m
+[92m✓ admin_users_items_schema_valid[0m
+[96m→ Test: GET /admin/roles → roles with permissions[0m
+  GET    https://c12.openledger.vn/api/v1/admin/roles  →  [92m200[0m  (35ms)
+[92m✓ admin_roles_returns_200_with_schema[0m
+[92m✓ admin_roles_is_array[0m
+[92m✓ admin_roles_items_schema_valid[0m
+[96m→ Test: GET /admin/settings → settings object[0m
+  GET    https://c12.openledger.vn/api/v1/admin/settings  →  [91m404[0m  (34ms)
+[93m⚠ SKIP admin_settings_returns_200: Endpoint not implemented[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 15
+  [92mPassed  : 10[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 5[0m
+  Time    : 1.65s
+============================================================
+
+
+[1m[95m▶ Running: AI Center, Reports & Integrations[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+AI CENTER, REPORTS & INTEGRATIONS API TESTS (/api/v1)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── AI Center ──[0m
+[96m→ Test: GET /ai/triage/queue → triage queue[0m
+  GET    https://c12.openledger.vn/api/v1/ai/triage/queue  →  [91m503[0m  (35ms)
+[93m⚠ SKIP ai_triage_queue_returns_200: AI service unavailable (503) — ai-service is down[0m
+[96m→ Test: GET /ai/triage/queue?status=pending → filter[0m
+  GET    https://c12.openledger.vn/api/v1/ai/triage/queue  →  [91m503[0m  (39ms)
+[93m⚠ SKIP ai_triage_queue_status_filter: AI service unavailable (503)[0m
+[96m→ Test: GET /ai/enrichment → EnrichmentStatus[0m
+  GET    https://c12.openledger.vn/api/v1/ai/enrichment  →  [91m503[0m  (1073ms)
+[93m⚠ SKIP ai_enrichment_status_returns_200: AI service unavailable (503)[0m
+[96m→ Test: GET /ai/enrichment/CVE-2021-44228 → CVEEnrichmentDetail[0m
+  GET    https://c12.openledger.vn/api/v1/ai/enrichment/CVE-2021-44228  →  [91m503[0m  (111ms)
+[93m⚠ SKIP ai_enrichment_CVE-2021-44228: AI service unavailable (503)[0m
+
+[1m── Reports ──[0m
+[96m→ Test: GET /reports → reports list[0m
+  GET    https://c12.openledger.vn/api/v1/reports  →  [91m404[0m  (36ms)
+[93m⚠ SKIP reports_list_returns_200: Endpoint not implemented (404)[0m
+[96m→ Test: POST /reports → 202 + Report schema[0m
+  POST   https://c12.openledger.vn/api/v1/reports  →  [91m404[0m  (37ms)
+[93m⚠ SKIP report_create_returns_202: Endpoint not implemented[0m
+
+[1m── Integrations ──[0m
+[96m→ Test: GET /webhooks → array of Webhook[0m
+  GET    https://c12.openledger.vn/api/v1/webhooks  →  [92m200[0m  (36ms)
+[92m✓ webhooks_list_returns_200_as_array[0m
+[92m✓ webhooks_items_schema_valid[0m
+[96m→ Test: GET /api-keys → array of APIKey[0m
+  GET    https://c12.openledger.vn/api/v1/api-keys  →  [91m404[0m  (38ms)
+[93m⚠ SKIP api_keys_list_returns_200: Endpoint not implemented[0m
+[96m→ Test: GET /jira/config → JIRA config[0m
+  GET    https://c12.openledger.vn/api/v1/jira/config  →  [91m404[0m  (34ms)
+[93m⚠ SKIP jira_config_returns_200: Endpoint not implemented[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 10
+  [92mPassed  : 2[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 8[0m
+  Time    : 1.67s
+============================================================
+
+
+[1m[95m▶ Running: Scan Stats & Weekly Activity (CR-008)[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+SCAN STATS & WEEKLY ACTIVITY API TESTS (/api/v1)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── Scan KPI Stats ──[0m
+[96m→ Test: GET /scans/stats → ScanStats schema[0m
+  GET    https://c12.openledger.vn/api/v1/scans/stats  →  [91m404[0m  (36ms)
+[93m⚠ SKIP scan_stats_returns_200: GET /scans/stats not implemented (404) — CR-008 pending[0m
+[96m→ Test: GET /scans/stats/weekly → WeeklyActivity[7][0m
+  GET    https://c12.openledger.vn/api/v1/scans/stats/weekly  →  [91m404[0m  (33ms)
+[93m⚠ SKIP weekly_activity_returns_200: GET /scans/stats/weekly not implemented (404) — CR-008 pending[0m
+
+[1m── ScansListResponse.stats field ──[0m
+[96m→ Test: GET /scans → has 'stats' field in response[0m
+  GET    https://c12.openledger.vn/api/v1/scans  →  [92m200[0m  (50ms)
+[93m⚠ SKIP scans_list_has_stats_field: 'stats' field not yet in ScansListResponse — CR-008 pending[0m
+[96m→ Test: GET /scans/stats không bị conflict route với /scans/{id}[0m
+  GET    https://c12.openledger.vn/api/v1/scans/stats  →  [91m404[0m  (33ms)
+  GET    https://c12.openledger.vn/api/v1/scans  →  [92m200[0m  (34ms)
+[93m⚠ SKIP scan_stats_not_confused_with_scan_list: One or both endpoints returned 404[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 4
+  [92mPassed  : 0[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 4[0m
+  Time    : 0.42s
+============================================================
+
+
+[1m[95m▶ Running: Webhook Deliveries, Retry & Hourly Stats (CR-009)[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+WEBHOOK DELIVERIES & HOURLY STATS API TESTS (/api/v1)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── Webhook Delivery List ──[0m
+[96m→ Test: GET /webhooks/deliveries → WebhookDeliveriesResponse[0m
+  GET    https://c12.openledger.vn/api/v1/webhooks/deliveries  →  [91m405[0m  (35ms)
+[93m⚠ SKIP webhook_deliveries_list_returns_200: GET /webhooks/deliveries returned 405 — endpoint not registered for GET[0m
+[96m→ Test: GET /webhooks/deliveries?status=failed → only failed[0m
+  GET    https://c12.openledger.vn/api/v1/webhooks/deliveries  →  [91m405[0m  (33ms)
+[93m⚠ SKIP webhook_deliveries_status_filter: Endpoint not registered for GET (405)[0m
+[93m⚠ SKIP webhook_deliveries_webhook_filter: SAMPLE_WEBHOOK_ID not set — set in .env to enable[0m
+
+[1m── Webhook Retry ──[0m
+[96m→ Test: POST /webhooks/deliveries/nonexistent/retry → 404[0m
+  POST   https://c12.openledger.vn/api/v1/webhooks/deliveries/nonexistent-delivery-id/retry  →  [91m404[0m  (38ms)
+[92m✓ webhook_retry_nonexistent_returns_404[0m
+[93m⚠ SKIP webhook_retry_delivery: SAMPLE_WEBHOOK_DELIVERY_ID not set — set in .env to enable[0m
+[93m⚠ SKIP webhook_retry_success_422: SAMPLE_SUCCESS_DELIVERY_ID not set in .env[0m
+
+[1m── Webhook Hourly Stats ──[0m
+[96m→ Test: GET /webhooks/stats/hourly → hourly stats array[0m
+  GET    https://c12.openledger.vn/api/v1/webhooks/stats/hourly  →  [91m404[0m  (101ms)
+[93m⚠ SKIP webhook_hourly_stats_returns_200: GET /webhooks/stats/hourly not implemented (404) — CR-009 pending[0m
+[96m→ Test: GET /webhooks/deliveries requires auth (no token → 401)[0m
+[93m⚠ SKIP webhook_deliveries_requires_auth: Endpoint not implemented yet (404/405)[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 8
+  [92mPassed  : 1[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 7[0m
+  Time    : 0.60s
+============================================================
+
+
+[1m[95m▶ Running: Admin RBAC Matrix, User Schema, Settings, API Keys (CR-011,012)[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+ADMIN EXTENDED: RBAC, USERS, SETTINGS, API KEYS (/api/v1)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── RBAC Matrix (GET /admin/roles) ──[0m
+[96m→ Test: GET /admin/roles → RBACMatrixResponse[0m
+  GET    https://c12.openledger.vn/api/v1/admin/roles  →  [92m200[0m  (38ms)
+[92m✓ rbac_matrix_returns_200_with_schema[0m
+[92m✓ rbac_roles_is_array[0m
+[92m✓ rbac_roles_include_admin_role[0m
+[92m✓ rbac_roles_all_have_user_count[0m
+[92m✓ rbac_roles_items_schema_valid[0m
+[93m⚠ SKIP rbac_permission_categories_is_array: permission_categories not yet in response (CR-011 pending)[0m
+
+[1m── Admin Users Extended Schema ──[0m
+[96m→ Test: GET /admin/users → AdminUsersResponse with login_attempts, is_locked[0m
+  GET    https://c12.openledger.vn/api/v1/admin/users  →  [92m200[0m  (38ms)
+[92m✓ admin_users_list_returns_200_with_wrapper[0m
+[92m✓ admin_users_extended_schema_valid[0m
+[92m✓ admin_user_has_login_attempts_field[0m
+[92m✓ admin_user_has_is_locked_field[0m
+[96m→ Test: GET /admin/users?role=admin → only admin role[0m
+  GET    https://c12.openledger.vn/api/v1/admin/users  →  [92m200[0m  (40ms)
+[92m✓ admin_users_role_filter_works[0m
+[96m→ Test: GET /admin/users?status=locked → only locked users[0m
+  GET    https://c12.openledger.vn/api/v1/admin/users  →  [92m200[0m  (58ms)
+[92m✓ admin_users_status_locked_filter_works[0m
+
+[1m── System Settings Typed Schema ──[0m
+[96m→ Test: GET /admin/settings → SystemSettings typed (4 sections)[0m
+  GET    https://c12.openledger.vn/api/v1/admin/settings  →  [91m404[0m  (39ms)
+[93m⚠ SKIP system_settings_returns_200: GET /admin/settings returned 404[0m
+[96m→ Test: PUT /admin/settings với invalid email → 400[0m
+  PUT    https://c12.openledger.vn/api/v1/admin/settings  →  [91m405[0m  (36ms)
+[93m⚠ SKIP system_settings_validation: Got 405[0m
+
+[1m── API Keys — Backend Generate Security Fix ──[0m
+[96m→ Test: GET /api-keys → keys với status, created_by[0m
+  GET    https://c12.openledger.vn/api/v1/api-keys  →  [91m404[0m  (37ms)
+[93m⚠ SKIP api_keys_list: GET /api-keys not implemented[0m
+[96m→ Test: POST /api-keys → backend generates raw_key (not frontend)[0m
+  POST   https://c12.openledger.vn/api/v1/api-keys  →  [91m404[0m  (34ms)
+[93m⚠ SKIP api_key_create: POST /api-keys not implemented — CR-012 pending[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 16
+  [92mPassed  : 11[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 5[0m
+  Time    : 0.54s
+============================================================
+
+
+[1m[95m▶ Running: Public Stats Endpoint — no auth required (CR-013)[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+PUBLIC STATS API TESTS (GET /api/v2/public/stats)
+============================================================[0m
+
+
+[1m── No-Auth Access ──[0m
+[96m→ Test: GET /api/v2/public/stats — no Authorization header → 200[0m
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+  GET    https://c12.openledger.vn/api/v2/public/stats  →  [91m404[0m  (36ms)
+[93m⚠ SKIP public_stats_accessible_without_auth_200: GET /api/v2/public/stats not implemented (404) — CR-013 pending[0m
+[96m→ Test: GET /api/v2/public/stats with auth token → still 200[0m
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+  GET    https://c12.openledger.vn/api/v2/public/stats  →  [91m404[0m  (52ms)
+[93m⚠ SKIP public_stats_also_works_with_auth: Not implemented[0m
+
+[1m── Cache Behavior ──[0m
+[96m→ Test: 2 calls to /api/v2/public/stats — 2nd should be cached[0m
+[96m→ Test: /api/v2/public/stats response time <= 2s[0m
+[96m→ Test: /api/v2/public/stats Content-Type is application/json[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 2
+  [92mPassed  : 0[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 2[0m
+  Time    : 1.28s
+============================================================
+
+
+[1m[95m▶ Running: AI Triage Queue — Full Schema + Human Decision (CR-014)[0m
+[95m─────────────────────────────────────────────────────────────────[0m
+
+[1m============================================================
+AI TRIAGE QUEUE FULL SCHEMA TESTS (/api/v1)
+============================================================[0m
+
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+
+[1m── AI Triage Queue — Full Schema ──[0m
+[96m→ Test: GET /ai/triage/queue → AITriageQueueResponse[0m
+  GET    https://c12.openledger.vn/api/v1/ai/triage/queue  →  [91m503[0m  (37ms)
+[93m⚠ SKIP ai_triage_queue_returns_200: AI service unavailable (503) — ai-service is down[0m
+
+============================================================
+[1mTEST SUMMARY[0m
+============================================================
+  Total   : 1
+  [92mPassed  : 0[0m
+  [91mFailed  : 0[0m
+  [93mSkipped : 1[0m
+  Time    : 0.34s
+============================================================
+
+
+[96mTổng thời gian chạy: 10.85s[0m
+
+[1m=================================================================
+  TỔNG HỢP KẾT QUẢ TOÀN BỘ TEST SUITE
+=================================================================[0m
+  Tổng số test    : 161
+  [92mPassed          : 109[0m
+  [91mFailed          : 0[0m
+  [93mSkipped         : 52[0m
+  Pass rate       : 67.7%
+=================================================================[0m
+

@@ -164,7 +164,7 @@ func (r *NotificationRepo) ListFailed(ctx context.Context, limit int) ([]*Notifi
 
 func reconstitueWebhook(doc *firestore.DocumentSnapshot) (*webhook.Webhook, error) {
 	data := doc.Data()
-	return webhook.Reconstitute(
+	return webhook.ReconstituteFromStrings(
 		doc.Ref.ID,
 		stringField(data, "owner_id"),
 		stringField(data, "callback_url"),

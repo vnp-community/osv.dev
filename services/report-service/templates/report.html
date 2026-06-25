@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="{{ .Theme }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vulnerability Report — {{ .ScanTarget }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .severity-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+    .stat-card { border-radius: 12px; }
+    @media print { .no-print { display: none !important; } }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="bg-dark text-white py-4 px-4">
+  <div class="container-fluid">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <h1 class="h3 mb-1">🔒 Vulnerability Scan Report</h1>
+        <p class="mb-0 text-muted">Target: <strong class="text-white">{{ .ScanTarget }}</strong> &nbsp;|&nbsp; Generated: {{ formatDate .GeneratedAt }}</p>
+      </div>
+      <div class="no-print">
+        <button class="btn btn-outline-light btn-sm" onclick="document.documentElement.setAttribute('data-bs-theme', document.documentElement.getAttribute('data-bs-theme')==='dark'?'light':'dark')">
+          Toggle Theme
+        </button>
+        <button class="btn btn-outline-light btn-sm ms-2" onclick="window.print()">🖨 Print</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Stats -->
+<div class="container-fluid py-4">
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card stat-card text-center border-danger">
+        <div class="card-body py-3">
+          <div class="display-5 fw-bold text-danger">{{ .Stats.CriticalCount }}</div>
+          <div class="small text-muted">Critical</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card stat-card text-center border-warning">
+        <div class="card-body py-3">
+          <div class="display-5 fw-bold text-warning">{{ .Stats.HighCount }}</div>
+          <div class="small text-muted">High</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card stat-card text-center">
+        <div class="card-body py-3">
+          <div class="display-5 fw-bold text-warning">{{ .Stats.MediumCount }}</div>
+          <div class="small text-muted">Medium</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card stat-card text-center border-info">
+        <div class="card-body py-3">
+          <div class="display-5 fw-bold text-info">{{ .Stats.LowCount }}</div>
+          <div class="small text-muted">Low</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">Severity Distribution</h6>
+          <canvas id="severityChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products -->
+  {{ range .Products }}
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mb-0">📦 {{ .ProductName }}</h5>
+      <span class="badge bg-secondary">{{ .TotalFindings }} findings</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-sm mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>CVE</th>
+              <th>Severity</th>
+              <th>CVSS</th>
+              <th>EPSS</th>
+              <th>Exploit</th>
+              <th>Component</th>
+              <th>Title</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .Findings }}
+            <tr>
+              <td>
+                {{ if .CVE }}
+                <a href="https://nvd.nist.gov/vuln/detail/{{ .CVE }}" target="_blank" rel="noopener">{{ .CVE }}</a>
+                {{ else }}—{{ end }}
+              </td>
+              <td>
+                <span class="severity-badge" style="{{ severityBadgeStyle .Severity }}">{{ .Severity }}</span>
+              </td>
+              <td>{{ formatScore .CVSSv3Score }}</td>
+              <td>{{ formatScore .EPSSScore }}</td>
+              <td>{{ boolIcon .IsExploit }}</td>
+              <td><code>{{ .ComponentName }}</code>{{ if .ComponentVersion }} <small class="text-muted">{{ .ComponentVersion }}</small>{{ end }}</td>
+              <td class="text-truncate" style="max-width: 300px;" title="{{ .Title }}">{{ .Title }}</td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {{ end }}
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+  new Chart(document.getElementById('severityChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Critical', 'High', 'Medium', 'Low'],
+      datasets: [{
+        data: [{{ .Stats.CriticalCount }}, {{ .Stats.HighCount }}, {{ .Stats.MediumCount }}, {{ .Stats.LowCount }}],
+        backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#0d6efd'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      plugins: { legend: { position: 'bottom' } },
+      cutout: '60%'
+    }
+  });
+</script>
+</body>
+</html>

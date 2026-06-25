@@ -13,6 +13,7 @@ import (
 	domainerr "github.com/osv/identity-service/internal/domain/error"
 	"github.com/osv/identity-service/internal/domain/repository"
 	jwtpkg "github.com/osv/identity-service/internal/infrastructure/jwt"
+	"net"
 )
 
 // Request is the input for the RefreshToken use case.
@@ -24,9 +25,10 @@ type Request struct {
 
 // Response contains the new token pair.
 type Response struct {
-	AccessToken  string
-	RefreshToken string
-	ExpiresIn    int
+	AccessToken      string
+	RefreshToken     string
+	ExpiresIn        int
+	RefreshExpiresIn int
 }
 
 // UseCase orchestrates refresh token rotation.
@@ -101,18 +103,24 @@ func (uc *UseCase) Execute(ctx context.Context, req Request) (*Response, error) 
 		UserID:           user.ID,
 		RefreshTokenHash: postgres.HashRefreshToken(newRefreshToken),
 		TokenFamily:      session.TokenFamily, // preserve family
-		IPAddress:        req.IPAddress,
+		IPAddress:        extractIP(req.IPAddress),
 		UserAgent:        req.UserAgent,
-		ExpiresAt:        time.Now().UTC().Add(7 * 24 * time.Hour),
+		ExpiresAt:        session.ExpiresAt, // preserve original expiration
 	}
 	if err := uc.sessionRepo.Create(ctx, newSession); err != nil {
 		return nil, err
 	}
 
+	refreshExpiresIn := int(time.Until(session.ExpiresAt).Seconds())
+	if refreshExpiresIn < 0 {
+		refreshExpiresIn = 0
+	}
+
 	return &Response{
-		AccessToken:  accessToken,
-		RefreshToken: newRefreshToken,
-		ExpiresIn:    int((15 * time.Minute).Seconds()),
+		AccessToken:      accessToken,
+		RefreshToken:     newRefreshToken,
+		ExpiresIn:        int((15 * time.Minute).Seconds()),
+		RefreshExpiresIn: refreshExpiresIn,
 	}, nil
 }
 
@@ -141,4 +149,11 @@ func (uc *LogoutUseCase) Execute(ctx context.Context, userID uuid.UUID, refreshT
 	}
 	// All-devices logout
 	return uc.sessionRepo.RevokeByUserID(ctx, userID)
+}
+
+func extractIP(addr string) string {
+	if host, _, err := net.SplitHostPort(addr); err == nil {
+		return host
+	}
+	return addr
 }

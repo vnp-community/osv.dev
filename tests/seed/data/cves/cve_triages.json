@@ -1,0 +1,47 @@
+[
+  {
+    "_id": "3c49b3c5-a743-40a7-9fe4-99997b7e393b",
+    "cve_id": "CVE-2021-44228",
+    "remarks": "Confirmed",
+    "comments": "Confirmed affected — log4j-core 2.14.1 in use across 3 services. Emergency patch deployed on 2021-12-13.",
+    "justification": "vulnerable_code_in_execute_path",
+    "response": [
+      "workaround_available",
+      "update"
+    ],
+    "triaged_by": "admin@company.com"
+  },
+  {
+    "_id": "2047844a-5627-47dc-b611-8c891aefc258",
+    "cve_id": "CVE-2022-22965",
+    "remarks": "Mitigated",
+    "comments": "Spring Boot upgraded to 2.7.4. JVM patched to > 9. No additional compensating controls required.",
+    "justification": "vulnerable_code_not_in_execute_path",
+    "response": [
+      "update"
+    ],
+    "triaged_by": "admin@company.com"
+  },
+  {
+    "_id": "89c4612a-08e4-41bc-9e00-689b42f7ebc6",
+    "cve_id": "CVE-2023-44487",
+    "remarks": "NotAffected",
+    "comments": "HTTP/2 rapid reset — our nginx version 1.25.3 includes the patch. Infrastructure team confirmed rate limiting is also in place.",
+    "justification": "inline_mitigations_already_exist",
+    "response": [
+      "will_not_fix"
+    ],
+    "triaged_by": "admin@company.com"
+  },
+  {
+    "_id": "7d364dfb-458d-4437-9c38-711de61708fc",
+    "cve_id": "CVE-2022-42889",
+    "remarks": "Confirmed",
+    "comments": "commons-text 1.9 confirmed in report-service classpath. Upgrade to 1.10.0 scheduled.",
+    "justification": "vulnerable_code_in_execute_path",
+    "response": [
+      "update"
+    ],
+    "triaged_by": "admin@company.com"
+  }
+]

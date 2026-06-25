@@ -41,7 +41,7 @@ func NewEPSSFetcher(db *mongo.Database) *EPSSFetcher {
 	}
 }
 
-func (f *EPSSFetcher) Name() string { return "epss" }
+func (f *EPSSFetcher) Name() string { return string(SourceEPSS) }
 
 // FetchAndStore downloads EPSS scores and updates epss/epssPercentile fields in "cves" collection.
 // EPSS data is stored in-place on CVE documents (not a separate collection).

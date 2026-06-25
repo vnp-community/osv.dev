@@ -1,0 +1,47 @@
+[
+  {
+    "_id": "604215fa-f3d9-4e0a-8fdc-cabeb1423379",
+    "targets": [
+      "10.0.0.0/24"
+    ],
+    "scan_type": "targeted_scan",
+    "cron_expr": "0 2 * * *",
+    "description": "Daily at 2am",
+    "options": {
+      "ports": "1-1024",
+      "timeout": 3600,
+      "intensity": 4
+    },
+    "is_active": true
+  },
+  {
+    "_id": "d07c412b-2528-4b74-bfd9-2d5f29b2c95f",
+    "targets": [
+      "10.0.1.0/24"
+    ],
+    "scan_type": "incremental_scan",
+    "cron_expr": "0 0 * * 0",
+    "description": "Weekly on Sunday midnight",
+    "options": {
+      "ports": "1-1024",
+      "timeout": 3600,
+      "intensity": 1
+    },
+    "is_active": true
+  },
+  {
+    "_id": "ed3d432d-ed26-42eb-a57c-713006d1cdff",
+    "targets": [
+      "10.0.2.0/24"
+    ],
+    "scan_type": "targeted_scan",
+    "cron_expr": "0 */6 * * *",
+    "description": "Every 6 hours",
+    "options": {
+      "ports": "1-1024",
+      "timeout": 3600,
+      "intensity": 4
+    },
+    "is_active": true
+  }
+]

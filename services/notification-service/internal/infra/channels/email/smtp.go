@@ -1,5 +1,6 @@
-// Package smtp provides the SMTP email sender for the notification service.
-package smtp
+// Package email — gomail-based SMTP sender (alternative to standard smtp.SendMail).
+// Provides NewGoMailSender which wraps gomail.Dialer for SMTP with TLS support.
+package email
 
 import (
 	"context"
@@ -7,31 +8,21 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-// Config holds SMTP connection settings.
-type Config struct {
-	Host     string
-	Port     int
-	Username string
-	Password string
-	From     string
-	UseTLS   bool
-}
-
-// Sender implements dispatch.EmailSender using SMTP via gomail.
-type Sender struct {
+// GoMailSender implements SMTP delivery using the gomail library (supports STARTTLS).
+type GoMailSender struct {
 	dialer *gomail.Dialer
 	from   string
 }
 
-// New creates an SMTP Sender with the given configuration.
-func New(cfg Config) *Sender {
+// NewGoMailSender creates a GoMailSender with TLS support.
+func NewGoMailSender(cfg Config, useTLS bool) *GoMailSender {
 	d := gomail.NewDialer(cfg.Host, cfg.Port, cfg.Username, cfg.Password)
-	d.SSL = cfg.UseTLS
-	return &Sender{dialer: d, from: cfg.From}
+	d.SSL = useTLS
+	return &GoMailSender{dialer: d, from: cfg.From}
 }
 
 // Send delivers an HTML email to the recipient.
-func (s *Sender) Send(_ context.Context, to, subject, htmlBody string) error {
+func (s *GoMailSender) Send(_ context.Context, to, subject, htmlBody string) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", s.from)
 	m.SetHeader("To", to)

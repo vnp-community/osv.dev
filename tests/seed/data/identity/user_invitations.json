@@ -1,0 +1,46 @@
+[
+  {
+    "_id": "8eed6f64-69af-4da7-bffb-53d6497bcfc6",
+    "email": "new.analyst@company.com",
+    "username": "new_analyst",
+    "role": "user",
+    "token": "4a0ffaf050f9fb802fbdd2916949e997e33b605e994672fdd552e831af6cdde3",
+    "invited_by_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "expires_at": "2026-06-28T11:07:40Z",
+    "accepted_at": null,
+    "_comment": "pending — not yet accepted"
+  },
+  {
+    "_id": "a1f45c9d-fbe5-4c7e-af20-7ca1222b3f2b",
+    "email": "contractor.sec@partner.org",
+    "username": "contractor_sec",
+    "role": "user",
+    "token": "687ead826266261d97320c2fc46f54a7c18363a86cc74679c37bd11c15274243",
+    "invited_by_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "expires_at": "2026-06-28T11:07:40Z",
+    "accepted_at": null,
+    "_comment": "pending — not yet accepted"
+  },
+  {
+    "_id": "8130c682-d557-4d39-ab87-7a77b03c8a84",
+    "email": "readonly.viewer@company.com",
+    "username": "readonly_viewer",
+    "role": "readonly",
+    "token": "0f164c7eec09b2c94759be14b02889954502ba26ca01dbd924cb21af8f0253b6",
+    "invited_by_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "expires_at": "2026-06-28T11:07:40Z",
+    "accepted_at": null,
+    "_comment": "pending — not yet accepted"
+  },
+  {
+    "_id": "3fd90f25-e9b1-4ee2-8805-6dcc7e3f38a6",
+    "email": "accepted.user@company.com",
+    "username": "accepted_user",
+    "role": "user",
+    "token": "e69c329933cacf5bcad26b32020996b3cd089251e180394a384f6543e72f16cd",
+    "invited_by_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "expires_at": "2026-06-26T11:07:40Z",
+    "accepted_at": "2026-06-23T11:07:40Z",
+    "_comment": "already accepted — user is active"
+  }
+]

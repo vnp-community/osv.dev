@@ -14,6 +14,7 @@ import (
 	"github.com/osv/gateway-service/internal/adapter/grpcclient"
 	"github.com/osv/gateway-service/internal/domain/entity"
 	gatemw "github.com/osv/gateway-service/internal/delivery/http/middleware"
+	grpchealth "github.com/osv/gateway-service/internal/bff/health"
 	pkghealth "github.com/osv/shared/pkg/health"
 	"github.com/osv/gateway-service/internal/usecase/dbsync"
 	"github.com/osv/gateway-service/internal/usecase/report"
@@ -77,10 +78,37 @@ func (h *CVEHandler) Health(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// handleReadiness handles GET /health/ready — checks all gRPC upstreams
+// handleReadiness handles GET /health/ready — checks HTTP + gRPC upstreams.
+// [FIX TASK-HC-004] Real upstream health checks — no longer stubbed.
 func (h *CVEHandler) handleReadiness(w http.ResponseWriter, r *http.Request) {
-	// TODO: ping each gRPC upstream
-	respondJSON(w, http.StatusOK, map[string]string{"status": "ready"})
+	// 1. HTTP upstream checks (same as /health)
+	healthURLs := make(map[string]string, len(h.cfg.UpstreamURLs))
+	for name, url := range h.cfg.UpstreamURLs {
+		healthURLs[name] = url + "/health"
+	}
+	httpResults := pkghealth.AggregateUpstreams(r.Context(), healthURLs)
+
+	// 2. gRPC upstream checks (from config; empty = skip)
+	grpcResults := grpchealth.PingAll(r.Context(), h.cfg.GRPCAddrs)
+
+	// 3. Determine overall readiness
+	httpReady := pkghealth.IsAllHealthy(httpResults)
+	grpcReady := grpchealth.IsAllHealthy(grpcResults)
+	ready := httpReady && grpcReady
+
+	code := http.StatusOK
+	status := "ready"
+	if !ready {
+		code = http.StatusServiceUnavailable
+		status = "not_ready"
+	}
+	respondJSON(w, code, map[string]interface{}{
+		"status":      status,
+		"service":     "api-gateway",
+		"timestamp":   time.Now().UTC().Format(time.RFC3339),
+		"http_checks": httpResults,
+		"grpc_checks": grpcResults,
+	})
 }
 
 // handleLiveness handles GET /health/live — always 200

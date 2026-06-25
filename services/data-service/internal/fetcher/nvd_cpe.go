@@ -34,7 +34,7 @@ func NewNVDCPEFetcher(db *mongo.Database, apiKey string) *NVDCPEFetcher {
 	}
 }
 
-func (f *NVDCPEFetcher) Name() string { return "cpe" }
+func (f *NVDCPEFetcher) Name() string { return string(SourceNVDCPE) }
 
 // FetchAndStore fetches CPE data from NVD and upserts into MongoDB "cpe" collection.
 func (f *NVDCPEFetcher) FetchAndStore(ctx context.Context, opts FetchOptions) (int, error) {

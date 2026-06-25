@@ -1,0 +1,5559 @@
+openapi: 3.0.3
+info:
+  title: OSV Platform API
+  version: 2.0.0
+  description: |
+    API Specification được tổng hợp từ frontend source code.
+    Phản ánh đúng tất cả các request mà frontend cần từ backend.
+
+    ## Versioning
+    - `/api/v1` — Auth, Dashboard, Scans, Findings, Assets, Products, AI, Reports, Integrations, Admin
+    - `/api/v2` — CVE Intelligence, KEV Catalog, EPSS Analytics, CWE/CAPEC Taxonomy, Vendor/Browse
+
+    ## Authentication
+    - Access token (JWT RS256, TTL 15 phút) gửi qua header `Authorization: Bearer <token>`
+    - Refresh token quản lý bởi server qua httpOnly cookie
+    - SSE endpoints dùng query param `?token=<jwt>` (EventSource không support header)
+
+servers:
+  - url: /api/v1
+    description: v1 API (Auth, Platform Operations)
+  - url: /api/v2
+    description: v2 API (CVE Intelligence, Taxonomy)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Security Schemes
+# ─────────────────────────────────────────────────────────────────────────────
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # Shared / Primitive Schemas
+  # ───────────────────────────────────────────────────────────────────────────
+  schemas:
+
+    # ── Error ────────────────────────────────────────────────────────────────
+    APIError:
+      type: object
+      description: Chuẩn lỗi trả về từ backend
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code (e.g. "NOT_FOUND", "UNAUTHORIZED")
+        message:
+          type: string
+          description: Human-readable message
+        details:
+          type: object
+          description: Optional structured details
+        traceId:
+          type: string
+          description: Support tracking ID
+      required:
+        - error
+        - message
+
+    # ── Auth / User ──────────────────────────────────────────────────────────
+    UserRole:
+      type: string
+      enum: [admin, user, readonly, agent]
+
+    Permission:
+      type: string
+      enum:
+        - scan:create
+        - scan:read
+        - asset:write
+        - asset:read
+        - user:manage
+        - report:download
+        - system:configure
+        - finding:write
+        - finding:read
+        - agent:report
+
+    User:
+      type: object
+      description: Authenticated user object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+        mfa_enabled:
+          type: boolean
+        avatar_url:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - email
+        - name
+        - role
+        - permissions
+        - mfa_enabled
+        - created_at
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        mfa_code:
+          type: string
+          description: 6-digit TOTP code (chỉ cần khi mfa_required=true)
+      required:
+        - email
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          nullable: true
+          description: JWT access token. null nếu MFA chưa xác thực
+        expires_in:
+          type: integer
+          description: TTL tính bằng giây (thường 900)
+        user:
+          allOf:
+            - $ref: '#/components/schemas/User'
+          nullable: true
+          description: null nếu mfa_required=true
+        mfa_required:
+          type: boolean
+          description: true → frontend phải nhập MFA code rồi call lại login
+      required:
+        - expires_in
+
+    RefreshResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        expires_in:
+          type: integer
+      required:
+        - access_token
+        - expires_in
+
+    MFASetupResponse:
+      type: object
+      properties:
+        secret:
+          type: string
+          description: TOTP secret (base32)
+        qr_url:
+          type: string
+          description: URL ảnh QR code để scan bằng authenticator app
+        backup_codes:
+          type: array
+          items:
+            type: string
+          description: One-time backup codes
+      required:
+        - secret
+        - qr_url
+        - backup_codes
+
+    MFAConfirmResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        mfa_enabled:
+          type: boolean
+      required:
+        - success
+        - mfa_enabled
+
+    # ── Dashboard ─────────────────────────────────────────────────────────────
+    SecurityGrade:
+      type: string
+      enum: [A, A-, B+, B, B-, C+, C, D, F]
+
+    DashboardKPIs:
+      type: object
+      properties:
+        critical_findings:
+          type: integer
+        high_findings:
+          type: integer
+        total_assets:
+          type: integer
+        high_risk_assets:
+          type: integer
+        active_scans:
+          type: integer
+        queued_scans:
+          type: integer
+        security_grade:
+          $ref: '#/components/schemas/SecurityGrade'
+        security_score:
+          type: integer
+          description: 0-100
+        sla_compliance:
+          type: integer
+          description: Percentage
+        sla_at_risk:
+          type: integer
+        sla_breached:
+          type: integer
+      required:
+        - critical_findings
+        - high_findings
+        - total_assets
+        - high_risk_assets
+        - active_scans
+        - queued_scans
+        - security_grade
+        - security_score
+        - sla_compliance
+        - sla_at_risk
+        - sla_breached
+
+    RiskTrendPoint:
+      type: object
+      properties:
+        month:
+          type: string
+          description: "Format: YYYY-MM"
+        critical:
+          type: integer
+        high:
+          type: integer
+        medium:
+          type: integer
+        low:
+          type: integer
+      required: [month, critical, high, medium, low]
+
+    SeverityDistribution:
+      type: object
+      properties:
+        critical:
+          type: integer
+        high:
+          type: integer
+        medium:
+          type: integer
+        low:
+          type: integer
+        total:
+          type: integer
+      required: [critical, high, medium, low, total]
+
+    ProductGradeItem:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        grade:
+          $ref: '#/components/schemas/SecurityGrade'
+        score:
+          type: integer
+        critical_count:
+          type: integer
+        high_count:
+          type: integer
+      required: [id, name, grade, score, critical_count, high_count]
+
+    KEVAlert:
+      type: object
+      description: KEV alert hiển thị trên Dashboard
+      properties:
+        cve_id:
+          type: string
+        vendor:
+          type: string
+        product:
+          type: string
+        date_added:
+          type: string
+          format: date
+        is_ransomware:
+          type: boolean
+      required: [cve_id, vendor, product, date_added, is_ransomware]
+
+    RecentScan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        targets:
+          type: array
+          items:
+            type: string
+        finding_count:
+          type: integer
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        duration_ms:
+          type: integer
+          nullable: true
+        created_by:
+          type: string
+      required: [id, name, type, status, targets, finding_count, started_at, created_by]
+
+    SLABreach:
+      type: object
+      properties:
+        finding_id:
+          type: string
+        title:
+          type: string
+        cve_id:
+          type: string
+        severity:
+          type: string
+        product_name:
+          type: string
+        sla_expiration_date:
+          type: string
+          format: date-time
+        days_overdue:
+          type: integer
+      required: [finding_id, title, cve_id, severity, product_name, sla_expiration_date, days_overdue]
+
+    DashboardData:
+      type: object
+      properties:
+        kpis:
+          $ref: '#/components/schemas/DashboardKPIs'
+        risk_trend:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskTrendPoint'
+        severity_distribution:
+          $ref: '#/components/schemas/SeverityDistribution'
+        product_grades:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductGradeItem'
+        kev_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/KEVAlert'
+        recent_scans:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecentScan'
+        sla_breaches:
+          type: array
+          items:
+            $ref: '#/components/schemas/SLABreach'
+      required:
+        - kpis
+        - risk_trend
+        - severity_distribution
+        - product_grades
+        - kev_alerts
+        - recent_scans
+        - sla_breaches
+
+    SLASummary:
+      type: object
+      properties:
+        total_active_findings:
+          type: integer
+        compliance_percent:
+          type: number
+        breached:
+          type: integer
+        at_risk:
+          type: integer
+        ok:
+          type: integer
+      required: [total_active_findings, compliance_percent, breached, at_risk, ok]
+
+    SLADashboardData:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/SLASummary'
+        compliance_trend:
+          type: array
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+              compliance_percent:
+                type: number
+            required: [month, compliance_percent]
+        breached_findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/SLABreach'
+        at_risk_findings:
+          type: array
+          items:
+            type: object
+            properties:
+              finding_id:
+                type: string
+              title:
+                type: string
+              severity:
+                type: string
+              product_name:
+                type: string
+              sla_expiration_date:
+                type: string
+                format: date-time
+              hours_remaining:
+                type: number
+            required: [finding_id, title, severity, product_name, sla_expiration_date, hours_remaining]
+        by_product:
+          type: array
+          items:
+            type: object
+            properties:
+              product_id:
+                type: string
+              product_name:
+                type: string
+              compliance_percent:
+                type: number
+              breached:
+                type: integer
+              at_risk:
+                type: integer
+              ok:
+                type: integer
+            required: [product_id, product_name, compliance_percent, breached, at_risk, ok]
+        total_breached:
+          type: integer
+        total_at_risk:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+      required:
+        - summary
+        - compliance_trend
+        - breached_findings
+        - at_risk_findings
+        - by_product
+        - total_breached
+        - total_at_risk
+        - page
+        - page_size
+
+    # ── Notifications ─────────────────────────────────────────────────────────
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          description: Extra structured data tuỳ notification type
+      required: [id, type, title, message, read, created_at]
+
+    # ── CVE Intelligence (v2) ─────────────────────────────────────────────────
+    Severity:
+      type: string
+      enum: [Critical, High, Medium, Low, Info]
+
+    CVESource:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "e.g. NVD, MITRE, ExploitDB"
+        url:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+      required: [name, url, published_at]
+
+    AffectedProduct:
+      type: object
+      properties:
+        cpe:
+          type: string
+        vendor:
+          type: string
+        product:
+          type: string
+        version_start:
+          type: string
+          nullable: true
+        version_end:
+          type: string
+          nullable: true
+      required: [cpe, vendor, product]
+
+    KEVDetail:
+      type: object
+      properties:
+        date_added:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        known_ransomware_campaign_use:
+          type: boolean
+        required_action:
+          type: string
+      required: [date_added, due_date, known_ransomware_campaign_use, required_action]
+
+    CVE:
+      type: object
+      description: CVE record. Các field có chú thích [detail-only] chỉ có trong GET /cves/{id}
+      properties:
+        id:
+          type: string
+          example: CVE-2025-44228
+        severity:
+          $ref: '#/components/schemas/Severity'
+        cvss_v3:
+          type: number
+          format: float
+          nullable: true
+        cvss_v2:
+          type: number
+          format: float
+          nullable: true
+        epss_score:
+          type: number
+          format: float
+          description: 0.0 - 1.0
+        epss_percentile:
+          type: number
+          format: float
+          description: 0.0 - 1.0
+        is_kev:
+          type: boolean
+        has_exploit:
+          type: boolean
+        vendor:
+          type: string
+        product:
+          type: string
+        cwe_ids:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/CVESource'
+        # detail-only fields
+        affected_products:
+          type: array
+          items:
+            $ref: '#/components/schemas/AffectedProduct'
+          description: "[detail-only] Danh sách CPE bị ảnh hưởng"
+        kev_detail:
+          allOf:
+            - $ref: '#/components/schemas/KEVDetail'
+          nullable: true
+          description: "[detail-only] KEV metadata, null nếu không trong catalog"
+        references:
+          type: array
+          items:
+            type: string
+          description: "[detail-only] Reference URLs"
+        # semantic search only
+        similarity_score:
+          type: number
+          format: float
+          nullable: true
+          description: "[semantic-search-only] Cosine similarity 0-1"
+      required:
+        - id
+        - severity
+        - epss_score
+        - epss_percentile
+        - is_kev
+        - has_exploit
+        - vendor
+        - product
+        - cwe_ids
+        - description
+        - published_at
+        - updated_at
+        - sources
+
+    CVESearchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Full-text search query
+        severity:
+          type: array
+          items:
+            $ref: '#/components/schemas/Severity'
+        kev_only:
+          type: boolean
+        has_exploit:
+          type: boolean
+        min_cvss:
+          type: number
+        max_cvss:
+          type: number
+        min_epss:
+          type: number
+        vendors:
+          type: array
+          items:
+            type: string
+        products:
+          type: array
+          items:
+            type: string
+        cwe_ids:
+          type: array
+          items:
+            type: string
+        date_from:
+          type: string
+          format: date
+        date_to:
+          type: string
+          format: date
+        page:
+          type: integer
+          default: 1
+        page_size:
+          type: integer
+          default: 20
+        sort_by:
+          type: string
+          enum: [epss_desc, cvss_desc, published_desc, published_asc]
+
+    CVESearchAggregations:
+      type: object
+      properties:
+        by_severity:
+          type: object
+          additionalProperties:
+            type: integer
+        top_vendors:
+          type: array
+          items:
+            type: object
+            properties:
+              vendor:
+                type: string
+              count:
+                type: integer
+            required: [vendor, count]
+        by_year:
+          type: array
+          items:
+            type: object
+            properties:
+              year:
+                type: integer
+              count:
+                type: integer
+            required: [year, count]
+      required: [by_severity, top_vendors, by_year]
+
+    CVESearchResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CVE'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+        aggregations:
+          $ref: '#/components/schemas/CVESearchAggregations'
+      required: [data, total, page, page_size, aggregations]
+
+    SemanticSearchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Natural language query
+        limit:
+          type: integer
+          default: 20
+        min_similarity:
+          type: number
+          format: float
+          description: Ngưỡng cosine similarity tối thiểu (0-1)
+      required: [query]
+
+    SemanticSearchResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CVE'
+        total:
+          type: integer
+        query_embedding_ms:
+          type: integer
+          description: Thời gian embedding query (ms)
+      required: [data, total, query_embedding_ms]
+
+    # ── KEV Catalog ───────────────────────────────────────────────────────────
+    KEVEntry:
+      type: object
+      properties:
+        cve_id:
+          type: string
+        vendor:
+          type: string
+        product:
+          type: string
+        vulnerability_name:
+          type: string
+        date_added:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        known_ransomware_campaign_use:
+          type: boolean
+        notes:
+          type: string
+          nullable: true
+      required:
+        - cve_id
+        - vendor
+        - product
+        - vulnerability_name
+        - date_added
+        - due_date
+        - known_ransomware_campaign_use
+
+    KEVStats:
+      type: object
+      properties:
+        total:
+          type: integer
+        added_last_30_days:
+          type: integer
+        ransomware_related:
+          type: integer
+        unmitigated_in_platform:
+          type: integer
+          nullable: true
+      required: [total, added_last_30_days, ransomware_related]
+
+    KEVListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/KEVEntry'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+        stats:
+          $ref: '#/components/schemas/KEVStats'
+      required: [data, total, page, page_size, stats]
+
+    KEVStatsResponse:
+      type: object
+      properties:
+        stats:
+          $ref: '#/components/schemas/KEVStats'
+        by_vendor:
+          type: array
+          items:
+            type: object
+            properties:
+              vendor:
+                type: string
+              count:
+                type: integer
+            required: [vendor, count]
+        recent_additions:
+          type: array
+          items:
+            $ref: '#/components/schemas/KEVEntry'
+      required: [stats, by_vendor, recent_additions]
+
+    # ── EPSS ─────────────────────────────────────────────────────────────────
+    EPSSHistoryPoint:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        score:
+          type: number
+        percentile:
+          type: number
+      required: [date, score, percentile]
+
+    EPSSByCVEResponse:
+      type: object
+      properties:
+        cve_id:
+          type: string
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/EPSSHistoryPoint'
+        current:
+          type: object
+          properties:
+            score:
+              type: number
+            percentile:
+              type: number
+          required: [score, percentile]
+      required: [cve_id, history, current]
+
+    EPSSTopEntry:
+      type: object
+      properties:
+        cve_id:
+          type: string
+        epss_score:
+          type: number
+        epss_percentile:
+          type: number
+        severity:
+          $ref: '#/components/schemas/Severity'
+        vendor:
+          type: string
+        product:
+          type: string
+        is_kev:
+          type: boolean
+      required: [cve_id, epss_score, epss_percentile, severity, vendor, product, is_kev]
+
+    EPSSTopResponse:
+      type: object
+      properties:
+        cves:
+          type: array
+          items:
+            $ref: '#/components/schemas/EPSSTopEntry'
+        total:
+          type: integer
+      required: [cves, total]
+
+    EPSSDistributionResponse:
+      type: object
+      properties:
+        buckets:
+          type: array
+          items:
+            type: object
+            properties:
+              range:
+                type: string
+                description: "e.g. '0.0-0.1', '0.1-0.2'"
+              count:
+                type: integer
+            required: [range, count]
+        total_cves:
+          type: integer
+        mean_epss:
+          type: number
+        median_epss:
+          type: number
+      required: [buckets, total_cves, mean_epss, median_epss]
+
+    # ── CWE / CAPEC Taxonomy ──────────────────────────────────────────────────
+    CWEListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: CWE-89
+        name:
+          type: string
+        related_cve_count:
+          type: integer
+      required: [id, name, related_cve_count]
+
+    CWEListResponse:
+      type: object
+      properties:
+        cwe_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/CWEListItem'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+      required: [cwe_list, total, page, page_size]
+
+    CAPECPattern:
+      type: object
+      properties:
+        id:
+          type: string
+          example: CAPEC-66
+        name:
+          type: string
+        likelihood:
+          type: string
+        description:
+          type: string
+      required: [id, name, likelihood, description]
+
+    CWEDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        extended_description:
+          type: string
+          nullable: true
+        likelihood:
+          type: string
+        mitigations:
+          type: array
+          items:
+            type: string
+        capec_patterns:
+          type: array
+          items:
+            $ref: '#/components/schemas/CAPECPattern'
+        related_cve_count:
+          type: integer
+      required: [id, name, description, likelihood, mitigations, capec_patterns, related_cve_count]
+
+    # ── Vendors / Browse ──────────────────────────────────────────────────────
+    VendorsResponse:
+      type: object
+      properties:
+        vendors:
+          type: array
+          items:
+            type: string
+      required: [vendors]
+
+    DBInfoResponse:
+      type: object
+      description: Thông tin metadata về CVE database
+      properties:
+        total_cves:
+          type: integer
+        last_updated:
+          type: string
+          format: date-time
+        sources:
+          type: array
+          items:
+            type: string
+        version:
+          type: string
+      required: [total_cves, last_updated, sources]
+
+    # ── Public Stats (no auth) ─────────────────────────────────────────────────
+    PublicStats:
+      type: object
+      description: Platform-wide statistics exposed publicly (no authentication required). Dùng cho Login page.
+      properties:
+        total_cves:
+          type: string
+          description: "e.g. '240K+'"
+        scans_today:
+          type: integer
+        finding_accuracy:
+          type: string
+          description: "e.g. '98.4%'"
+        uptime_sla:
+          type: string
+          description: "e.g. '99.99%'"
+        threat_indicators:
+          type: object
+          properties:
+            critical_threats:
+              type: integer
+            kev_active:
+              type: integer
+            assets_at_risk:
+              type: integer
+          required: [critical_threats, kev_active, assets_at_risk]
+      required: [total_cves, scans_today, finding_accuracy, uptime_sla, threat_indicators]
+
+    # ── Findings ──────────────────────────────────────────────────────────────
+    FindingStatus:
+      type: string
+      enum: [active, mitigated, false_positive, risk_accepted, out_of_scope, duplicate]
+
+    SLAStatus:
+      type: string
+      enum: [ok, at_risk, breached]
+
+    AITriageResult:
+      type: object
+      properties:
+        remarks:
+          type: string
+          enum: [Confirmed, FalsePositive, NotAffected, Unexplored]
+        confidence:
+          type: number
+          description: 0.0 - 1.0
+        justification:
+          type: string
+        actions:
+          type: array
+          items:
+            type: string
+        generated_at:
+          type: string
+          format: date-time
+      required: [remarks, confidence, justification, actions, generated_at]
+
+    Finding:
+      type: object
+      properties:
+        id:
+          type: string
+          example: F-2847
+        title:
+          type: string
+        description:
+          type: string
+        cve_id:
+          type: string
+          nullable: true
+        severity:
+          $ref: '#/components/schemas/Severity'
+        cvss_v3:
+          type: number
+          nullable: true
+        cvss_v4:
+          type: number
+          nullable: true
+        epss_score:
+          type: number
+          nullable: true
+        is_kev:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/FindingStatus'
+        is_duplicate:
+          type: boolean
+        duplicate_finding_id:
+          type: string
+          nullable: true
+        # Hierarchy
+        product_id:
+          type: string
+        product_name:
+          type: string
+        engagement_id:
+          type: string
+        test_id:
+          type: string
+        # Asset
+        asset_ip:
+          type: string
+          nullable: true
+        asset_hostname:
+          type: string
+          nullable: true
+        component_name:
+          type: string
+          nullable: true
+        component_version:
+          type: string
+          nullable: true
+        # SLA
+        sla_expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+        sla_status:
+          $ref: '#/components/schemas/SLAStatus'
+        sla_days_left:
+          type: integer
+          nullable: true
+        # Metadata
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        mitigated_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_by:
+          type: string
+        assigned_to:
+          type: string
+          nullable: true
+        # AI
+        ai_triage_result:
+          allOf:
+            - $ref: '#/components/schemas/AITriageResult'
+          nullable: true
+        # VEX
+        vex_justification:
+          type: string
+          nullable: true
+        # JIRA
+        jira_issue_key:
+          type: string
+          nullable: true
+        jira_url:
+          type: string
+          nullable: true
+      required:
+        - id
+        - title
+        - description
+        - severity
+        - is_kev
+        - status
+        - is_duplicate
+        - product_id
+        - product_name
+        - engagement_id
+        - test_id
+        - sla_status
+        - created_at
+        - updated_at
+        - created_by
+
+    FindingsListResponse:
+      type: object
+      properties:
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Finding'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+        by_severity:
+          type: object
+          additionalProperties:
+            type: integer
+        by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        sla_stats:
+          type: object
+          properties:
+            breached:
+              type: integer
+            at_risk:
+              type: integer
+            ok:
+              type: integer
+          required: [breached, at_risk, ok]
+      required: [findings, total, page, page_size, by_severity, by_status, sla_stats]
+
+    FindingNote:
+      type: object
+      properties:
+        id:
+          type: string
+        finding_id:
+          type: string
+        content:
+          type: string
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required: [id, finding_id, content, created_by, created_at]
+
+    BulkOperationResponse:
+      type: object
+      properties:
+        success_count:
+          type: integer
+        failed_ids:
+          type: array
+          items:
+            type: string
+        errors:
+          type: array
+          items:
+            type: string
+      required: [success_count, failed_ids, errors]
+
+    RiskAcceptance:
+      type: object
+      properties:
+        id:
+          type: string
+        product_id:
+          type: string
+        finding_ids:
+          type: array
+          items:
+            type: string
+        expiration_date:
+          type: string
+          format: date
+        retest_date:
+          type: string
+          format: date
+          nullable: true
+        reason:
+          type: string
+        approved_by:
+          type: string
+        is_expired:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - product_id
+        - finding_ids
+        - expiration_date
+        - reason
+        - approved_by
+        - is_expired
+        - created_at
+
+    SLAConfig:
+      type: object
+      properties:
+        product_id:
+          type: string
+          nullable: true
+          description: null = global default
+        critical_days:
+          type: integer
+          default: 7
+        high_days:
+          type: integer
+          default: 30
+        medium_days:
+          type: integer
+          default: 90
+        low_days:
+          type: integer
+          default: 180
+      required: [critical_days, high_days, medium_days, low_days]
+
+    # ── Scans ─────────────────────────────────────────────────────────────────
+    ScanStats:
+      type: object
+      description: KPI summary cho Scan Dashboard
+      properties:
+        active_scans:
+          type: integer
+          description: Số scans đang chạy (status=running)
+        completed_today:
+          type: integer
+          description: Số scans completed trong ngày hôm nay
+        total_findings:
+          type: integer
+          description: Tổng số findings phát hiện hôm nay
+        scheduled_scans:
+          type: integer
+          description: Số scheduled scans đang active
+      required: [active_scans, completed_today, total_findings, scheduled_scans]
+
+    WeeklyActivity:
+      type: object
+      description: Dữ liệu activity theo ngày trong tuần
+      properties:
+        day:
+          type: string
+          description: "e.g. 'Mon', 'Tue', 'Wed'"
+        scans:
+          type: integer
+        findings:
+          type: integer
+      required: [day, scans, findings]
+
+    # ── Risk Acceptance (extended) ─────────────────────────────────────────────
+    RiskAcceptancesResponse:
+      type: object
+      properties:
+        acceptances:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskAcceptance'
+        total:
+          type: integer
+      required: [acceptances, total]
+
+    ScanType:
+      type: string
+      enum: [nmap_full, nmap_discovery, zap, agent, import]
+
+    ScanStatus:
+      type: string
+      enum: [pending, queued, running, completed, failed, cancelled]
+
+    Scan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/ScanType'
+        status:
+          $ref: '#/components/schemas/ScanStatus'
+        targets:
+          type: array
+          items:
+            type: string
+          description: IPs, CIDRs, hostnames, URLs
+        progress:
+          type: integer
+          description: 0-100
+        finding_count:
+          type: integer
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        duration_ms:
+          type: integer
+          nullable: true
+        created_by:
+          type: string
+        engagement_id:
+          type: string
+          nullable: true
+        error:
+          type: string
+          nullable: true
+      required:
+        - id
+        - name
+        - type
+        - status
+        - targets
+        - progress
+        - finding_count
+        - created_by
+
+    ScansListResponse:
+      type: object
+      properties:
+        scans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scan'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+        stats:
+          type: object
+          properties:
+            active_scans:
+              type: integer
+            completed_today:
+              type: integer
+            total_findings_today:
+              type: integer
+            scheduled_scans:
+              type: integer
+          required: [active_scans, completed_today, total_findings_today, scheduled_scans]
+      required: [scans, total, page, page_size, stats]
+
+    CreateScanRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+        type:
+          $ref: '#/components/schemas/ScanType'
+        targets:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        options:
+          type: object
+          properties:
+            scan_profile:
+              type: string
+              enum: [discovery, full, custom]
+            port_range:
+              type: string
+            max_depth:
+              type: integer
+              minimum: 1
+              maximum: 10
+            timeout:
+              type: integer
+              minimum: 30
+              maximum: 3600
+        engagement_id:
+          type: string
+          nullable: true
+        schedule_frequency:
+          type: string
+          enum: [once, daily, weekly, custom]
+        schedule_cron_expr:
+          type: string
+          nullable: true
+      required: [name, type, targets]
+
+    NmapPort:
+      type: object
+      properties:
+        port:
+          type: integer
+        protocol:
+          type: string
+          enum: [tcp, udp]
+        state:
+          type: string
+          enum: [open, filtered]
+        service:
+          type: string
+        version:
+          type: string
+          nullable: true
+        cve_ids:
+          type: array
+          items:
+            type: string
+      required: [port, protocol, state, service, cve_ids]
+
+    NmapHost:
+      type: object
+      properties:
+        ip:
+          type: string
+        hostname:
+          type: string
+          nullable: true
+        os:
+          type: string
+          nullable: true
+        state:
+          type: string
+          enum: [up, down]
+        ports:
+          type: array
+          items:
+            $ref: '#/components/schemas/NmapPort'
+        cve_ids:
+          type: array
+          items:
+            type: string
+        risk_score:
+          type: number
+          description: Max CVSS score across CVEs
+      required: [ip, state, ports, cve_ids, risk_score]
+
+    NmapResultsResponse:
+      type: object
+      properties:
+        scan_id:
+          type: string
+        hosts:
+          type: array
+          items:
+            $ref: '#/components/schemas/NmapHost'
+        total_hosts:
+          type: integer
+        hosts_up:
+          type: integer
+        total_findings:
+          type: integer
+      required: [scan_id, hosts, total_hosts, hosts_up, total_findings]
+
+    ZAPAlert:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        risk:
+          type: string
+          enum: [High, Medium, Low, Informational]
+        confidence:
+          type: string
+          enum: [High, Medium, Low]
+        url:
+          type: string
+        description:
+          type: string
+        solution:
+          type: string
+        evidence:
+          type: string
+          nullable: true
+        cwe_id:
+          type: string
+          nullable: true
+        references:
+          type: array
+          items:
+            type: string
+      required: [id, name, risk, confidence, url, description, solution, references]
+
+    ZAPResultsResponse:
+      type: object
+      properties:
+        scan_id:
+          type: string
+        target_url:
+          type: string
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ZAPAlert'
+        total:
+          type: integer
+        by_risk:
+          type: object
+          additionalProperties:
+            type: integer
+      required: [scan_id, target_url, alerts, total, by_risk]
+
+    ScheduledScan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/ScanType'
+        targets:
+          type: array
+          items:
+            type: string
+        frequency:
+          type: string
+          enum: [once, daily, weekly, custom]
+        cron_expr:
+          type: string
+          nullable: true
+        next_run_at:
+          type: string
+          format: date-time
+        last_run_at:
+          type: string
+          format: date-time
+          nullable: true
+        enabled:
+          type: boolean
+      required: [id, name, type, targets, frequency, next_run_at, enabled]
+
+    # ── Assets ────────────────────────────────────────────────────────────────
+    AssetService:
+      type: object
+      properties:
+        port:
+          type: integer
+        protocol:
+          type: string
+        service:
+          type: string
+        version:
+          type: string
+          nullable: true
+        cve_ids:
+          type: array
+          items:
+            type: string
+      required: [port, protocol, service, cve_ids]
+
+    Asset:
+      type: object
+      properties:
+        id:
+          type: string
+        ip:
+          type: string
+        hostname:
+          type: string
+          nullable: true
+        os:
+          type: string
+          nullable: true
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetService'
+        web_technologies:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+        risk_score:
+          type: number
+        active_finding_count:
+          type: integer
+        first_seen_at:
+          type: string
+          format: date-time
+        last_seen_at:
+          type: string
+          format: date-time
+        last_scan_id:
+          type: string
+          nullable: true
+      required:
+        - id
+        - ip
+        - services
+        - web_technologies
+        - tags
+        - risk_score
+        - active_finding_count
+        - first_seen_at
+        - last_seen_at
+
+    AssetsListResponse:
+      type: object
+      properties:
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        total:
+          type: integer
+      required: [assets, total]
+
+    # ── Products ──────────────────────────────────────────────────────────────
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        product_type:
+          type: string
+        grade:
+          $ref: '#/components/schemas/SecurityGrade'
+        score:
+          type: integer
+        critical_count:
+          type: integer
+        high_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+      required: [id, name, product_type, grade, score, critical_count, high_count, created_at]
+
+    Engagement:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        product_id:
+          type: string
+      required: [id, name, status, start_date, product_id]
+
+    Test:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        test_type:
+          type: string
+        engagement_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required: [id, title, test_type, engagement_id, created_at]
+
+    # ── AI Center ────────────────────────────────────────────────────────────
+    TriageQueueItem:
+      type: object
+      description: "[Legacy] Basic queue item — see AITriageQueueItem for full schema"
+      properties:
+        finding_id:
+          type: string
+        finding_title:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        status:
+          type: string
+          enum: [pending, processing, done, failed]
+        queued_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required: [finding_id, finding_title, severity, status, queued_at]
+
+    AITriageQueueItem:
+      type: object
+      description: Triage queue item đầy đủ — bao gồm AI result và human decision
+      properties:
+        finding_id:
+          type: string
+        finding_title:
+          type: string
+        cve_id:
+          type: string
+          nullable: true
+        severity:
+          $ref: '#/components/schemas/Severity'
+        ai_result:
+          $ref: '#/components/schemas/AITriageResult'
+        human_decision:
+          type: string
+          enum: [accepted, overridden, rejected]
+          nullable: true
+          description: Quyết định của người review (null = chưa review)
+        human_note:
+          type: string
+          nullable: true
+        reviewed_by:
+          type: string
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required: [finding_id, finding_title, severity, ai_result]
+
+    AITriageQueueStats:
+      type: object
+      properties:
+        pending:
+          type: integer
+          description: Số items chưa có human decision
+        accepted_today:
+          type: integer
+          description: Số items đã accepted trong ngày hôm nay
+        avg_confidence:
+          type: number
+          description: Average AI confidence (0-100)
+        false_positive_rate:
+          type: number
+          description: Tỷ lệ false positive (percentage)
+      required: [pending, accepted_today, avg_confidence, false_positive_rate]
+
+    AITriageQueueResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AITriageQueueItem'
+        total:
+          type: integer
+        stats:
+          $ref: '#/components/schemas/AITriageQueueStats'
+      required: [items, total, stats]
+
+    ReviewTriageRequest:
+      type: object
+      properties:
+        decision:
+          type: string
+          enum: [accepted, overridden, rejected]
+        note:
+          type: string
+          nullable: true
+      required: [decision]
+
+    EnrichmentStatus:
+      type: object
+      properties:
+        total_enriched:
+          type: integer
+        last_run_at:
+          type: string
+          format: date-time
+          nullable: true
+        next_run_at:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum: [idle, running, error]
+      required: [total_enriched, status]
+
+    CVEEnrichmentDetail:
+      type: object
+      description: AI-generated enrichment detail cho một CVE
+      properties:
+        cve_id:
+          type: string
+        summary:
+          type: string
+        attack_vectors:
+          type: array
+          items:
+            type: string
+        remediation:
+          type: string
+        references:
+          type: array
+          items:
+            type: string
+        enriched_at:
+          type: string
+          format: date-time
+      required: [cve_id, summary, attack_vectors, remediation, references, enriched_at]
+
+    # ── Reports ───────────────────────────────────────────────────────────────
+    ReportFormat:
+      type: string
+      enum: [html, pdf, csv, excel, json]
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          description: "'Executive' | 'Technical' | 'Compliance'"
+        format:
+          $ref: '#/components/schemas/ReportFormat'
+        status:
+          type: string
+          enum: [pending, generating, completed, failed]
+        finding_count:
+          type: integer
+          nullable: true
+        file_size_bytes:
+          type: integer
+          nullable: true
+        generated_at:
+          type: string
+          format: date-time
+          nullable: true
+        artifact_url:
+          type: string
+          nullable: true
+          description: S3/MinIO presigned download URL
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: URL expiry time
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_by:
+          type: string
+      required: [id, name, type, format, status, created_at, created_by]
+
+    ReportsListResponse:
+      type: object
+      properties:
+        reports:
+          type: array
+          items:
+            $ref: '#/components/schemas/Report'
+        total:
+          type: integer
+        last_generated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp của báo cáo gần nhất (dùng cho subtitle UI)
+      required: [reports, total]
+
+    ReportTemplate:
+      type: object
+      description: Template định nghĩa loại báo cáo có thể tạo
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          description: "'Executive' | 'Technical' | 'Compliance'"
+      required: [id, name, description, type]
+
+    ReportTemplatesResponse:
+      type: object
+      properties:
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportTemplate'
+      required: [templates]
+
+    CreateReportRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          nullable: true
+        engagement_id:
+          type: string
+          nullable: true
+        format:
+          $ref: '#/components/schemas/ReportFormat'
+        type:
+          type: string
+          description: "'Executive' | 'Technical' | 'Compliance'"
+        min_severity:
+          $ref: '#/components/schemas/Severity'
+        min_score:
+          type: number
+          nullable: true
+        date_from:
+          type: string
+          format: date
+          nullable: true
+        date_to:
+          type: string
+          format: date
+          nullable: true
+      required: [format, type]
+
+    # ── Integrations ─────────────────────────────────────────────────────────
+    APIKey:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        prefix:
+          type: string
+          description: "Prefix của key dùng cho display (e.g. 'osv_prod_xK7m'). Không phải full key."
+        scopes:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [active, revoked]
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: null = không hết hạn
+      required: [id, name, prefix, scopes, status, created_at, created_by]
+
+    APIKeysListResponse:
+      type: object
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIKey'
+        total:
+          type: integer
+      required: [keys, total]
+
+    CreateAPIKeyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        scopes:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+      required: [name, scopes]
+
+    CreateAPIKeyResponse:
+      type: object
+      description: |
+        Response khi tạo API key thành công.
+        `raw_key` chứa full key — **chỉ trả về 1 lần duy nhất**.
+        Backend chỉ lưu hashed key, không thể recover sau này.
+      properties:
+        key:
+          $ref: '#/components/schemas/APIKey'
+        raw_key:
+          type: string
+          description: "Full plaintext key — show once, store securely"
+      required: [key, raw_key]
+
+    # ── Webhook Deliveries ─────────────────────────────────────────────────────
+    WebhookDelivery:
+      type: object
+      description: Bản ghi lịch sử một lần webhook delivery
+      properties:
+        id:
+          type: string
+        webhook_id:
+          type: string
+        event:
+          type: string
+          description: "e.g. 'finding.created', 'scan.completed', 'sla.breached'"
+        endpoint:
+          type: string
+          description: Hostname của URL đích
+        status:
+          type: string
+          enum: [success, failed, retried]
+        response_time_ms:
+          type: integer
+        status_code:
+          type: integer
+          description: HTTP status code từ endpoint
+        time:
+          type: string
+          format: date-time
+        request_body:
+          type: string
+          nullable: true
+          description: JSON payload đã gửi
+        response_body:
+          type: string
+          nullable: true
+          description: Response body nhận được
+      required: [id, webhook_id, event, endpoint, status, response_time_ms, status_code, time]
+
+    WebhookDeliveriesResponse:
+      type: object
+      properties:
+        deliveries:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookDelivery'
+        total:
+          type: integer
+      required: [deliveries, total]
+
+    WebhookHourlyStats:
+      type: object
+      description: Thống kê webhook deliveries theo giờ (24h gần nhất)
+      properties:
+        h:
+          type: string
+          description: "Giờ trong ngày (e.g. '06:00', '09:00')"
+        success:
+          type: integer
+        failed:
+          type: integer
+      required: [h, success, failed]
+
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+        secret:
+          type: string
+        active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        last_triggered_at:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, name, url, events, secret, active, created_at]
+
+    # ── Admin ─────────────────────────────────────────────────────────────────
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+        is_active:
+          type: boolean
+        mfa_enabled:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        last_login_at:
+          type: string
+          format: date-time
+          nullable: true
+        login_attempts:
+          type: integer
+          description: Số lần đăng nhập thất bại liên tiếp
+          default: 0
+        is_locked:
+          type: boolean
+          description: true nếu tài khoản bị khoá do quá nhiều lần thất bại
+          default: false
+      required: [id, email, name, role, is_active, mfa_enabled, created_at, login_attempts, is_locked]
+
+    AdminUsersResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminUser'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+      required: [users, total, page, page_size]
+
+    InviteUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+      required: [email, name, role]
+
+    # ── RBAC ──────────────────────────────────────────────────────────────────
+    RBACRole:
+      type: object
+      description: Role definition với danh sách permissions được gán
+      properties:
+        id:
+          type: string
+        name:
+          $ref: '#/components/schemas/UserRole'
+        display_name:
+          type: string
+        description:
+          type: string
+        user_count:
+          type: integer
+          description: Số users hiện đang có role này
+        color:
+          type: string
+          description: Hex color code cho UI display
+        permissions:
+          type: array
+          items:
+            type: string
+          description: "Danh sách permission keys (e.g. 'scan:create', 'finding:read')"
+      required: [id, name, display_name, description, user_count, permissions]
+
+    RBACPermissionCategory:
+      type: object
+      properties:
+        category:
+          type: string
+          description: "e.g. 'Dashboard', 'Scanning', 'Findings'"
+        items:
+          type: array
+          items:
+            type: string
+          description: Permission keys trong category này
+      required: [category, items]
+
+    RBACMatrixResponse:
+      type: object
+      description: Toàn bộ permission matrix — roles và categorized permissions
+      properties:
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RBACRole'
+        permission_categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/RBACPermissionCategory'
+      required: [roles, permission_categories]
+
+    # ── System Settings ───────────────────────────────────────────────────────
+    SystemSettingsGeneral:
+      type: object
+      properties:
+        platform_name:
+          type: string
+          example: OSV Platform
+        organization:
+          type: string
+        support_email:
+          type: string
+          format: email
+        timezone:
+          type: string
+          example: Asia/Ho_Chi_Minh
+        logo_url:
+          type: string
+          nullable: true
+      required: [platform_name, organization, support_email, timezone]
+
+    SystemSettingsSMTP:
+      type: object
+      properties:
+        host:
+          type: string
+        port:
+          type: integer
+          default: 587
+        username:
+          type: string
+          nullable: true
+        use_tls:
+          type: boolean
+          default: true
+        from_email:
+          type: string
+          format: email
+      required: [host, port, use_tls, from_email]
+
+    SystemSettingsSecurity:
+      type: object
+      properties:
+        password_min_length:
+          type: integer
+          minimum: 8
+          default: 12
+        password_max_age_days:
+          type: integer
+          default: 90
+        session_timeout_minutes:
+          type: integer
+          default: 60
+        max_concurrent_sessions:
+          type: integer
+          default: 3
+        mfa_required:
+          type: boolean
+          default: false
+        allow_oauth:
+          type: boolean
+          default: true
+      required: [password_min_length, password_max_age_days, session_timeout_minutes, max_concurrent_sessions, mfa_required, allow_oauth]
+
+    AIProviderConfig:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          description: "e.g. 'OpenAI', 'Azure OpenAI', 'Ollama (Local)'"
+        model:
+          type: string
+          description: "e.g. 'gpt-4o', 'llama3:8b'"
+        status:
+          type: string
+          enum: [active, standby, inactive]
+        latency_ms:
+          type: integer
+          nullable: true
+        requests_per_day:
+          type: integer
+          nullable: true
+        cost_per_day:
+          type: number
+          nullable: true
+      required: [id, name, model, status]
+
+    SystemSettingsAI:
+      type: object
+      properties:
+        providers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AIProviderConfig'
+        active_provider_id:
+          type: string
+      required: [providers, active_provider_id]
+
+    SystemSettings:
+      type: object
+      description: Toàn bộ platform configuration settings
+      properties:
+        general:
+          $ref: '#/components/schemas/SystemSettingsGeneral'
+        smtp:
+          $ref: '#/components/schemas/SystemSettingsSMTP'
+        security:
+          $ref: '#/components/schemas/SystemSettingsSecurity'
+        ai:
+          $ref: '#/components/schemas/SystemSettingsAI'
+      required: [general, smtp, security, ai]
+
+    SystemHealth:
+      type: object
+      description: Health status của từng service component
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        services:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [up, down, degraded]
+              latency_ms:
+                type: integer
+              message:
+                type: string
+            required: [status]
+      required: [status, services]
+
+    AuditLogEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        user_name:
+          type: string
+        action:
+          type: string
+        entity_type:
+          type: string
+        entity_id:
+          type: string
+        before_state:
+          type: object
+          nullable: true
+        after_state:
+          type: object
+          nullable: true
+        ip_address:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+      required: [id, user_id, user_name, action, entity_type, entity_id, timestamp]
+
+    AuditLogResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          description: "Alias field: backend có thể trả 'entries' hoặc 'events'"
+          items:
+            $ref: '#/components/schemas/AuditLogEntry'
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLogEntry'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+      required: [total, page, page_size]
+
+# =============================================================================
+# PATHS
+# =============================================================================
+paths:
+
+  # ─── Auth (/api/v1/auth) ───────────────────────────────────────────────────
+  /auth/login:
+    post:
+      operationId: auth_login
+      summary: Đăng nhập
+      tags: [Auth]
+      description: |
+        Trả về access_token nếu đăng nhập thành công.
+        Nếu tài khoản bật MFA, trả về `mfa_required=true` và `access_token=null`;
+        frontend phải nhập TOTP rồi gọi lại với `mfa_code`.
+        Refresh token được ghi vào httpOnly cookie tự động.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Đăng nhập thành công hoặc cần MFA
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Sai credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+
+  /auth/refresh:
+    post:
+      operationId: auth_refresh
+      summary: Làm mới access token
+      tags: [Auth]
+      description: |
+        Đọc refresh token từ httpOnly cookie (không cần body).
+        Trả về access_token mới.
+      responses:
+        '200':
+          description: Token mới
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        '401':
+          description: Refresh token hết hạn hoặc không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+
+  /auth/logout:
+    post:
+      operationId: auth_logout
+      summary: Đăng xuất
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      description: Xoá refresh token cookie phía server.
+      responses:
+        '204':
+          description: Đăng xuất thành công (no content)
+
+  /auth/me:
+    get:
+      operationId: auth_me
+      summary: Lấy thông tin user hiện tại
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      description: |
+        Trả về thông tin user đang đăng nhập.
+        Response wrapper: `{ user: User }`.
+      responses:
+        '200':
+          description: User object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                required: [user]
+        '401':
+          description: Token không hợp lệ
+
+  /auth/mfa/setup:
+    get:
+      operationId: auth_mfa_setup
+      summary: Lấy TOTP secret và QR code để setup MFA
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: MFA setup info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MFASetupResponse'
+
+  /auth/mfa/confirm:
+    post:
+      operationId: auth_mfa_confirm
+      summary: Xác nhận TOTP code và kích hoạt MFA
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 6-digit TOTP code
+              required: [code]
+      responses:
+        '200':
+          description: Kết quả xác nhận
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MFAConfirmResponse'
+        '400':
+          description: Code không đúng
+
+  /auth/oauth/google:
+    get:
+      operationId: auth_oauth_google
+      summary: Bắt đầu OAuth2 flow với Google
+      tags: [Auth]
+      description: |
+        Redirect browser đến Google OAuth. Frontend dùng `window.location.href` để redirect
+        (không qua axios/apiClient).
+      responses:
+        '302':
+          description: Redirect đến Google OAuth
+
+  /auth/oauth/github:
+    get:
+      operationId: auth_oauth_github
+      summary: Bắt đầu OAuth2 flow với GitHub
+      tags: [Auth]
+      description: |
+        Redirect browser đến GitHub OAuth. Frontend dùng `window.location.href` để redirect.
+      responses:
+        '302':
+          description: Redirect đến GitHub OAuth
+
+  /auth/callback:
+    get:
+      operationId: auth_oauth_callback
+      summary: OAuth2 callback handler
+      tags: [Auth]
+      description: |
+        Backend nhận authorization code từ OAuth provider, exchange lấy token,
+        tạo session, rồi redirect về frontend.
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect về frontend với access_token
+
+  # ─── Dashboard (/api/v1/dashboard) ────────────────────────────────────────
+  /dashboard:
+    get:
+      operationId: dashboard_get_metrics
+      summary: Lấy dữ liệu dashboard tổng hợp
+      tags: [Dashboard]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          description: Khoảng thời gian thống kê
+          schema:
+            type: string
+            enum: ['30d', '90d', '1y']
+            default: '30d'
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardData'
+
+  /dashboard/sla:
+    get:
+      operationId: dashboard_get_sla
+      summary: Lấy SLA dashboard detail
+      tags: [Dashboard]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: product_id
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: SLA dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SLADashboardData'
+
+  # ─── Notifications (/api/v1/notifications) ────────────────────────────────
+  /notifications/stream:
+    get:
+      operationId: notifications_stream_sse
+      summary: SSE stream cho real-time notifications
+      tags: [Notifications]
+      description: |
+        Server-Sent Events endpoint. EventSource không hỗ trợ Authorization header,
+        nên token phải được truyền qua query param.
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: JWT access token
+      responses:
+        '200':
+          description: SSE stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /notifications:
+    get:
+      operationId: notifications_list
+      summary: Lấy danh sách notifications
+      tags: [Notifications]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: read
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notifications list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  total:
+                    type: integer
+                  unread_count:
+                    type: integer
+                required: [notifications, total, unread_count]
+
+  /notifications/unread-count:
+    get:
+      operationId: notifications_unread_count
+      summary: Lấy số notification chưa đọc
+      tags: [Notifications]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Unread count
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  unread_count:
+                    type: integer
+                required: [unread_count]
+
+  /notifications/{id}/read:
+    patch:
+      operationId: notifications_mark_read
+      summary: Đánh dấu notification đã đọc
+      tags: [Notifications]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification đã được cập nhật
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+
+  /notifications/mark-all-read:
+    post:
+      operationId: notifications_mark_all_read
+      summary: Đánh dấu tất cả notifications đã đọc
+      tags: [Notifications]
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Tất cả đã được đánh dấu
+
+  # ─── CVE Intelligence (/api/v2/cves) ──────────────────────────────────────
+  /cves/search:
+    post:
+      operationId: cve_search
+      summary: Tìm kiếm CVE (full-text + filter)
+      tags: [CVE Intelligence]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CVESearchRequest'
+      responses:
+        '200':
+          description: Kết quả tìm kiếm
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CVESearchResponse'
+
+  /cves/search/semantic:
+    post:
+      operationId: cve_semantic_search
+      summary: Tìm kiếm CVE bằng ngôn ngữ tự nhiên (vector similarity)
+      tags: [CVE Intelligence]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SemanticSearchRequest'
+      responses:
+        '200':
+          description: Semantic search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticSearchResponse'
+
+  /cves/{id}:
+    get:
+      operationId: cve_get_by_id
+      summary: Lấy chi tiết một CVE
+      tags: [CVE Intelligence]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "CVE ID, e.g. CVE-2025-44228"
+      responses:
+        '200':
+          description: CVE detail (bao gồm affected_products, kev_detail, references)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CVE'
+        '404':
+          description: CVE không tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+
+  /cves/export:
+    get:
+      operationId: cve_export
+      summary: Xuất CVE data ra file
+      tags: [CVE Intelligence]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: format
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [json, csv]
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: severity
+          in: query
+          schema:
+            type: string
+        - name: kev_only
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: File download
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            text/csv:
+              schema:
+                type: string
+
+  # ─── KEV Catalog (/api/v2/kev) ────────────────────────────────────────────
+  /kev:
+    get:
+      operationId: kev_list
+      summary: Danh sách KEV catalog
+      tags: [KEV Catalog]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: ransomware_only
+          in: query
+          schema:
+            type: boolean
+        - name: vendor
+          in: query
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum: [date_added_desc, date_added_asc, vendor_asc]
+      responses:
+        '200':
+          description: KEV list với stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KEVListResponse'
+
+  /kev/stats:
+    get:
+      operationId: kev_get_stats
+      summary: Thống kê KEV catalog
+      tags: [KEV Catalog]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: KEV statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KEVStatsResponse'
+
+  /kev/ransomware:
+    get:
+      operationId: kev_list_ransomware
+      summary: Danh sách KEV liên quan đến ransomware
+      tags: [KEV Catalog]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ransomware-related KEVs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KEVListResponse'
+
+  # ─── EPSS Analytics (/api/v2/epss) ────────────────────────────────────────
+  /epss/{cveId}:
+    get:
+      operationId: epss_get_by_cve
+      summary: Lấy lịch sử EPSS score của một CVE
+      tags: [EPSS Analytics]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cveId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: EPSS history và current score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EPSSByCVEResponse'
+
+  /epss/top:
+    get:
+      operationId: epss_get_top
+      summary: Top CVEs theo EPSS score cao nhất
+      tags: [EPSS Analytics]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: min_epss
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Top EPSS CVEs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EPSSTopResponse'
+
+  /epss/distribution:
+    get:
+      operationId: epss_get_distribution
+      summary: Phân phối EPSS score theo buckets
+      tags: [EPSS Analytics]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: EPSS distribution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EPSSDistributionResponse'
+
+  # ─── CWE / CAPEC Taxonomy (/api/v2/cwe, /api/v2/capec) ───────────────────
+  /cwe:
+    get:
+      operationId: cwe_list
+      summary: Danh sách CWE
+      tags: [Taxonomy]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Tìm kiếm theo tên hoặc ID
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: CWE list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CWEListResponse'
+
+  /cwe/{id}:
+    get:
+      operationId: cwe_get_by_id
+      summary: Chi tiết CWE bao gồm CAPEC patterns
+      tags: [Taxonomy]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "CWE ID, e.g. CWE-89"
+      responses:
+        '200':
+          description: CWE detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CWEDetail'
+
+  /capec/{id}:
+    get:
+      operationId: capec_get_by_id
+      summary: Chi tiết CAPEC attack pattern
+      tags: [Taxonomy]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "CAPEC ID, e.g. CAPEC-66"
+      responses:
+        '200':
+          description: CAPEC detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CAPECPattern'
+
+  # ─── Vendors / Browse (/api/v2/vendors, /api/v2/browse) ──────────────────
+  /vendors:
+    get:
+      operationId: vendors_list
+      summary: Danh sách vendors (cho autocomplete)
+      tags: [Taxonomy]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Prefix search
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Vendor list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorsResponse'
+
+  /browse:
+    get:
+      operationId: browse_vendors
+      summary: Browse vendors (paginated)
+      tags: [Taxonomy]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vendor catalog
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vendors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        product_count:
+                          type: integer
+                        cve_count:
+                          type: integer
+                      required: [name, product_count, cve_count]
+                  total:
+                    type: integer
+                required: [vendors, total]
+
+  /browse/{vendor}:
+    get:
+      operationId: browse_vendor_products
+      summary: Danh sách products của một vendor
+      tags: [Taxonomy]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: vendor
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Products của vendor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vendor:
+                    type: string
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        cve_count:
+                          type: integer
+                      required: [name, cve_count]
+                required: [vendor, products]
+
+  /browse/{vendor}/{product}:
+    get:
+      operationId: browse_product_cves
+      summary: Danh sách CVEs của một vendor/product cụ thể
+      tags: [Taxonomy]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: vendor
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: product
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: CVEs của vendor/product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vendor:
+                    type: string
+                  product:
+                    type: string
+                  cves:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CVE'
+                  total:
+                    type: integer
+                required: [vendor, product, cves, total]
+
+  /dbinfo:
+    get:
+      operationId: get_dbinfo
+      summary: Thông tin metadata về CVE database
+      tags: [Taxonomy]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: DB info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DBInfoResponse'
+
+  # ─── Scans (/api/v1/scans) ───────────────────────────────────────────────
+  /scans:
+    get:
+      operationId: scans_list
+      summary: Danh sách scans
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ScanStatus'
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/ScanType'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scans list với stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScansListResponse'
+    post:
+      operationId: scans_create
+      summary: Tạo scan mới
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScanRequest'
+      responses:
+        '201':
+          description: Scan được tạo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scan'
+        '400':
+          description: Dữ liệu không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+
+  /scans/scheduled:
+    get:
+      operationId: scans_list_scheduled
+      summary: Danh sách scheduled scans
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Scheduled scans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scheduled_scans:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScheduledScan'
+                  total:
+                    type: integer
+                required: [scheduled_scans, total]
+
+  /scans/import:
+    post:
+      operationId: scans_import
+      summary: Import kết quả scan từ tool ngoài (Nmap XML, ZAP JSON…)
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                tool_name:
+                  type: string
+                  description: "e.g. nmap, zap, burp"
+                engagement_id:
+                  type: string
+                test_title:
+                  type: string
+              required: [file, tool_name, engagement_id]
+      responses:
+        '202':
+          description: Import đang xử lý
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  import_id:
+                    type: string
+                  status:
+                    type: string
+                  findings_count:
+                    type: integer
+                    nullable: true
+                required: [import_id, status]
+
+  /scans/{id}:
+    get:
+      operationId: scans_get_by_id
+      summary: Chi tiết scan
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scan detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scan'
+
+  /scans/{id}/stream:
+    get:
+      operationId: scans_stream_progress
+      summary: SSE stream tiến trình scan
+      tags: [Scans]
+      description: |
+        Server-Sent Events. Token phải truyền qua query param vì SSE không
+        hỗ trợ Authorization header.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: SSE stream với ScanProgress events
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: |
+                  JSON events: { scanId, status, progress, currentTarget, message, findingsFound }
+
+  /scans/{id}/cancel:
+    post:
+      operationId: scans_cancel
+      summary: Huỷ scan đang chạy
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scan đã được cancel
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  scan_id:
+                    type: string
+                  status:
+                    type: string
+                required: [success, scan_id, status]
+
+  /scans/{id}/results/nmap:
+    get:
+      operationId: scans_get_nmap_results
+      summary: Lấy kết quả Nmap scan
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Nmap hosts và findings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NmapResultsResponse'
+
+  /scans/{id}/results/zap:
+    get:
+      operationId: scans_get_zap_results
+      summary: Lấy kết quả ZAP scan
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ZAP alerts và summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZAPResultsResponse'
+
+  # ─── Findings (/api/v1/findings) ──────────────────────────────────────────
+  /findings:
+    get:
+      operationId: findings_list
+      summary: Danh sách findings với filter
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Lọc theo status (có thể multi-value)
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/FindingStatus'
+          style: form
+          explode: true
+        - name: severity
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: productId
+          in: query
+          schema:
+            type: string
+        - name: engagementId
+          in: query
+          schema:
+            type: string
+        - name: testId
+          in: query
+          schema:
+            type: string
+        - name: cveId
+          in: query
+          schema:
+            type: string
+        - name: slaStatus
+          in: query
+          schema:
+            $ref: '#/components/schemas/SLAStatus'
+        - name: assignedTo
+          in: query
+          schema:
+            type: string
+        - name: isKev
+          in: query
+          schema:
+            type: boolean
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [severity_desc, sla_asc, created_desc, epss_desc]
+        - name: q
+          in: query
+          description: Full-text search
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Findings list với aggregations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindingsListResponse'
+
+  /findings/stats:
+    get:
+      operationId: findings_get_stats
+      summary: Thống kê findings theo severity / status
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: product_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Finding stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  by_severity:
+                    type: object
+                    additionalProperties:
+                      type: integer
+                  by_status:
+                    type: object
+                    additionalProperties:
+                      type: integer
+                  total:
+                    type: integer
+                required: [by_severity, by_status, total]
+
+  /findings/bulk/close:
+    post:
+      operationId: findings_bulk_close
+      summary: Đóng nhiều findings cùng lúc
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                finding_ids:
+                  type: array
+                  items:
+                    type: string
+                comment:
+                  type: string
+              required: [finding_ids]
+      responses:
+        '200':
+          description: Bulk operation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOperationResponse'
+
+  /findings/bulk/reopen:
+    post:
+      operationId: findings_bulk_reopen
+      summary: Mở lại nhiều findings
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                finding_ids:
+                  type: array
+                  items:
+                    type: string
+                comment:
+                  type: string
+              required: [finding_ids]
+      responses:
+        '200':
+          description: Bulk operation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOperationResponse'
+
+  /findings/bulk/assign:
+    post:
+      operationId: findings_bulk_assign
+      summary: Gán nhiều findings cho một user
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                finding_ids:
+                  type: array
+                  items:
+                    type: string
+                assigned_to:
+                  type: string
+              required: [finding_ids, assigned_to]
+      responses:
+        '200':
+          description: Bulk operation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOperationResponse'
+
+  /findings/{id}:
+    get:
+      operationId: findings_get_by_id
+      summary: Chi tiết finding
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Finding detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Finding'
+        '404':
+          description: Finding không tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    patch:
+      operationId: findings_update
+      summary: Cập nhật trạng thái / thông tin finding
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/FindingStatus'
+                comment:
+                  type: string
+                assigned_to:
+                  type: string
+                  nullable: true
+                vex_justification:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Finding đã cập nhật
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Finding'
+
+  /findings/{id}/notes:
+    get:
+      operationId: findings_get_notes
+      summary: Lấy danh sách notes của finding
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notes list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FindingNote'
+                required: [notes]
+    post:
+      operationId: findings_add_note
+      summary: Thêm note vào finding
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+              required: [content]
+      responses:
+        '201':
+          description: Note đã được tạo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindingNote'
+
+  /findings/{id}/audit:
+    get:
+      operationId: findings_get_audit
+      summary: Lấy audit log của finding
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Audit trail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  audit:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditLogEntry'
+                required: [audit]
+
+  # ─── Risk Acceptances (/api/v1/risk-acceptances) ──────────────────────────
+  /risk-acceptances:
+    get:
+      operationId: risk_acceptances_list
+      summary: Danh sách risk acceptances
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: product_id
+          in: query
+          schema:
+            type: string
+        - name: is_expired
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Risk acceptances list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  risk_acceptances:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RiskAcceptance'
+                  total:
+                    type: integer
+                required: [risk_acceptances, total]
+    post:
+      operationId: risk_acceptances_create
+      summary: Tạo risk acceptance mới
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: string
+                finding_ids:
+                  type: array
+                  items:
+                    type: string
+                expiration_date:
+                  type: string
+                  format: date
+                retest_date:
+                  type: string
+                  format: date
+                  nullable: true
+                reason:
+                  type: string
+                approved_by:
+                  type: string
+              required: [product_id, finding_ids, expiration_date, reason, approved_by]
+      responses:
+        '201':
+          description: Risk acceptance đã tạo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskAcceptance'
+
+  /risk-acceptances/{id}:
+    delete:
+      operationId: risk_acceptances_delete
+      summary: Xoá risk acceptance (findings sẽ chuyển về active)
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Đã xoá
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  reopened_finding_ids:
+                    type: array
+                    items:
+                      type: string
+                required: [success, reopened_finding_ids]
+
+  # ─── SLA Config (/api/v1/sla) ─────────────────────────────────────────────
+  /sla/config:
+    get:
+      operationId: sla_get_config
+      summary: Lấy cấu hình SLA (global + product overrides)
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: SLA configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  global:
+                    $ref: '#/components/schemas/SLAConfig'
+                  product_overrides:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/SLAConfig'
+                        - type: object
+                          properties:
+                            product_id:
+                              type: string
+                            product_name:
+                              type: string
+                          required: [product_id, product_name]
+                required: [global, product_overrides]
+    put:
+      operationId: sla_update_config
+      summary: Cập nhật cấu hình SLA
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                global:
+                  $ref: '#/components/schemas/SLAConfig'
+                product_overrides:
+                  type: array
+                  items:
+                    type: object
+              required: [global]
+      responses:
+        '200':
+          description: SLA config đã cập nhật
+
+  /sla/overview:
+    get:
+      operationId: sla_get_overview
+      summary: Tổng quan SLA compliance
+      tags: [Findings]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: SLA overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SLASummary'
+
+  # ─── Assets (/api/v1/assets) ──────────────────────────────────────────────
+  /assets:
+    get:
+      operationId: assets_list
+      summary: Danh sách assets
+      tags: [Assets]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: riskLevel
+          in: query
+          schema:
+            type: string
+            enum: [critical, high, medium, low]
+        - name: tags
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: query
+          in: query
+          schema:
+            type: string
+          description: Tìm kiếm theo IP, hostname
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Assets list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetsListResponse'
+
+  /assets/tags:
+    get:
+      operationId: assets_get_tags
+      summary: Lấy danh sách tags của assets (cho filter autocomplete)
+      tags: [Assets]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tags list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                required: [tags]
+
+  /assets/{id}:
+    get:
+      operationId: assets_get_by_id
+      summary: Chi tiết asset
+      tags: [Assets]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Asset detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+    patch:
+      operationId: assets_update
+      summary: Cập nhật asset (tags, metadata)
+      tags: [Assets]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    type: string
+                hostname:
+                  type: string
+      responses:
+        '200':
+          description: Asset đã cập nhật
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+
+  /assets/{id}/findings:
+    get:
+      operationId: assets_get_findings
+      summary: Danh sách findings của asset
+      tags: [Assets]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/FindingStatus'
+        - name: severity
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Findings của asset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindingsListResponse'
+
+  # ─── Products (/api/v1/products) ──────────────────────────────────────────
+  /products:
+    get:
+      operationId: products_list
+      summary: Danh sách products
+      tags: [Product Security]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Products list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  total:
+                    type: integer
+                required: [products, total]
+    post:
+      operationId: products_create
+      summary: Tạo product mới
+      tags: [Product Security]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                product_type:
+                  type: string
+              required: [name, product_type]
+      responses:
+        '201':
+          description: Product đã tạo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+  /products/grades:
+    get:
+      operationId: products_get_grades
+      summary: Lấy danh sách product grades (summary cho dashboard)
+      tags: [Product Security]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Product grades
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  grades:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductGradeItem'
+                required: [grades]
+
+  /products/types:
+    get:
+      operationId: products_get_types
+      summary: Danh sách product types
+      tags: [Product Security]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Product types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  types:
+                    type: array
+                    items:
+                      type: string
+                required: [types]
+
+  /products/{id}:
+    get:
+      operationId: products_get_by_id
+      summary: Chi tiết product
+      tags: [Product Security]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+    patch:
+      operationId: products_update
+      summary: Cập nhật product
+      tags: [Product Security]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                product_type:
+                  type: string
+      responses:
+        '200':
+          description: Product đã cập nhật
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+  /products/{id}/engagements:
+    get:
+      operationId: products_get_engagements
+      summary: Danh sách engagements của product
+      tags: [Product Security]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Engagements list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  engagements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Engagement'
+                  total:
+                    type: integer
+                required: [engagements, total]
+    post:
+      operationId: products_create_engagement
+      summary: Tạo engagement mới trong product
+      tags: [Product Security]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                status:
+                  type: string
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+              required: [name, status, start_date]
+      responses:
+        '201':
+          description: Engagement đã tạo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Engagement'
+
+  /engagements/{engId}/tests:
+    get:
+      operationId: engagements_get_tests
+      summary: Danh sách tests của engagement
+      tags: [Product Security]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: engId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tests list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Test'
+                required: [tests]
+
+  # ─── AI Center (/api/v1/ai) ───────────────────────────────────────────────
+  /ai/triage/{findingId}:
+    post:
+      operationId: ai_trigger_triage
+      summary: Trigger AI triage cho finding
+      tags: [AI Center]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: findingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Triage đã được queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  queue_position:
+                    type: integer
+                required: [status]
+
+  /ai/triage/{findingId}/review:
+    post:
+      operationId: ai_review_triage
+      summary: Submit human review cho AI triage result
+      tags: [AI Center]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: findingId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accepted:
+                  type: boolean
+                override_remarks:
+                  type: string
+                  nullable: true
+                comment:
+                  type: string
+                  nullable: true
+              required: [accepted]
+      responses:
+        '200':
+          description: Review đã được ghi nhận
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AITriageResult'
+
+  /ai/triage/queue:
+    get:
+      operationId: ai_get_triage_queue
+      summary: Lấy danh sách findings đang chờ AI triage
+      tags: [AI Center]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, processing, done, failed]
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Triage queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TriageQueueItem'
+                  total:
+                    type: integer
+                required: [items, total]
+
+  /ai/enrichment:
+    get:
+      operationId: ai_get_enrichment_status
+      summary: Lấy trạng thái enrichment pipeline
+      tags: [AI Center]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Enrichment status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrichmentStatus'
+
+  /ai/enrichment/trigger:
+    post:
+      operationId: ai_trigger_enrichment
+      summary: Trigger enrichment thủ công
+      tags: [AI Center]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cve_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Danh sách CVE IDs cần enrich. Rỗng = enrich tất cả pending
+                force:
+                  type: boolean
+                  default: false
+      responses:
+        '202':
+          description: Enrichment đã được trigger
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queued_count:
+                    type: integer
+                  status:
+                    type: string
+                required: [queued_count, status]
+
+  /ai/enrichment/{cveId}:
+    get:
+      operationId: ai_get_enrichment_by_cve
+      summary: Lấy AI enrichment detail cho một CVE
+      tags: [AI Center]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cveId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Enrichment detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CVEEnrichmentDetail'
+        '404':
+          description: Chưa có enrichment cho CVE này
+
+  # ─── Reports (/api/v1/reports) ────────────────────────────────────────────
+  /reports:
+    get:
+      operationId: reports_list
+      summary: Danh sách reports
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Reports list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reports:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Report'
+                  total:
+                    type: integer
+                required: [reports, total]
+    post:
+      operationId: reports_create
+      summary: Tạo report mới (async generation)
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
+                  description: "e.g. executive_summary, technical_detail, compliance"
+                config:
+                  type: object
+                  description: Report-specific configuration
+              required: [name, type, config]
+      responses:
+        '202':
+          description: Report đang được tạo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+
+  /reports/{id}:
+    get:
+      operationId: reports_get_by_id
+      summary: Chi tiết report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Report detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+    delete:
+      operationId: reports_delete
+      summary: Xoá report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Đã xoá
+
+  /reports/{id}/download:
+    get:
+      operationId: reports_download
+      summary: Download report file
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: format
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [pdf, html, csv, xlsx]
+      responses:
+        '200':
+          description: Report file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  # ─── Webhooks (/api/v1/webhooks) ─────────────────────────────────────────
+  /webhooks:
+    get:
+      operationId: webhooks_list
+      summary: Danh sách webhooks
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Webhooks list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Webhook'
+    post:
+      operationId: webhooks_create
+      summary: Tạo webhook mới
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+                  format: uri
+                events:
+                  type: array
+                  items:
+                    type: string
+                secret:
+                  type: string
+                  nullable: true
+              required: [name, url, events]
+      responses:
+        '201':
+          description: Webhook đã tạo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+
+  /webhooks/{id}:
+    delete:
+      operationId: webhooks_delete
+      summary: Xoá webhook
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Đã xoá
+
+  /webhooks/{id}/test:
+    post:
+      operationId: webhooks_test
+      summary: Gửi test event tới webhook
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Test result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                required: [success, status_code]
+
+  # ─── API Keys (/api/v1/api-keys) ─────────────────────────────────────────
+  /api-keys:
+    get:
+      operationId: api_keys_list
+      summary: Danh sách API keys
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: API keys list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/APIKey'
+    post:
+      operationId: api_keys_create
+      summary: Tạo API key mới
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                scopes:
+                  type: array
+                  items:
+                    type: string
+                expires_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+              required: [name, scopes]
+      responses:
+        '201':
+          description: API key đã tạo. Secret chỉ hiển thị một lần!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAPIKeyResponse'
+
+  /api-keys/{id}:
+    delete:
+      operationId: api_keys_revoke
+      summary: Thu hồi API key
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: API key đã bị thu hồi
+
+  # ─── JIRA (/api/v1/jira) ─────────────────────────────────────────────────
+  /jira/config:
+    get:
+      operationId: jira_get_config
+      summary: Lấy cấu hình JIRA integration
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: JIRA config
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  url:
+                    type: string
+                  project_key:
+                    type: string
+                  username:
+                    type: string
+                required: [enabled]
+    put:
+      operationId: jira_update_config
+      summary: Cập nhật cấu hình JIRA integration
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                project_key:
+                  type: string
+                username:
+                  type: string
+                api_token:
+                  type: string
+              required: [url, project_key, username, api_token]
+      responses:
+        '200':
+          description: Config đã cập nhật
+
+  /jira/config/test:
+    post:
+      operationId: jira_test_connection
+      summary: Kiểm tra kết nối JIRA
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Test result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                required: [success, message]
+
+  # ─── Profile (/api/v1/profile) ────────────────────────────────────────────
+  /profile:
+    get:
+      operationId: profile_get
+      summary: Lấy profile của current user
+      tags: [Profile]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    patch:
+      operationId: profile_update
+      summary: Cập nhật profile
+      tags: [Profile]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                avatar_url:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Profile đã cập nhật
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /profile/change-password:
+    post:
+      operationId: profile_change_password
+      summary: Đổi password
+      tags: [Profile]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                  format: password
+                new_password:
+                  type: string
+                  format: password
+              required: [current_password, new_password]
+      responses:
+        '204':
+          description: Password đã đổi thành công
+        '400':
+          description: Password hiện tại không đúng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+
+  # ─── Admin (/api/v1/admin) ────────────────────────────────────────────────
+  /admin/users:
+    get:
+      operationId: admin_list_users
+      summary: Danh sách users (admin)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+        - name: role
+          in: query
+          schema:
+            $ref: '#/components/schemas/UserRole'
+      responses:
+        '200':
+          description: Users list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminUser'
+                  total:
+                    type: integer
+                required: [users, total]
+
+  /admin/users/invite:
+    post:
+      operationId: admin_invite_user
+      summary: Invite user mới
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                role:
+                  $ref: '#/components/schemas/UserRole'
+                name:
+                  type: string
+              required: [email, role]
+      responses:
+        '201':
+          description: Invite email đã gửi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+
+  /admin/users/{id}:
+    get:
+      operationId: admin_get_user
+      summary: Chi tiết user (admin)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+    patch:
+      operationId: admin_update_user
+      summary: Cập nhật thông tin user (role, status)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  $ref: '#/components/schemas/UserRole'
+                is_active:
+                  type: boolean
+      responses:
+        '200':
+          description: User đã cập nhật
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+
+  /admin/users/{id}/unlock:
+    post:
+      operationId: admin_unlock_user
+      summary: Mở khoá tài khoản bị lock
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tài khoản đã được mở khoá
+
+  /admin/users/{id}/reset-password:
+    post:
+      operationId: admin_reset_user_password
+      summary: Reset password của user (gửi email)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reset email đã gửi
+
+  /admin/roles:
+    get:
+      operationId: admin_list_roles
+      summary: Danh sách roles và permissions
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Roles list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          $ref: '#/components/schemas/UserRole'
+                        permissions:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Permission'
+                      required: [name, permissions]
+                required: [roles]
+
+  /admin/health:
+    get:
+      operationId: admin_get_health
+      summary: System health check
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemHealth'
+
+  /admin/settings:
+    get:
+      operationId: admin_get_settings
+      summary: Lấy system settings
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: System settings
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Key-value settings object (schema tùy platform config)
+    patch:
+      operationId: admin_update_settings
+      summary: Cập nhật system settings
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Partial settings update
+      responses:
+        '200':
+          description: Settings đã cập nhật
+
+  # ─── Audit Log (/api/v1/audit-log) ────────────────────────────────────────
+  /audit-log:
+    get:
+      operationId: audit_log_list
+      summary: Lấy audit log toàn hệ thống
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: entity_type
+          in: query
+          schema:
+            type: string
+        - name: entity_id
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogResponse'
+
+  # ─── Scan Stats (/api/v1/scans/stats) ──────────────────────────────────────
+  /scans/stats:
+    get:
+      operationId: scans_get_stats
+      summary: KPI stats cho Scan Dashboard
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      description: |
+        Trả về summary metrics dùng cho Scan Dashboard KPI cards.
+        Frontend tự động refresh mỗi 30 giây.
+      responses:
+        '200':
+          description: Scan stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanStats'
+
+  /scans/stats/weekly:
+    get:
+      operationId: scans_get_weekly_activity
+      summary: Weekly activity chart data
+      tags: [Scans]
+      security:
+        - bearerAuth: []
+      description: |
+        Trả về 7 điểm dữ liệu (Mon–Sun) cho weekly activity bar chart.
+        Data ổn định — KHÔNG random. Cache 5 phút phía backend.
+      responses:
+        '200':
+          description: Weekly activity data (7 items)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeeklyActivity'
+                minItems: 7
+                maxItems: 7
+
+  # ─── Webhook Deliveries (/api/v1/webhooks/deliveries) ──────────────────────
+  /webhooks/deliveries:
+    get:
+      operationId: webhook_deliveries_list
+      summary: Lịch sử webhook deliveries
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: webhook_id
+          in: query
+          description: Filter theo webhook (optional — nếu bỏ qua thì trả all)
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [success, failed, retried]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Delivery records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDeliveriesResponse'
+
+  /webhooks/deliveries/{deliveryId}/retry:
+    post:
+      operationId: webhook_retry_delivery
+      summary: Retry một webhook delivery thất bại
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Retry đã được kích hoạt — trả về delivery record mới
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDelivery'
+        '404':
+          description: Delivery không tìm thấy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '422':
+          description: Không thể retry delivery có status=success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+
+  /webhooks/stats/hourly:
+    get:
+      operationId: webhook_hourly_stats
+      summary: Thống kê webhook deliveries theo giờ (24h)
+      tags: [Integrations]
+      security:
+        - bearerAuth: []
+      description: Trả về hourly buckets trong 24h gần nhất — dùng cho activity area chart.
+      responses:
+        '200':
+          description: Hourly delivery stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebhookHourlyStats'
+
+  # ─── Report Templates (/api/v1/reports/templates) ──────────────────────────
+  /reports/templates:
+    get:
+      operationId: reports_get_templates
+      summary: Danh sách report templates
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      description: |
+        Trả về các templates có thể dùng để tạo báo cáo.
+        Frontend dùng để hiển thị template picker trong Generate Report dialog.
+        Cache 10 phút — templates ít thay đổi.
+      responses:
+        '200':
+          description: Report templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportTemplatesResponse'
+
+  # ─── AI Triage Queue — updated response schema ──────────────────────────────
+  # NOTE: /ai/triage/queue đã tồn tại ở trên với TriageQueueItem schema cũ.
+  # Endpoint không đổi, chỉ cập nhật response schema trong implementation.
+  # Backend cần trả về AITriageQueueResponse (bao gồm ai_result + human_decision).
+
+# =============================================================================
+# PUBLIC ENDPOINTS (api/v2/public) — No authentication required
+# =============================================================================
+  /public/stats:
+    get:
+      operationId: public_get_platform_stats
+      summary: Platform statistics (public, không cần auth)
+      tags: [Public]
+      description: |
+        Endpoint công khai — không cần JWT Bearer token.
+        Dùng trên Login page để hiển thị stats: tổng CVEs, scans hôm nay,
+        finding accuracy, uptime SLA, và threat indicators.
+
+        **Lưu ý:** Backend nên cache response này (TTL 5 phút) để giảm tải.
+        Frontend fallback về placeholder "—" nếu endpoint trả 503.
+      responses:
+        '200':
+          description: Platform-wide statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicStats'
+        '503':
+          description: Service không sẵn sàng (frontend gracefully falls back to placeholder)
+

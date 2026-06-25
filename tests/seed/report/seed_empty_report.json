@@ -1,0 +1,47 @@
+[
+  {
+    "status": "OK",
+    "endpoint": "/api/v1/search/recent",
+    "detail": "Triggered 5 searches to populate history"
+  },
+  {
+    "status": "OK",
+    "endpoint": "/api/v1/profile/notifications/settings",
+    "detail": "Created 5 notification preferences"
+  },
+  {
+    "status": "OK",
+    "endpoint": "/api/v1/webhooks/deliveries",
+    "detail": "Triggered test delivery for webhook 541efc0e-646a-410b-836b-df669da3f6d4"
+  },
+  {
+    "status": "OK",
+    "endpoint": "/api/v1/risk-acceptances",
+    "detail": "Created 2 risk acceptance(s) via domain API"
+  },
+  {
+    "status": "OK",
+    "endpoint": "/api/v1/sla/overview",
+    "detail": "Found 5 critical findings — SLA engine will compute violations automatically"
+  },
+  {
+    "status": "SKIP",
+    "endpoint": "/api/v1/ai/triage/queue",
+    "detail": "AI service may not be running — triage not triggered"
+  },
+  {
+    "status": "OK",
+    "endpoint": "/api/v1/scans/history",
+    "detail": "5 scans exist, 0 in history — completed scans appear automatically"
+  },
+  {
+    "status": "OK",
+    "endpoint": "/api/v1/reports",
+    "detail": "Created report record"
+  },
+  {
+    "status": "OK",
+    "endpoint": "/api/v1/audit-log",
+    "detail": "Auth actions logged — audit_events populated via NATS or direct insert"
+  }
+]

@@ -1,0 +1,162 @@
+[
+  {
+    "_id": "040d6c33-72e1-4505-a2bf-ba38f0660567",
+    "user_id": "62d887af-5f61-4bcd-ae4d-d2c14f4b6082",
+    "query": "log4j CVE critical",
+    "result_count": 223,
+    "search_type": "full_text",
+    "searched_at": "2026-06-11T11:07:40Z"
+  },
+  {
+    "_id": "1c64216f-bd69-4f55-8152-7a7e683ee8c5",
+    "user_id": "87e4d75c-fcd2-42b1-a421-40006be2e34f",
+    "query": "spring rce 2022",
+    "result_count": 126,
+    "search_type": "semantic",
+    "searched_at": "2026-06-18T11:07:40Z"
+  },
+  {
+    "_id": "00907364-fb8d-4742-9e9c-914c86b98709",
+    "user_id": "1c973b81-d8db-4e2e-b0b1-f61c9cd87536",
+    "query": "nginx 1.20 vulnerability",
+    "result_count": 243,
+    "search_type": "semantic",
+    "searched_at": "2026-06-21T11:07:40Z"
+  },
+  {
+    "_id": "dea3b6c0-41fb-45c4-9b47-ddc5cbfd7e65",
+    "user_id": "772b94cd-abc0-496a-a042-c0ed9ea8344a",
+    "query": "openssl 3.0 critical",
+    "result_count": 45,
+    "search_type": "semantic",
+    "searched_at": "2026-06-21T11:07:40Z"
+  },
+  {
+    "_id": "09196faf-4982-4f41-a040-d4eda88093a2",
+    "user_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "query": "apache struts rce",
+    "result_count": 163,
+    "search_type": "semantic",
+    "searched_at": "2026-06-11T11:07:40Z"
+  },
+  {
+    "_id": "aa720e84-a62a-40b5-b9d0-bbdebc505147",
+    "user_id": "da1291e1-57d8-4edb-9932-0b287daff906",
+    "query": "jackson-databind deserialization",
+    "result_count": 76,
+    "search_type": "full_text",
+    "searched_at": "2026-06-23T11:07:40Z"
+  },
+  {
+    "_id": "148bfe79-1274-424f-b32a-6dcd420e1399",
+    "user_id": "da1291e1-57d8-4edb-9932-0b287daff906",
+    "query": "cisco ios xss",
+    "result_count": 90,
+    "search_type": "full_text",
+    "searched_at": "2026-06-12T11:07:40Z"
+  },
+  {
+    "_id": "e444de21-f7c3-47e6-b1e4-bf86cc657fd9",
+    "user_id": "62d887af-5f61-4bcd-ae4d-d2c14f4b6082",
+    "query": "microsoft windows zero day",
+    "result_count": 157,
+    "search_type": "full_text",
+    "searched_at": "2026-06-13T11:07:40Z"
+  },
+  {
+    "_id": "94bf7393-2f8c-49e9-b963-7df0900861de",
+    "user_id": "62d887af-5f61-4bcd-ae4d-d2c14f4b6082",
+    "query": "oracle database privilege escalation",
+    "result_count": 61,
+    "search_type": "full_text",
+    "searched_at": "2026-06-10T11:07:40Z"
+  },
+  {
+    "_id": "41d0c5f4-f268-4a7a-bed7-e2ddf386ff4d",
+    "user_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "query": "vmware vcenter authentication bypass",
+    "result_count": 198,
+    "search_type": "full_text",
+    "searched_at": "2026-05-29T11:07:40Z"
+  },
+  {
+    "_id": "4142acfe-0717-43f7-8a25-8cdf4b37c8bf",
+    "user_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "query": "CVE-2021-44228",
+    "result_count": 134,
+    "search_type": "semantic",
+    "searched_at": "2026-06-01T11:07:40Z"
+  },
+  {
+    "_id": "77b9faa2-1b37-48b4-a34c-9dbf85978364",
+    "user_id": "62d887af-5f61-4bcd-ae4d-d2c14f4b6082",
+    "query": "CVE-2022-22965",
+    "result_count": 230,
+    "search_type": "semantic",
+    "searched_at": "2026-05-25T11:07:40Z"
+  },
+  {
+    "_id": "e74b9a90-68b3-4427-aa36-5e9d0eea19cd",
+    "user_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "query": "CVE-2023-44487",
+    "result_count": 117,
+    "search_type": "full_text",
+    "searched_at": "2026-05-28T11:07:40Z"
+  },
+  {
+    "_id": "305f1ed5-33c3-40fd-8c5f-aee93b01975f",
+    "user_id": "87e4d75c-fcd2-42b1-a421-40006be2e34f",
+    "query": "CVE-2023-20198",
+    "result_count": 223,
+    "search_type": "full_text",
+    "searched_at": "2026-06-11T11:07:40Z"
+  },
+  {
+    "_id": "e720487c-32e8-445d-9c9c-a27b16f45768",
+    "user_id": "87e4d75c-fcd2-42b1-a421-40006be2e34f",
+    "query": "CVE-2022-42889",
+    "result_count": 41,
+    "search_type": "full_text",
+    "searched_at": "2026-06-15T11:07:40Z"
+  },
+  {
+    "_id": "e54ddc99-8aa8-4497-9574-9cd3acde05a8",
+    "user_id": "772b94cd-abc0-496a-a042-c0ed9ea8344a",
+    "query": "CVSS >= 9.0 remote code execution",
+    "result_count": 55,
+    "search_type": "full_text",
+    "searched_at": "2026-06-04T11:07:40Z"
+  },
+  {
+    "_id": "5667da06-da7f-49b2-8231-20cfab67d8a7",
+    "user_id": "3f07415e-4e43-47ba-91e7-75c4bc8a0766",
+    "query": "KEV 2024 high",
+    "result_count": 8,
+    "search_type": "full_text",
+    "searched_at": "2026-06-21T11:07:40Z"
+  },
+  {
+    "_id": "4ac9f42a-5d83-4b16-97a1-b3ce23ac0d72",
+    "user_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "query": "EPSS > 0.9 unpatched",
+    "result_count": 221,
+    "search_type": "semantic",
+    "searched_at": "2026-06-12T11:07:40Z"
+  },
+  {
+    "_id": "858fe56d-e6ab-4973-a829-adfac57a7a46",
+    "user_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "query": "buffer overflow kernel",
+    "result_count": 40,
+    "search_type": "semantic",
+    "searched_at": "2026-06-23T11:07:40Z"
+  },
+  {
+    "_id": "7167da05-34f7-4725-b2ae-c0f0feeae109",
+    "user_id": "da1291e1-57d8-4edb-9932-0b287daff906",
+    "query": "sql injection authentication",
+    "result_count": 210,
+    "search_type": "full_text",
+    "searched_at": "2026-06-14T11:07:40Z"
+  }
+]

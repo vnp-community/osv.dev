@@ -4,7 +4,7 @@ package service
 import (
 	"sort"
 
-	"github.com/osv/finding-service/internal/domain/entity"
+	"github.com/osv/finding-service/internal/domain/report"
 )
 
 // severityOrder maps severity strings to numeric rank for comparison.
@@ -27,12 +27,12 @@ func severityRank(s string) int {
 
 // FilterBySeverity keeps only CVEs with severity >= minSeverity.
 // Severity order: UNKNOWN < LOW < MEDIUM < HIGH < CRITICAL
-func FilterBySeverity(cves []entity.CVEData, minSeverity string) []entity.CVEData {
+func FilterBySeverity(cves []report.CVEData, minSeverity string) []report.CVEData {
 	if minSeverity == "" || minSeverity == "UNKNOWN" {
 		return cves
 	}
 	minRank := severityRank(minSeverity)
-	out := make([]entity.CVEData, 0, len(cves))
+	out := make([]report.CVEData, 0, len(cves))
 	for _, c := range cves {
 		if severityRank(c.Severity) >= minRank {
 			out = append(out, c)
@@ -43,11 +43,11 @@ func FilterBySeverity(cves []entity.CVEData, minSeverity string) []entity.CVEDat
 
 // FilterByScore keeps only CVEs with Score >= minScore.
 // If minScore <= 0, all CVEs are kept.
-func FilterByScore(cves []entity.CVEData, minScore float64) []entity.CVEData {
+func FilterByScore(cves []report.CVEData, minScore float64) []report.CVEData {
 	if minScore <= 0 {
 		return cves
 	}
-	out := make([]entity.CVEData, 0, len(cves))
+	out := make([]report.CVEData, 0, len(cves))
 	for _, c := range cves {
 		if c.Score >= minScore {
 			out = append(out, c)
@@ -58,8 +58,8 @@ func FilterByScore(cves []entity.CVEData, minScore float64) []entity.CVEData {
 
 // SortBySeverity sorts CVEs by severity descending (CRITICAL first),
 // then by score descending as secondary sort.
-func SortBySeverity(cves []entity.CVEData) []entity.CVEData {
-	sorted := make([]entity.CVEData, len(cves))
+func SortBySeverity(cves []report.CVEData) []report.CVEData {
+	sorted := make([]report.CVEData, len(cves))
 	copy(sorted, cves)
 	sort.SliceStable(sorted, func(i, j int) bool {
 		ri := severityRank(sorted[i].Severity)
@@ -73,14 +73,14 @@ func SortBySeverity(cves []entity.CVEData) []entity.CVEData {
 }
 
 // FilterAndSort applies severity + score filters and sorts CRITICAL-first.
-func FilterAndSort(cves []entity.CVEData, minSeverity string, minScore float64) []entity.CVEData {
+func FilterAndSort(cves []report.CVEData, minSeverity string, minScore float64) []report.CVEData {
 	filtered := FilterBySeverity(cves, minSeverity)
 	filtered = FilterByScore(filtered, minScore)
 	return SortBySeverity(filtered)
 }
 
 // HasCVEs returns true if any product in the map has at least one CVE.
-func HasCVEs(data map[entity.ProductInfo][]entity.CVEData) bool {
+func HasCVEs(data map[report.ProductInfo][]report.CVEData) bool {
 	for _, cves := range data {
 		if len(cves) > 0 {
 			return true

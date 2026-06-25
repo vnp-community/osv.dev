@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,6 +13,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/osv/identity-service/internal/domain/entity"
 	domainerr "github.com/osv/identity-service/internal/domain/error"
+	"github.com/osv/identity-service/internal/domain/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // UserRepo implements repository.UserRepository using pgx/v5.
@@ -48,6 +51,71 @@ func (r *UserRepo) Create(ctx context.Context, u *entity.User) error {
 		return fmt.Errorf("create user: %w", err)
 	}
 	return nil
+}
+
+// List returns a paginated list of users based on the filter.
+func (r *UserRepo) List(ctx context.Context, filter repository.UserFilter) ([]*entity.User, int, error) {
+	query := "SELECT " + userColumns + " FROM auth.users WHERE 1=1"
+	countQuery := "SELECT COUNT(*) FROM auth.users WHERE 1=1"
+
+	args := []any{}
+	argID := 1
+
+	if filter.Role != "" {
+		query += fmt.Sprintf(" AND role = $%d", argID)
+		countQuery += fmt.Sprintf(" AND role = $%d", argID)
+		args = append(args, filter.Role)
+		argID++
+	}
+	if filter.IsActive != "" {
+		isActive := filter.IsActive == "true"
+		query += fmt.Sprintf(" AND is_active = $%d", argID)
+		countQuery += fmt.Sprintf(" AND is_active = $%d", argID)
+		args = append(args, isActive)
+		argID++
+	}
+	if filter.Query != "" {
+		query += fmt.Sprintf(" AND (email ILIKE $%d OR username ILIKE $%d)", argID, argID)
+		countQuery += fmt.Sprintf(" AND (email ILIKE $%d OR username ILIKE $%d)", argID, argID)
+		args = append(args, "%"+filter.Query+"%")
+		argID++
+	}
+
+	// Get total count
+	var total int
+	if err := r.db.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
+		return nil, 0, fmt.Errorf("count users: %w", err)
+	}
+
+	// Add pagination
+	query += " ORDER BY created_at DESC"
+	if filter.PageSize > 0 {
+		offset := (filter.Page - 1) * filter.PageSize
+		if offset < 0 {
+			offset = 0
+		}
+		query += fmt.Sprintf(" LIMIT %d OFFSET %d", filter.PageSize, offset)
+	}
+
+	rows, err := r.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, 0, fmt.Errorf("query users: %w", err)
+	}
+	defer rows.Close()
+
+	var users []*entity.User
+	for rows.Next() {
+		u, err := scanUser(rows)
+		if err != nil {
+			return nil, 0, fmt.Errorf("scan user: %w", err)
+		}
+		users = append(users, u)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("iterate users: %w", err)
+	}
+
+	return users, total, nil
 }
 
 // FindByID returns a user by UUID. Returns ErrUserNotFound if not found.
@@ -99,6 +167,134 @@ func (r *UserRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+// UpdateMFA sets the MFA status and secret.
+func (r *UserRepo) UpdateMFA(ctx context.Context, userID uuid.UUID, enabled bool, secret string) error {
+	now := time.Now().UTC()
+	_, err := r.db.Exec(ctx,
+		`UPDATE auth.users SET mfa_totp_secret=$2, mfa_enabled=$3, updated_at=$4 WHERE id=$1`,
+		userID, secret, enabled, now,
+	)
+	return err
+}
+
+// ── SEED-001: Admin bulk-create & role assignment ─────────────────────────────
+
+// CreateDirect inserts a user with a pre-hashed password.
+// Returns ErrEmailAlreadyExists when the email already exists (via ON CONFLICT check).
+func (r *UserRepo) CreateDirect(ctx context.Context, u *entity.User, hashedPassword string) error {
+	if u.ID == uuid.Nil {
+		u.ID = uuid.New()
+	}
+	now := time.Now().UTC()
+
+	tag, err := r.db.Exec(ctx, `
+		INSERT INTO auth.users
+		  (id, email, username, hashed_password, role, auth_provider,
+		   mfa_enabled, is_active, is_verified, created_at, updated_at)
+		VALUES ($1,$2,$3,$4,$5,'local',false,$6,$7,$8,$9)
+		ON CONFLICT (email) DO NOTHING`,
+		u.ID, u.Email, u.Username, hashedPassword, u.Role,
+		u.IsActive, u.IsVerified, now, now,
+	)
+	if err != nil {
+		return fmt.Errorf("create direct user: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return domainerr.ErrEmailAlreadyExists
+	}
+	u.CreatedAt = now
+	u.UpdatedAt = now
+	return nil
+}
+
+// CreateBulk inserts multiple users within a single transaction.
+// Rows that fail validation or conflict are recorded as status="error";
+// the transaction commits whatever succeeded.
+func (r *UserRepo) CreateBulk(ctx context.Context, inputs []entity.UserCreateInput) ([]entity.UserCreateResult, error) {
+	results := make([]entity.UserCreateResult, 0, len(inputs))
+
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("begin tx: %w", err)
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck
+
+	now := time.Now().UTC()
+	for _, in := range inputs {
+		res := entity.UserCreateResult{Email: in.Email}
+
+		if in.Email == "" {
+			res.Status = "error"
+			res.Message = "email is required"
+			results = append(results, res)
+			continue
+		}
+		if len(in.Password) < 8 {
+			res.Status = "error"
+			res.Message = "password must be at least 8 characters"
+			results = append(results, res)
+			continue
+		}
+
+		hashed, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
+		if err != nil {
+			res.Status = "error"
+			res.Message = "password hashing failed"
+			results = append(results, res)
+			continue
+		}
+
+		id := uuid.New()
+		tag, err := tx.Exec(ctx, `
+			INSERT INTO auth.users
+			  (id, email, username, hashed_password, role, auth_provider,
+			   mfa_enabled, is_active, is_verified, created_at, updated_at)
+			VALUES ($1,$2,$3,$4,$5,'local',false,$6,$7,$8,$9)
+			ON CONFLICT (email) DO NOTHING`,
+			id, in.Email, in.Username, string(hashed), in.Role,
+			in.IsActive, in.IsVerified, now, now,
+		)
+		if err != nil {
+			res.Status = "error"
+			res.Message = err.Error()
+			results = append(results, res)
+			continue
+		}
+		if tag.RowsAffected() == 0 {
+			res.Status = "error"
+			res.Message = "email already exists"
+			results = append(results, res)
+			continue
+		}
+
+		res.Status = "created"
+		res.ID = &id
+		results = append(results, res)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("commit bulk create: %w", err)
+	}
+	return results, nil
+}
+
+// AssignRole upserts a role_assignment record.
+func (r *UserRepo) AssignRole(ctx context.Context, a entity.RoleAssignment) error {
+	_, err := r.db.Exec(ctx, `
+		INSERT INTO auth.role_assignments
+		  (user_id, role_id, scope, resource_id, assigned_by, assigned_at)
+		VALUES ($1, $2, $3, $4, $5, NOW())
+		ON CONFLICT (user_id, role_id, scope,
+		  COALESCE(resource_id, '00000000-0000-0000-0000-000000000000'::UUID))
+		DO UPDATE SET assigned_by = EXCLUDED.assigned_by, assigned_at = NOW()`,
+		a.UserID, a.RoleID, a.Scope, a.ResourceID, a.AssignedBy,
+	)
+	if err != nil {
+		return fmt.Errorf("assign role: %w", err)
+	}
+	return nil
+}
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 const userColumns = `
@@ -129,18 +325,18 @@ func scanUser(row pgx.Row) (*entity.User, error) {
 }
 
 func isDuplicateKey(err error) bool {
-	return err != nil && (contains(err.Error(), "unique") || contains(err.Error(), "duplicate"))
+	return err != nil && (strings.Contains(err.Error(), "unique") || strings.Contains(err.Error(), "duplicate"))
 }
 
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsStr(s, substr))
-}
-
-func containsStr(s, sub string) bool {
-	for i := 0; i <= len(s)-len(sub); i++ {
-		if s[i:i+len(sub)] == sub {
-			return true
-		}
+// Activate sets is_active=true and is_verified=true for the user.
+// [FIX TASK-HC-014] Called by AcceptInvite after validating invitation token.
+func (r *UserRepo) Activate(ctx context.Context, userID uuid.UUID) error {
+	_, err := r.db.Exec(ctx,
+		`UPDATE auth.users SET is_active=true, is_verified=true, updated_at=NOW() WHERE id=$1`,
+		userID,
+	)
+	if err != nil {
+		return fmt.Errorf("activate user: %w", err)
 	}
-	return false
+	return nil
 }

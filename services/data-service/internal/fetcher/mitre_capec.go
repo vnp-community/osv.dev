@@ -35,7 +35,7 @@ func NewMITRECAPECFetcher(db *mongo.Database) *MITRECAPECFetcher {
 	}
 }
 
-func (f *MITRECAPECFetcher) Name() string { return "capec" }
+func (f *MITRECAPECFetcher) Name() string { return string(SourceCAPEC) }
 
 // FetchAndStore downloads CAPEC XML and upserts into MongoDB "capec" collection.
 func (f *MITRECAPECFetcher) FetchAndStore(ctx context.Context, opts FetchOptions) (int, error) {

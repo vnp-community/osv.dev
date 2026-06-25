@@ -1,113 +1,154 @@
-// Package webhook provides the Webhook aggregate for the notification service.
-// This is a clean-architecture rewrite of the original webhook domain.
+// Package webhook defines the Webhook aggregate root.
+// A Webhook is a registered HTTP endpoint that receives CVE event notifications.
 package webhook
 
 import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"errors"
-	"net/url"
-	"strings"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
+	wh "github.com/osv/notification-service/internal/domain/webhook"
 )
 
-// Sentinel domain errors.
-var (
-	ErrInvalidURL    = errors.New("webhook URL must start with https://")
-	ErrEmptyEvents   = errors.New("at least one event type required")
-	ErrInactive      = errors.New("webhook is inactive")
+// EventType re-exports the domain webhook event type.
+type EventType = wh.EventType
+
+// Event type constants.
+const (
+	EventNewKEV      = wh.EventNewKEV
+	EventNewCritical = wh.EventNewCritical
+	EventNewHigh     = wh.EventNewHigh
+	EventHighEPSS    = wh.EventHighEPSS
+	EventVendorCVE   = wh.EventVendorCVE
+	EventProductCVE  = wh.EventProductCVE
 )
 
-// SupportedEvents lists valid event type strings.
-var SupportedEvents = map[string]bool{
-	"cve.created":    true,
-	"cve.updated":    true,
-	"kev.added":      true,
-	"sync.completed": true,
-}
-
-// Webhook is the aggregate root for a registered webhook endpoint.
+// Webhook is the aggregate root representing a registered webhook endpoint.
+// Fields are private; access via accessor methods to preserve encapsulation.
 type Webhook struct {
 	id        string
 	ownerID   string
-	rawURL    string
-	events    []string
+	url       string
+	events    []EventType
 	secret    string
-	active    bool
+	isActive  bool
 	createdAt time.Time
 	updatedAt time.Time
 }
 
-// New creates and validates a new Webhook aggregate.
-func New(rawURL string, events []string, secret, ownerID string) (*Webhook, error) {
-	if !strings.HasPrefix(rawURL, "https://") {
-		return nil, ErrInvalidURL
+// New creates a new active Webhook aggregate.
+func New(rawURL string, events []EventType, secret, ownerID string) (*Webhook, error) {
+	if rawURL == "" {
+		return nil, fmt.Errorf("webhook: URL is required")
 	}
-	if _, err := url.ParseRequestURI(rawURL); err != nil {
-		return nil, ErrInvalidURL
+	if ownerID == "" {
+		return nil, fmt.Errorf("webhook: ownerID is required")
 	}
-	if len(events) == 0 {
-		return nil, ErrEmptyEvents
-	}
-
 	now := time.Now().UTC()
 	return &Webhook{
 		id:        uuid.NewString(),
 		ownerID:   ownerID,
-		rawURL:    rawURL,
+		url:       rawURL,
 		events:    events,
 		secret:    secret,
-		active:    true,
+		isActive:  true,
 		createdAt: now,
 		updatedAt: now,
 	}, nil
 }
 
-// Reconstitute rebuilds a Webhook from persisted state (no validation).
-func Reconstitute(id, ownerID, rawURL string, events []string, secret string, active bool, createdAt, updatedAt time.Time) *Webhook {
+// Reconstitute rebuilds a Webhook from persisted data (no validation).
+func Reconstitute(id, ownerID, url string, events []EventType, secret string, active bool, createdAt, updatedAt time.Time) *Webhook {
 	return &Webhook{
-		id: id, ownerID: ownerID, rawURL: rawURL,
-		events: events, secret: secret, active: active,
-		createdAt: createdAt, updatedAt: updatedAt,
+		id:        id,
+		ownerID:   ownerID,
+		url:       url,
+		events:    events,
+		secret:    secret,
+		isActive:  active,
+		createdAt: createdAt,
+		updatedAt: updatedAt,
 	}
 }
 
-// Accessors.
-func (w *Webhook) ID() string          { return w.id }
-func (w *Webhook) OwnerID() string     { return w.ownerID }
-func (w *Webhook) URL() string         { return w.rawURL }
-func (w *Webhook) Events() []string    { return w.events }
-func (w *Webhook) Secret() string      { return w.secret }
-func (w *Webhook) IsActive() bool      { return w.active }
-func (w *Webhook) CreatedAt() time.Time { return w.createdAt }
-func (w *Webhook) UpdatedAt() time.Time { return w.updatedAt }
+// ReconstituteFromStrings rebuilds a Webhook accepting []string events (e.g., from PostgreSQL pgx scan).
+func ReconstituteFromStrings(id, ownerID, url string, events []string, secret string, active bool, createdAt, updatedAt time.Time) *Webhook {
+	evtTypes := make([]EventType, len(events))
+	for i, e := range events {
+		evtTypes[i] = EventType(e)
+	}
+	return Reconstitute(id, ownerID, url, evtTypes, secret, active, createdAt, updatedAt)
+}
 
-// ShouldDeliver returns true if this webhook is active and subscribes to eventType.
+// ── Accessors ──────────────────────────────────────────────────────────────────
+
+func (w *Webhook) ID() string            { return w.id }
+func (w *Webhook) OwnerID() string       { return w.ownerID }
+func (w *Webhook) URL() string           { return w.url }
+func (w *Webhook) Events() []EventType   { return w.events }
+func (w *Webhook) Secret() string        { return w.secret }
+func (w *Webhook) IsActive() bool        { return w.isActive }
+func (w *Webhook) CreatedAt() time.Time  { return w.createdAt }
+func (w *Webhook) UpdatedAt() time.Time  { return w.updatedAt }
+
+// ── Domain methods ─────────────────────────────────────────────────────────────
+
+// ShouldDeliver returns true if this webhook is active and subscribes to the given event.
 func (w *Webhook) ShouldDeliver(eventType string) bool {
-	if !w.active {
+	if !w.isActive {
 		return false
 	}
 	for _, e := range w.events {
-		if e == eventType {
+		if string(e) == eventType {
 			return true
 		}
 	}
 	return false
 }
 
-// Sign creates an HMAC-SHA256 signature of payload.
-// Returns: "sha256=<hex>"
+// Sign generates an HMAC-SHA256 signature for the payload using the webhook secret.
+// Returns the hex-encoded signature (used in X-Hub-Signature-256 header).
 func (w *Webhook) Sign(payload []byte) string {
+	if w.secret == "" {
+		return ""
+	}
 	mac := hmac.New(sha256.New, []byte(w.secret))
 	mac.Write(payload)
 	return "sha256=" + hex.EncodeToString(mac.Sum(nil))
 }
 
-// Deactivate marks the webhook as inactive.
-func (w *Webhook) Deactivate() {
-	w.active = false
+// Activate enables this webhook for delivery.
+func (w *Webhook) Activate() {
+	w.isActive = true
 	w.updatedAt = time.Now().UTC()
 }
+
+// Deactivate disables this webhook.
+func (w *Webhook) Deactivate() {
+	w.isActive = false
+	w.updatedAt = time.Now().UTC()
+}
+
+// UpdateSecret rotates the signing secret.
+func (w *Webhook) UpdateSecret(newSecret string) {
+	w.secret = newSecret
+	w.updatedAt = time.Now().UTC()
+}
+
+// ── Delivery types (re-exported from domain/webhook) ──────────────────────────
+
+// DeliveryStatus re-exports the delivery status type.
+type DeliveryStatus = wh.DeliveryStatus
+
+const (
+	DeliveryPending   = wh.DeliveryPending
+	DeliveryDelivered = wh.DeliveryDelivered
+	DeliveryFailed    = wh.DeliveryFailed
+	DeliveryRetrying  = wh.DeliveryRetrying
+)
+
+// WebhookDelivery re-exports the delivery record type.
+type WebhookDelivery = wh.WebhookDelivery

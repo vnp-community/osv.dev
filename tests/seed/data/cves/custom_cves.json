@@ -1,0 +1,68 @@
+[
+  {
+    "_id": "a0198c7b-1739-45cd-b48a-ace3120891d3",
+    "id": "CVE-INTERNAL-2026-001",
+    "summary": "Internal authentication bypass in legacy API",
+    "description": "Legacy API endpoint /api/legacy/auth bypasses token validation when X-Internal header is set. Affects versions prior to 2.1.0.",
+    "severity": "critical",
+    "cvss3": 9.1,
+    "cvss3_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+    "published": "2026-05-25T11:07:40Z",
+    "source": "INTERNAL",
+    "vendors": [
+      "company-internal"
+    ],
+    "products": [
+      "legacy-api"
+    ],
+    "references": [
+      "https://internal.company.com/security/2026-001"
+    ],
+    "is_kev": false,
+    "is_exploit": false
+  },
+  {
+    "_id": "64e4c074-ee45-4616-8bef-ba169c465644",
+    "id": "CVE-INTERNAL-2026-002",
+    "summary": "SQL injection in report generation endpoint",
+    "description": "Report generation endpoint /api/reports/custom accepts unsanitized user input leading to SQL injection. Affected all versions before 3.5.2.",
+    "severity": "high",
+    "cvss3": 8.8,
+    "cvss3_vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+    "published": "2026-06-10T11:07:40Z",
+    "source": "INTERNAL",
+    "vendors": [
+      "company-internal"
+    ],
+    "products": [
+      "report-service"
+    ],
+    "references": [
+      "https://internal.company.com/security/2026-002"
+    ],
+    "is_kev": false,
+    "is_exploit": true
+  },
+  {
+    "_id": "2c83f61e-9569-438b-8dfc-609da7d81728",
+    "id": "CVE-INTERNAL-2026-003",
+    "summary": "SSRF vulnerability in webhook delivery",
+    "description": "Webhook delivery service accepts arbitrary URLs including internal network addresses, enabling SSRF attacks against internal services.",
+    "severity": "high",
+    "cvss3": 7.7,
+    "cvss3_vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N",
+    "published": "2026-06-17T11:07:40Z",
+    "source": "INTERNAL",
+    "vendors": [
+      "company-internal"
+    ],
+    "products": [
+      "notification-service"
+    ],
+    "references": [
+      "https://internal.company.com/security/2026-003"
+    ],
+    "is_kev": false,
+    "is_exploit": false
+  }
+]

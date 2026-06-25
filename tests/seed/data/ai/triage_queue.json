@@ -1,0 +1,321 @@
+[
+  {
+    "_id": "9ae6f92e-5027-4622-a967-5b48ffb61f4e",
+    "finding_id": "93972ea1-0fd7-4fb0-b417-c82a51cbf6b8",
+    "finding_title": "CVE-2022-22965 in nginx",
+    "cve_id": "CVE-2022-22965",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "Unexplored",
+      "confidence": 0.6345,
+      "justification": "CVE-2022-22965 requires deeper investigation. Automated analysis inconclusive — manual review recommended.",
+      "actions": [
+        "Assign to security team for manual review.",
+        "Gather additional context from asset owner."
+      ],
+      "generated_at": "2026-06-20T11:07:40Z"
+    },
+    "human_decision": null,
+    "human_note": null,
+    "reviewed_by": null,
+    "reviewed_at": null
+  },
+  {
+    "_id": "4930620a-9e69-45d0-b645-db8e28c82ae6",
+    "finding_id": "99cb7060-9ee4-4764-a44d-6b3bfe71a343",
+    "finding_title": "CVE-2023-20198 in jackson-databind",
+    "cve_id": "CVE-2023-20198",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "NotAffected",
+      "confidence": 0.7607,
+      "justification": "Infrastructure analysis confirms jackson-databind is not deployed in a configuration affected by CVE-2023-20198. Compensating controls are in place.",
+      "actions": [
+        "Document not-affected status with justification.",
+        "Review compensating controls quarterly."
+      ],
+      "generated_at": "2026-06-22T11:07:40Z"
+    },
+    "human_decision": "overridden",
+    "human_note": "Reviewed during security sprint — notaffected confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-23T11:07:40Z"
+  },
+  {
+    "_id": "e8d086ad-619e-4ef0-ac04-fe152fc6729d",
+    "finding_id": "d173bd8b-c733-4884-b7de-035b188ce591",
+    "finding_title": "CVE-2022-22965 in nginx",
+    "cve_id": "CVE-2022-22965",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "NotAffected",
+      "confidence": 0.7741,
+      "justification": "Infrastructure analysis confirms nginx is not deployed in a configuration affected by CVE-2022-22965. Compensating controls are in place.",
+      "actions": [
+        "Document not-affected status with justification.",
+        "Review compensating controls quarterly."
+      ],
+      "generated_at": "2026-06-20T11:07:40Z"
+    },
+    "human_decision": "accepted",
+    "human_note": "Reviewed during security sprint — notaffected confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-22T11:07:40Z"
+  },
+  {
+    "_id": "c3fd08f7-d737-497c-962c-ac4cc396ce02",
+    "finding_id": "38710aa5-fb41-48df-aeca-c5ea9616a360",
+    "finding_title": "CVE-2021-44228 in openssl",
+    "cve_id": "CVE-2021-44228",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "NotAffected",
+      "confidence": 0.8391,
+      "justification": "Infrastructure analysis confirms openssl is not deployed in a configuration affected by CVE-2021-44228. Compensating controls are in place.",
+      "actions": [
+        "Document not-affected status with justification.",
+        "Review compensating controls quarterly."
+      ],
+      "generated_at": "2026-06-21T11:07:40Z"
+    },
+    "human_decision": "overridden",
+    "human_note": "Reviewed during security sprint — notaffected confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-22T11:07:40Z"
+  },
+  {
+    "_id": "2a804389-efa6-47bd-b794-4d7dc071d32e",
+    "finding_id": "c46819c5-ada3-4f03-83a1-d223c26f8387",
+    "finding_title": "CVE-2021-44228 in openssl",
+    "cve_id": "CVE-2021-44228",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "Unexplored",
+      "confidence": 0.7279,
+      "justification": "CVE-2021-44228 requires deeper investigation. Automated analysis inconclusive — manual review recommended.",
+      "actions": [
+        "Assign to security team for manual review.",
+        "Gather additional context from asset owner."
+      ],
+      "generated_at": "2026-06-21T11:07:40Z"
+    },
+    "human_decision": "overridden",
+    "human_note": "Reviewed during security sprint — unexplored confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-23T11:07:40Z"
+  },
+  {
+    "_id": "994bee87-2d68-45e2-b8aa-2641281ece24",
+    "finding_id": "b0d54541-6ba4-4174-aeeb-df6616fe316c",
+    "finding_title": "log4j-core — High vulnerability",
+    "cve_id": null,
+    "severity": "High",
+    "ai_result": {
+      "remarks": "Confirmed",
+      "confidence": 0.9156,
+      "justification": "CVSS 7.5 (High). log4j-core 2.14.1 is in the affected version range for this vulnerability. No compensating controls detected in the current configuration.",
+      "actions": [
+        "Upgrade log4j-core to the latest patched version immediately.",
+        "Apply vendor security advisory mitigations.",
+        "Monitor for exploitation attempts in SIEM."
+      ],
+      "generated_at": "2026-06-24T11:07:40Z"
+    },
+    "human_decision": "rejected",
+    "human_note": "Reviewed during security sprint — confirmed confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-24T11:07:40Z"
+  },
+  {
+    "_id": "ba222aad-4a9c-4639-ad57-20f6d9b4c6d1",
+    "finding_id": "6ff51605-210e-49ca-8837-51d6e7785567",
+    "finding_title": "CVE-2022-1388 in apache-struts",
+    "cve_id": "CVE-2022-1388",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "Unexplored",
+      "confidence": 0.5614,
+      "justification": "CVE-2022-1388 requires deeper investigation. Automated analysis inconclusive — manual review recommended.",
+      "actions": [
+        "Assign to security team for manual review.",
+        "Gather additional context from asset owner."
+      ],
+      "generated_at": "2026-06-19T11:07:40Z"
+    },
+    "human_decision": "rejected",
+    "human_note": "Reviewed during security sprint — unexplored confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-23T11:07:40Z"
+  },
+  {
+    "_id": "87ccf0cb-acac-4a10-b4fd-b7c083c6940c",
+    "finding_id": "e0afdbba-56ee-4c73-be6d-3e33480b6f66",
+    "finding_title": "CVE-2023-20198 in openssl",
+    "cve_id": "CVE-2023-20198",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "Unexplored",
+      "confidence": 0.6521,
+      "justification": "CVE-2023-20198 requires deeper investigation. Automated analysis inconclusive — manual review recommended.",
+      "actions": [
+        "Assign to security team for manual review.",
+        "Gather additional context from asset owner."
+      ],
+      "generated_at": "2026-06-22T11:07:40Z"
+    },
+    "human_decision": "overridden",
+    "human_note": "Reviewed during security sprint — unexplored confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-24T11:07:40Z"
+  },
+  {
+    "_id": "f7bffc79-8674-4aff-8118-fe766fe1a2e0",
+    "finding_id": "067d142a-2310-4682-bbd1-ef5bc2fdf6c4",
+    "finding_title": "apache-struts — High vulnerability",
+    "cve_id": null,
+    "severity": "High",
+    "ai_result": {
+      "remarks": "FalsePositive",
+      "confidence": 0.7652,
+      "justification": "apache-struts 2.5.28 appears in the scan, but static analysis confirms the vulnerable code path is not reachable in this deployment context.",
+      "actions": [
+        "Mark as false positive in finding tracker.",
+        "Document justification for audit trail."
+      ],
+      "generated_at": "2026-06-23T11:07:40Z"
+    },
+    "human_decision": "rejected",
+    "human_note": "Reviewed during security sprint — falsepositive confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-24T11:07:40Z"
+  },
+  {
+    "_id": "e5b3be88-b0ad-4c3a-bd4c-3b2b274249d8",
+    "finding_id": "d7c08d24-78d9-4b1f-b012-a01e401fa1b1",
+    "finding_title": "CVE-2021-26084 in nginx",
+    "cve_id": "CVE-2021-26084",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "Unexplored",
+      "confidence": 0.5943,
+      "justification": "CVE-2021-26084 requires deeper investigation. Automated analysis inconclusive — manual review recommended.",
+      "actions": [
+        "Assign to security team for manual review.",
+        "Gather additional context from asset owner."
+      ],
+      "generated_at": "2026-06-23T11:07:40Z"
+    },
+    "human_decision": null,
+    "human_note": null,
+    "reviewed_by": null,
+    "reviewed_at": null
+  },
+  {
+    "_id": "dddc5d0e-1a50-4bc2-8746-d25ea979c0ef",
+    "finding_id": "43fda2b5-befa-44ac-ae71-6f5858b99625",
+    "finding_title": "CVE-2022-22965 in apache-struts",
+    "cve_id": "CVE-2022-22965",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "Confirmed",
+      "confidence": 0.8869,
+      "justification": "CVSS 9.8 (Critical). apache-struts 2.5.28 is in the affected version range for CVE-2022-22965. No compensating controls detected in the current configuration.",
+      "actions": [
+        "Upgrade apache-struts to the latest patched version immediately.",
+        "Apply vendor security advisory mitigations.",
+        "Monitor for exploitation attempts in SIEM."
+      ],
+      "generated_at": "2026-06-20T11:07:40Z"
+    },
+    "human_decision": null,
+    "human_note": null,
+    "reviewed_by": null,
+    "reviewed_at": null
+  },
+  {
+    "_id": "3b7391a1-a1f6-4f23-8bc5-32bde86c5be7",
+    "finding_id": "b86f1864-691b-40e8-8141-464867fce239",
+    "finding_title": "CVE-2023-20198 in log4j-core",
+    "cve_id": "CVE-2023-20198",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "Confirmed",
+      "confidence": 0.8737,
+      "justification": "CVSS 10.0 (Critical). log4j-core 2.14.1 is in the affected version range for CVE-2023-20198. No compensating controls detected in the current configuration.",
+      "actions": [
+        "Upgrade log4j-core to the latest patched version immediately.",
+        "Apply vendor security advisory mitigations.",
+        "Monitor for exploitation attempts in SIEM."
+      ],
+      "generated_at": "2026-06-21T11:07:40Z"
+    },
+    "human_decision": null,
+    "human_note": null,
+    "reviewed_by": null,
+    "reviewed_at": null
+  },
+  {
+    "_id": "bc9fa0eb-4ac8-4bf7-a11c-462236ca0320",
+    "finding_id": "e349355b-0f68-4e84-b18d-8055ece8f8cf",
+    "finding_title": "CVE-2022-22965 in jquery",
+    "cve_id": "CVE-2022-22965",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "Confirmed",
+      "confidence": 0.9121,
+      "justification": "CVSS 9.8 (Critical). jquery 3.5.1 is in the affected version range for CVE-2022-22965. No compensating controls detected in the current configuration.",
+      "actions": [
+        "Upgrade jquery to the latest patched version immediately.",
+        "Apply vendor security advisory mitigations.",
+        "Monitor for exploitation attempts in SIEM."
+      ],
+      "generated_at": "2026-06-24T11:07:40Z"
+    },
+    "human_decision": "overridden",
+    "human_note": "Reviewed during security sprint — confirmed confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-23T11:07:40Z"
+  },
+  {
+    "_id": "9d50b1c5-c44e-49a2-9604-711e904aad07",
+    "finding_id": "8b8ea4a4-04b0-4ad2-a70d-66fc74f5c03b",
+    "finding_title": "CVE-2023-44487 in jquery",
+    "cve_id": "CVE-2023-44487",
+    "severity": "High",
+    "ai_result": {
+      "remarks": "FalsePositive",
+      "confidence": 0.8323,
+      "justification": "jquery 3.5.1 appears in the scan, but static analysis confirms the vulnerable code path is not reachable in this deployment context.",
+      "actions": [
+        "Mark as false positive in finding tracker.",
+        "Document justification for audit trail."
+      ],
+      "generated_at": "2026-06-20T11:07:40Z"
+    },
+    "human_decision": "accepted",
+    "human_note": "Reviewed during security sprint — falsepositive confirmed.",
+    "reviewed_by": "admin@company.com",
+    "reviewed_at": "2026-06-24T11:07:40Z"
+  },
+  {
+    "_id": "9fd47b9b-cfeb-4b7f-a1c5-26d7aa94df6f",
+    "finding_id": "267a8919-e290-440d-8024-70622c0b2b9a",
+    "finding_title": "CVE-2021-44228 in jackson-databind",
+    "cve_id": "CVE-2021-44228",
+    "severity": "Critical",
+    "ai_result": {
+      "remarks": "Unexplored",
+      "confidence": 0.5929,
+      "justification": "CVE-2021-44228 requires deeper investigation. Automated analysis inconclusive — manual review recommended.",
+      "actions": [
+        "Assign to security team for manual review.",
+        "Gather additional context from asset owner."
+      ],
+      "generated_at": "2026-06-22T11:07:40Z"
+    },
+    "human_decision": null,
+    "human_note": null,
+    "reviewed_by": null,
+    "reviewed_at": null
+  }
+]

@@ -36,6 +36,10 @@ type userDocument struct {
 }
 
 func toDocument(u *entity.User) *userDocument {
+	mfaSecret := ""
+	if u.MFATOTPSecret != nil {
+		mfaSecret = *u.MFATOTPSecret
+	}
 	doc := &userDocument{
 		ID:                  u.ID.String(),
 		Email:               u.Email,
@@ -44,7 +48,7 @@ func toDocument(u *entity.User) *userDocument {
 		Role:                u.Role,
 		AuthProvider:        string(u.AuthProvider),
 		MFAEnabled:          u.MFAEnabled,
-		MFATOTPSecret:       u.MFATOTPSecret,
+		MFATOTPSecret:       mfaSecret, // *string → string (nil → "")
 		IsActive:            u.IsActive,
 		IsVerified:          u.IsVerified,
 		FailedLoginAttempts: u.FailedLoginAttempts,
@@ -60,6 +64,11 @@ func toEntity(doc *userDocument) (*entity.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("parse user UUID %q: %w", doc.ID, err)
 	}
+	var mfaSecret *string
+	if doc.MFATOTPSecret != "" {
+		s := doc.MFATOTPSecret
+		mfaSecret = &s
+	}
 	return &entity.User{
 		ID:                  id,
 		Email:               doc.Email,
@@ -68,7 +77,7 @@ func toEntity(doc *userDocument) (*entity.User, error) {
 		Role:                doc.Role,
 		AuthProvider:        entity.AuthProvider(doc.AuthProvider),
 		MFAEnabled:          doc.MFAEnabled,
-		MFATOTPSecret:       doc.MFATOTPSecret,
+		MFATOTPSecret:       mfaSecret, // string → *string ("" → nil)
 		IsActive:            doc.IsActive,
 		IsVerified:          doc.IsVerified,
 		FailedLoginAttempts: doc.FailedLoginAttempts,

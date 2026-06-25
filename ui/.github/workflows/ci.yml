@@ -1,0 +1,99 @@
+name: UI CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['ui/**']
+  pull_request:
+    branches: [main]
+    paths: ['ui/**']
+
+defaults:
+  run:
+    working-directory: ui/
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with: { version: '9' }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: 'ui/pnpm-lock.yaml'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # ── Gate 1: Hardcoded data check ─────────────────────────────────
+      - name: Check for hardcoded data arrays in components
+        run: |
+          VIOLATIONS=$(grep -rn 'const [a-zA-Z]*Data\s*=\s*\[' \
+            src/features/ src/app/components/ \
+            --include='*.tsx' \
+            | grep -v '//\|COLUMN\|OPTION\|TAB\|COLOR\|CONFIG' || true)
+
+          if [ -n "$VIOLATIONS" ]; then
+            echo "❌ VIOLATION: Hardcoded data arrays found:"
+            echo "$VIOLATIONS"
+            echo ""
+            echo "Move data to src/mocks/fixtures/ and use React Query hooks."
+            exit 1
+          fi
+          echo "✅ No hardcoded data arrays found"
+
+      # ── Gate 2: MSW not in production ─────────────────────────────────
+      - name: Verify MSW disabled in production
+        run: |
+          if grep -q 'VITE_ENABLE_MSW=true' .env.production 2>/dev/null; then
+            echo "❌ VITE_ENABLE_MSW=true in .env.production"
+            exit 1
+          fi
+          echo "✅ VITE_ENABLE_MSW=false in production"
+
+      # ── Lint ────────────────────────────────────────────────────────────
+      - name: ESLint
+        run: pnpm lint
+
+      # ── Type check ──────────────────────────────────────────────────────
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      # ── Unit tests ──────────────────────────────────────────────────────
+      - name: Unit tests + coverage
+        run: pnpm test --coverage
+
+      # ── Build ───────────────────────────────────────────────────────────
+      - name: Build
+        run: pnpm build
+        env:
+          VITE_API_BASE_URL: https://api.osv.internal
+          VITE_ENABLE_MSW: 'false'
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [lint-and-test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with: { version: '9' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'pnpm', cache-dependency-path: 'ui/pnpm-lock.yaml' }
+      - run: pnpm install
+      - run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests (MSW enabled)
+        run: npx playwright test
+        env:
+          VITE_ENABLE_MSW: 'true'
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: ui/playwright-report/

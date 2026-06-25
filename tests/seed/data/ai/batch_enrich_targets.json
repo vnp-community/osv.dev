@@ -1,0 +1,42 @@
+[
+  {
+    "cve_id": "CVE-2021-44228",
+    "priority": "critical",
+    "reason": "Log4Shell — most widely exploited CVE"
+  },
+  {
+    "cve_id": "CVE-2022-22965",
+    "priority": "critical",
+    "reason": "Spring4Shell — RCE in Spring Framework"
+  },
+  {
+    "cve_id": "CVE-2023-44487",
+    "priority": "high",
+    "reason": "HTTP/2 Rapid Reset — DDoS at protocol level"
+  },
+  {
+    "cve_id": "CVE-2022-42889",
+    "priority": "critical",
+    "reason": "Text4Shell — RCE in Apache Commons Text"
+  },
+  {
+    "cve_id": "CVE-2023-34362",
+    "priority": "critical",
+    "reason": "MOVEit Transfer — actively exploited"
+  },
+  {
+    "cve_id": "CVE-2023-20198",
+    "priority": "critical",
+    "reason": "Cisco IOS XE — privilege escalation"
+  },
+  {
+    "cve_id": "CVE-2024-21762",
+    "priority": "critical",
+    "reason": "Fortinet SSL VPN out-of-bounds write"
+  },
+  {
+    "cve_id": "CVE-2024-3400",
+    "priority": "critical",
+    "reason": "Palo Alto PAN-OS command injection"
+  }
+]

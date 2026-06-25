@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/osv/finding-service/internal/domain/entity"
-	"github.com/osv/finding-service/internal/domain/service"
+	"github.com/osv/finding-service/internal/domain/report"
+	"github.com/osv/finding-service/internal/domain/report/service"
 	"github.com/osv/finding-service/internal/formatters"
 )
 
@@ -35,7 +35,7 @@ var csvHeader = []string{
 }
 
 // Format renders CVE findings to CSV bytes.
-func (f *CSVFormatter) Format(_ context.Context, data entity.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
+func (f *CSVFormatter) Format(_ context.Context, data report.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
 	var buf bytes.Buffer
 	w := csv.NewWriter(&buf)
 

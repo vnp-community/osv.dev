@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/jung-kurt/gofpdf"
-	"github.com/osv/finding-service/internal/domain/entity"
-	"github.com/osv/finding-service/internal/domain/service"
+	"github.com/osv/finding-service/internal/domain/report"
+	"github.com/osv/finding-service/internal/domain/report/service"
 	"github.com/osv/finding-service/internal/formatters"
 )
 
@@ -36,7 +36,7 @@ var severityColors = map[string][3]int{
 }
 
 // Format renders the PDF report.
-func (f *PDFFormatter) Format(_ context.Context, data entity.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
+func (f *PDFFormatter) Format(_ context.Context, data report.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
 	pdf := gofpdf.New("L", "mm", "A4", "") // Landscape for wide tables
 	pdf.SetMargins(15, 15, 15)
 	pdf.SetAutoPageBreak(true, 15)

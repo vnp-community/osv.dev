@@ -13,18 +13,30 @@ import (
 	"github.com/osv/search-service/internal/domain/entity"
 	domainerrors "github.com/osv/search-service/internal/domain/errors"
 	"github.com/osv/search-service/internal/domain/repository"
+	"github.com/osv/search-service/internal/infra/opensearch"
+	"os"
 )
 
 const defaultCacheTTL = 300 // 5 minutes
 
 // Request holds search parameters.
 type Request struct {
-	Query    string
-	Severity string
-	Source   string
-	Sort     string
-	Page     int
-	Limit    int
+	Query     string
+	Severity  string
+	Source    string
+	Sort      string
+	Page      int
+	Limit     int
+	// CR-GCV-002: EPSS filters
+	MinEPSS   *float64
+	MaxEPSS   *float64
+	// CR-GCV-003: Exploit/KEV bool filters
+	IsKEV     *bool
+	IsExploit *bool
+	// CR-GCV-005: CWE / Vendor / Product text filters
+	CWE       string
+	Vendor    string
+	Product   string
 }
 
 // Response holds the search result.
@@ -40,16 +52,21 @@ type Response struct {
 
 // UseCase handles CVE search with cache-first strategy.
 type UseCase struct {
-	cveRepo   repository.CVERepository
+	pgRepo    repository.CVERepository
+	osClient  *opensearch.Client
+	osEnabled bool
 	cacheRepo repository.CVECacheRepository
 	log       zerolog.Logger
 	cacheTTL  int
 }
 
 // New creates a search UseCase.
-func New(cveRepo repository.CVERepository, cacheRepo repository.CVECacheRepository, log zerolog.Logger) *UseCase {
+func New(cveRepo repository.CVERepository, cacheRepo repository.CVECacheRepository, osClient *opensearch.Client, log zerolog.Logger) *UseCase {
+	enabled := os.Getenv("OPENSEARCH_ENABLED") == "true"
 	return &UseCase{
-		cveRepo:   cveRepo,
+		pgRepo:    cveRepo,
+		osClient:  osClient,
+		osEnabled: enabled && osClient != nil,
 		cacheRepo: cacheRepo,
 		log:       log.With().Str("usecase", "cve.search").Logger(),
 		cacheTTL:  defaultCacheTTL,
@@ -70,8 +87,21 @@ func (uc *UseCase) Execute(ctx context.Context, req *Request) (*Response, error)
 		}
 	}
 
-	// 2. DB query
-	cves, total, err := uc.cveRepo.Search(ctx, filter)
+	// 2. Search Backend
+	var cves []*entity.CVE
+	var total int64
+	var err error
+
+	if uc.osEnabled && req.Query != "" {
+		cves, total, err = uc.searchViaOpenSearch(ctx, req)
+		if err != nil {
+			uc.log.Warn().Err(err).Msg("OpenSearch search failed, falling back to PostgreSQL")
+			cves, total, err = uc.searchViaPostgres(ctx, filter)
+		}
+	} else {
+		cves, total, err = uc.searchViaPostgres(ctx, filter)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("cve search: %w", err)
 	}
@@ -97,12 +127,38 @@ func (uc *UseCase) Execute(ctx context.Context, req *Request) (*Response, error)
 	return resp, nil
 }
 
+func (uc *UseCase) searchViaOpenSearch(ctx context.Context, req *Request) ([]*entity.CVE, int64, error) {
+	var severity []string
+	if req.Severity != "" {
+		severity = []string{req.Severity}
+	}
+	osReq := &opensearch.SearchCVEsRequest{
+		Query:    req.Query,
+		Severity: severity,
+		MinEPSS:  req.MinEPSS,
+		Page:     req.Page,
+		Limit:    req.Limit,
+	}
+	return uc.osClient.SearchCVEs(ctx, osReq)
+}
+
+func (uc *UseCase) searchViaPostgres(ctx context.Context, filter *entity.SearchFilter) ([]*entity.CVE, int64, error) {
+	return uc.pgRepo.Search(ctx, filter)
+}
+
 func buildFilter(req *Request) *entity.SearchFilter {
 	f := &entity.SearchFilter{
-		Query: req.Query,
-		Sort:  entity.SortOrder(req.Sort),
-		Page:  req.Page,
-		Limit: req.Limit,
+		Query:     req.Query,
+		Sort:      entity.SortOrder(req.Sort),
+		Page:      req.Page,
+		Limit:     req.Limit,
+		MinEPSS:   req.MinEPSS,
+		MaxEPSS:   req.MaxEPSS,
+		IsKEV:     req.IsKEV,
+		IsExploit: req.IsExploit,
+		CWE:       req.CWE,
+		Vendor:    req.Vendor,
+		Product:   req.Product,
 	}
 	if req.Severity != "" {
 		s := entity.Severity(req.Severity)
@@ -117,8 +173,23 @@ func buildFilter(req *Request) *entity.SearchFilter {
 }
 
 func buildCacheKey(req *Request) string {
-	raw := fmt.Sprintf("%s:%s:%s:%s:%d:%d",
-		req.Query, req.Severity, req.Source, req.Sort, req.Page, req.Limit)
+	epssMin, epssMax := "", ""
+	if req.MinEPSS != nil {
+		epssMin = fmt.Sprintf("%.4f", *req.MinEPSS)
+	}
+	if req.MaxEPSS != nil {
+		epssMax = fmt.Sprintf("%.4f", *req.MaxEPSS)
+	}
+	kev, exploit := "", ""
+	if req.IsKEV != nil {
+		kev = fmt.Sprintf("%v", *req.IsKEV)
+	}
+	if req.IsExploit != nil {
+		exploit = fmt.Sprintf("%v", *req.IsExploit)
+	}
+	raw := fmt.Sprintf("%s:%s:%s:%s:%d:%d:%s:%s:%s:%s:%s:%s:%s",
+		req.Query, req.Severity, req.Source, req.Sort, req.Page, req.Limit,
+		epssMin, epssMax, kev, exploit, req.CWE, req.Vendor, req.Product)
 	h := sha256.Sum256([]byte(raw))
 	return fmt.Sprintf("%x", h[:8])
 }

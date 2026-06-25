@@ -1,0 +1,51 @@
+[
+  {
+    "_id": "8909cb6c-8e7f-412e-82be-ba341505fbbe",
+    "type": "vendor",
+    "value": "apache",
+    "min_severity": "HIGH"
+  },
+  {
+    "_id": "dc1005d2-65ee-40b7-beda-6ce8b09b82fb",
+    "type": "vendor",
+    "value": "microsoft",
+    "min_severity": "CRITICAL"
+  },
+  {
+    "_id": "921f21dd-9e59-4eef-92b5-6cf598106d61",
+    "type": "vendor",
+    "value": "oracle",
+    "min_severity": "CRITICAL"
+  },
+  {
+    "_id": "5ffd816c-33ca-4138-90e0-995b2f8fa1c2",
+    "type": "vendor",
+    "value": "cisco",
+    "min_severity": "HIGH"
+  },
+  {
+    "_id": "4ac7c7bd-67ba-4229-99c8-5553e2affefe",
+    "type": "product",
+    "value": "log4j",
+    "min_severity": "HIGH",
+    "min_epss": 0.5
+  },
+  {
+    "_id": "2284d0c7-8418-4bc9-a810-70bcbd4faeb9",
+    "type": "product",
+    "value": "spring",
+    "min_severity": "HIGH"
+  },
+  {
+    "_id": "9774e8e5-4ec6-4a68-9db8-c6842045d57f",
+    "type": "product",
+    "value": "openssl",
+    "min_severity": "HIGH"
+  },
+  {
+    "_id": "c3767fd7-30a8-4e16-81af-6b43b2440bc6",
+    "type": "kev",
+    "value": "",
+    "min_severity": "MEDIUM"
+  }
+]

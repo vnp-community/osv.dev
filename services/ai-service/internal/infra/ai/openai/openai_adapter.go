@@ -1,5 +1,5 @@
 // Package openai implements LLMProvider and EmbeddingProvider backed by OpenAI API.
-// Supports GPT-4o-mini (default) and text-embedding-3-small.
+// [FIX BUG-007] Default model constants removed — set OPENAI_CHAT_MODEL / OPENAI_EMBEDDING_MODEL env vars.
 package openai
 
 import (
@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -16,10 +17,10 @@ import (
 )
 
 const (
-	openAIBaseURL          = "https://api.openai.com/v1"
-	defaultChatModel       = "gpt-4o-mini"
-	defaultEmbeddingModel  = "text-embedding-3-small"
-	embeddingDimension     = 768 // text-embedding-3-small supports 768 via dimensions param
+	openAIBaseURL      = "https://api.openai.com/v1"
+	embeddingDimension = 768 // text-embedding-3-small supports 768 via dimensions param
+	// [FIX BUG-007] defaultChatModel and defaultEmbeddingModel removed.
+	// Callers must pass non-empty values sourced from OPENAI_CHAT_MODEL / OPENAI_EMBEDDING_MODEL env vars.
 )
 
 // Client wraps the OpenAI API.
@@ -32,12 +33,13 @@ type Client struct {
 }
 
 // NewClient creates an OpenAI client.
+// [FIX BUG-007] chatModel and embedModel must not be empty — callers must provide env-configured values.
 func NewClient(apiKey, chatModel, embedModel string, log zerolog.Logger) *Client {
 	if chatModel == "" {
-		chatModel = defaultChatModel
+		slog.Warn("OpenAI chatModel is empty — set OPENAI_CHAT_MODEL env var (e.g. gpt-4o-mini)")
 	}
 	if embedModel == "" {
-		embedModel = defaultEmbeddingModel
+		slog.Warn("OpenAI embedModel is empty — set OPENAI_EMBEDDING_MODEL env var (e.g. text-embedding-3-small)")
 	}
 	return &Client{
 		apiKey:     apiKey,

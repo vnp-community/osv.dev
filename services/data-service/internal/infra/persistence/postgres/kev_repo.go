@@ -48,36 +48,42 @@ func (r *kevRepository) upsertChunk(ctx context.Context, chunk []*entity.KEVEntr
 		return 0, 0, nil
 	}
 
-	// Build multi-row VALUES clause.
+	// Build multi-row VALUES clause (12 fields per row).
 	placeholders := make([]string, 0, len(chunk))
-	args := make([]interface{}, 0, len(chunk)*8)
+	args := make([]interface{}, 0, len(chunk)*12)
 	idx := 1
 	now := time.Now().UTC()
 
 	for _, e := range chunk {
 		placeholders = append(placeholders, fmt.Sprintf(
-			"($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d)",
-			idx, idx+1, idx+2, idx+3, idx+4, idx+5, idx+6, idx+7,
+			"($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d)",
+			idx, idx+1, idx+2, idx+3, idx+4, idx+5, idx+6, idx+7, idx+8, idx+9, idx+10, idx+11,
 		))
 		args = append(args,
 			e.CVEID, e.VendorProject, e.Product, e.VulnerabilityName,
 			e.DateAdded, e.DueDate, e.Notes, now,
+			e.ShortDescription, e.RequiredAction, e.IsKnownRansomware, e.KnownRansomwareCampaignUse,
 		)
-		idx += 8
+		idx += 12
 	}
 
 	sql := fmt.Sprintf(`
 		INSERT INTO kev_entries
 			(cve_id, vendor_project, product, vulnerability_name,
-			 date_added, due_date, notes, created_at, updated_at)
+			 date_added, due_date, notes, created_at,
+			 short_description, required_action, is_known_ransomware, ransomware_campaign_use)
 		VALUES %s
 		ON CONFLICT (cve_id) DO UPDATE SET
-			vendor_project      = EXCLUDED.vendor_project,
-			product             = EXCLUDED.product,
-			vulnerability_name  = EXCLUDED.vulnerability_name,
-			due_date            = EXCLUDED.due_date,
-			notes               = EXCLUDED.notes,
-			updated_at          = NOW()
+			vendor_project           = EXCLUDED.vendor_project,
+			product                  = EXCLUDED.product,
+			vulnerability_name       = EXCLUDED.vulnerability_name,
+			due_date                 = EXCLUDED.due_date,
+			notes                    = EXCLUDED.notes,
+			short_description        = EXCLUDED.short_description,
+			required_action          = EXCLUDED.required_action,
+			is_known_ransomware      = EXCLUDED.is_known_ransomware,
+			ransomware_campaign_use  = EXCLUDED.ransomware_campaign_use,
+			updated_at               = NOW()
 		RETURNING
 			(xmax = 0) AS is_insert`,
 		strings.Join(placeholders, ","),
@@ -107,13 +113,18 @@ func (r *kevRepository) upsertChunk(ctx context.Context, chunk []*entity.KEVEntr
 func (r *kevRepository) FindByCVEID(ctx context.Context, cveID string) (*entity.KEVEntry, error) {
 	row := r.db.QueryRow(ctx, `
 		SELECT cve_id, vendor_project, product, vulnerability_name,
-		       date_added, due_date, notes, created_at, updated_at
+		       date_added, due_date, notes, created_at, updated_at,
+		       COALESCE(short_description,'') AS short_description,
+		       COALESCE(required_action,'')   AS required_action,
+		       COALESCE(is_known_ransomware, FALSE) AS is_known_ransomware,
+		       COALESCE(ransomware_campaign_use,'') AS ransomware_campaign_use
 		FROM kev_entries WHERE cve_id = $1`, cveID)
 
 	e := &entity.KEVEntry{}
 	err := row.Scan(
 		&e.CVEID, &e.VendorProject, &e.Product, &e.VulnerabilityName,
 		&e.DateAdded, &e.DueDate, &e.Notes, &e.CreatedAt, &e.UpdatedAt,
+		&e.ShortDescription, &e.RequiredAction, &e.IsKnownRansomware, &e.KnownRansomwareCampaignUse,
 	)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, domainerrors.ErrKEVNotFound
@@ -151,6 +162,12 @@ func (r *kevRepository) List(ctx context.Context, filter *entity.KEVFilter) ([]*
 		args = append(args, *filter.Since)
 		idx++
 	}
+	// CR-GCV-007: Ransomware filter
+	if filter.IsRansomware != nil {
+		conditions = append(conditions, fmt.Sprintf("COALESCE(is_known_ransomware, FALSE) = $%d", idx))
+		args = append(args, *filter.IsRansomware)
+		idx++
+	}
 
 	where := "TRUE"
 	if len(conditions) > 0 {
@@ -167,7 +184,11 @@ func (r *kevRepository) List(ctx context.Context, filter *entity.KEVFilter) ([]*
 	offset := filter.Page * filter.Limit
 	dataSQL := fmt.Sprintf(`
 		SELECT cve_id, vendor_project, product, vulnerability_name,
-		       date_added, due_date, notes, created_at, updated_at
+		       date_added, due_date, notes, created_at, updated_at,
+		       COALESCE(short_description,'')         AS short_description,
+		       COALESCE(required_action,'')           AS required_action,
+		       COALESCE(is_known_ransomware, FALSE)   AS is_known_ransomware,
+		       COALESCE(ransomware_campaign_use,'')   AS ransomware_campaign_use
 		FROM kev_entries WHERE %s
 		ORDER BY date_added DESC NULLS LAST
 		LIMIT $%d OFFSET $%d`, where, idx, idx+1)
@@ -185,6 +206,7 @@ func (r *kevRepository) List(ctx context.Context, filter *entity.KEVFilter) ([]*
 		if err := rows.Scan(
 			&e.CVEID, &e.VendorProject, &e.Product, &e.VulnerabilityName,
 			&e.DateAdded, &e.DueDate, &e.Notes, &e.CreatedAt, &e.UpdatedAt,
+			&e.ShortDescription, &e.RequiredAction, &e.IsKnownRansomware, &e.KnownRansomwareCampaignUse,
 		); err != nil {
 			return nil, 0, err
 		}
@@ -245,18 +267,104 @@ func (r *kevRepository) Count(ctx context.Context) (int64, error) {
 	return n, err
 }
 
-// Stats returns catalog statistics.
+// Stats returns catalog statistics including extended CR-GCV-007 fields.
 func (r *kevRepository) Stats(ctx context.Context) (*entity.KEVStats, error) {
 	var stats entity.KEVStats
+
+	// Basic counts
 	err := r.db.QueryRow(ctx, `
 		SELECT
 			COUNT(*) AS total,
 			COUNT(*) FILTER (WHERE date_added >= NOW() - INTERVAL '7 days') AS last7d,
-			COUNT(*) FILTER (WHERE date_added >= NOW() - INTERVAL '30 days') AS last30d
+			COUNT(*) FILTER (WHERE date_added >= NOW() - INTERVAL '30 days') AS last30d,
+			COUNT(*) FILTER (WHERE COALESCE(is_known_ransomware, FALSE) = TRUE) AS total_ransomware
 		FROM kev_entries
-	`).Scan(&stats.Total, &stats.AddedLast7d, &stats.AddedLast30d)
+	`).Scan(&stats.Total, &stats.AddedLast7d, &stats.AddedLast30d, &stats.TotalRansomware)
 	if err != nil {
 		return nil, fmt.Errorf("kev stats: %w", err)
 	}
+
+	// Top 10 vendors by KEV count
+	vendorRows, err := r.db.Query(ctx, `
+		SELECT vendor_project, COUNT(*) as count
+		FROM kev_entries
+		GROUP BY vendor_project
+		ORDER BY count DESC
+		LIMIT 10
+	`)
+	if err == nil {
+		defer vendorRows.Close()
+		for vendorRows.Next() {
+			var vc entity.VendorCount
+			if vendorRows.Scan(&vc.Vendor, &vc.Count) == nil {
+				stats.TopVendors = append(stats.TopVendors, vc)
+			}
+		}
+	}
+
+	// Entries by month (last 12 months)
+	monthRows, err := r.db.Query(ctx, `
+		SELECT to_char(date_added, 'YYYY-MM') AS month, COUNT(*) AS count
+		FROM kev_entries
+		WHERE date_added >= NOW() - INTERVAL '12 months'
+		  AND date_added IS NOT NULL
+		GROUP BY month
+		ORDER BY month ASC
+	`)
+	if err == nil {
+		defer monthRows.Close()
+		for monthRows.Next() {
+			var mc entity.MonthCount
+			if monthRows.Scan(&mc.Month, &mc.Count) == nil {
+				stats.ByMonth = append(stats.ByMonth, mc)
+			}
+		}
+	}
+
+	// Average days from CVE publication to CISA KEV addition.
+	// [FIX TASK-HC-003] Compute from JOIN kev_entries × cves (PostgreSQL cves table).
+	// Falls back to 0 gracefully when data is unavailable.
+	var avgDays float64
+	avgErr := r.db.QueryRow(ctx, `
+		SELECT COALESCE(
+			AVG(
+				EXTRACT(EPOCH FROM (k.date_added::timestamptz - c.published_at)) / 86400.0
+			)::INT,
+			0
+		)
+		FROM kev_entries k
+		JOIN cves c ON c.cve_id = k.cve_id
+		WHERE c.published_at IS NOT NULL
+		  AND k.date_added IS NOT NULL
+		  AND k.date_added > c.published_at
+	`).Scan(&avgDays)
+	if avgErr == nil {
+		stats.AvgDaysToPatch = avgDays
+	}
+	// If avgErr != nil (e.g., table missing or no join data), stats.AvgDaysToPatch stays 0 (safe default)
+
 	return &stats, nil
+}
+
+// DeleteByIDs removes KEV entries whose CVE ID is NOT in the keepIDs list.
+// Used by diff-based sync to prune entries CISA has removed.
+func (r *kevRepository) DeleteByIDs(ctx context.Context, keepIDs []string) (deleted int, err error) {
+	if len(keepIDs) == 0 {
+		return 0, nil // safety: never delete all if keepIDs is empty
+	}
+
+	tag, err := r.db.Exec(ctx,
+		"DELETE FROM kev_entries WHERE cve_id != ALL($1::text[])",
+		keepIDs2pgArray(keepIDs),
+	)
+	if err != nil {
+		return 0, fmt.Errorf("kev delete stale: %w", err)
+	}
+	return int(tag.RowsAffected()), nil
+}
+
+// keepIDs2pgArray converts a string slice to a pgx-compatible array.
+func keepIDs2pgArray(ids []string) interface{} {
+	// pgx/v5 handles []string directly for ANY() queries
+	return ids
 }

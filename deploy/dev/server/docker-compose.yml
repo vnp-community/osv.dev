@@ -1,0 +1,205 @@
+# =============================================================
+# OSV Platform — Server Deployment (172.20.2.48)
+# Binary built locally via: deploy/dev/server/deploy.sh --build-only
+# Deployed via:             deploy/dev/server/deploy.sh
+#
+# DO NOT run docker-compose build here — binary is pre-compiled
+# Usage on server: docker compose -f docker-compose.yml up -d
+# =============================================================
+
+services:
+  # ============================================================
+  # Infrastructure
+  # ============================================================
+
+  postgres:
+    image: pgvector/pgvector:pg16   # pgvector required for cves.embedding
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     osv
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB:       ${POSTGRES_DB:-osvdb}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U osv -d ${POSTGRES_DB:-osvdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - osv-internal
+
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - osv-internal
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: >
+      redis-server ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - osv-internal
+
+  nats:
+    image: nats:2.10-alpine
+    restart: unless-stopped
+    command: ["-js", "-m", "8222", "--name", "osv-nats"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8222/varz | grep -q server_name || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - osv-internal
+
+  opensearch:
+    image: opensearchproject/opensearch:2.13.0
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+      - cluster.name=osv-search
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - osv-internal
+
+  # ============================================================
+  # OSV Server — pre-built static binary
+  # Binary: ./bin/osv-server (rsync'd by deploy.sh)
+  # Secrets: ./secrets/jwt_private.pem (RSA-4096)
+  # ============================================================
+  osv-server:
+    image: gcr.io/distroless/static-debian12:nonroot
+    restart: unless-stopped
+    user: "65532:65532"
+    volumes:
+      - ./bin/osv-server:/service:ro
+      - ./secrets:/run/secrets:ro     # RSA keys cho identity-service JWT
+    entrypoint: ["/service"]
+    ports:
+      - "127.0.0.1:8080:8080"         # gateway — nginx proxy handles external
+      - "127.0.0.1:9101:9101"         # identity HTTP (JWKS endpoint)
+    environment:
+      OSV_MODE: "microservices"
+      HTTP_PORT: "8080"
+
+      POSTGRES_DSN: "postgres://osv:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      IDENTITY_DATABASE_URL: "postgres://osv:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      DATA_DATABASE_URL:     "postgres://osv:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      NOTIFICATION_DATABASE_URL: "postgres://osv:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+
+      MONGO_URI: "mongodb://mongodb:27017"
+      MONGO_DB:  "${MONGO_DB:-cvedb}"
+
+      REDIS_ADDR:     "redis:6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_URL:      "redis://redis:6379/0"
+
+      NATS_URL:     "nats://nats:4222"
+      NATS_ENABLED: "${NATS_ENABLED:-true}"
+
+      OPENSEARCH_URL:   "http://opensearch:9200"
+      OPENSEARCH_INDEX: "${OPENSEARCH_INDEX:-vulnerabilities}"
+      SEARCH_BACKEND:   "${SEARCH_BACKEND:-auto}"
+
+      IDENTITY_HTTP_PORT:   "9101"
+      IDENTITY_GRPC_PORT:   "9001"
+      JWT_PRIVATE_KEY_PATH: "/run/secrets/jwt_private.pem"
+      JWT_SECRET:           "${JWT_SECRET}"
+      JWT_ISSUER:           "${JWT_ISSUER:-https://auth.openvulnscan.io}"
+      JWT_AUDIENCE:         "${JWT_AUDIENCE:-openvulnscan}"
+      JWKS_URL:             "http://localhost:9101/.well-known/jwks.json"
+      JWT_EXPIRY:           "${JWT_EXPIRY:-24h}"
+
+      DATA_HTTP_PORT:         "8082"
+      DATA_GRPC_PORT:         "50053"
+      SEARCH_HTTP_PORT:       "8083"
+      SEARCH_GRPC_PORT:       "50056"
+      RANKING_PORT:           "8088"
+      NOTIFICATION_HTTP_PORT: "8086"
+      NOTIFICATION_GRPC_PORT: "50063"
+      AI_GRPC_PORT:           "50052"
+
+      IDENTITY_SERVICE_HTTP: "http://localhost:9101"
+      DATA_SERVICE_HTTP:     "http://localhost:8082"
+      SEARCH_SERVICE_HTTP:   "http://localhost:8083"
+      RANKING_SERVICE_HTTP:  "http://localhost:8088"
+      NOTIFICATION_HTTP:     "http://localhost:8086"
+
+      ALIAS_GROUP_BACKEND: "${ALIAS_GROUP_BACKEND:-postgres}"
+
+      INIT_ADMIN_EMAIL:    "${INIT_ADMIN_EMAIL}"
+      INIT_ADMIN_USERNAME: "${INIT_ADMIN_USERNAME:-admin}"
+      INIT_ADMIN_PASSWORD: "${INIT_ADMIN_PASSWORD}"
+
+      AI_BACKEND:        "${AI_BACKEND:-openai}"
+      AI_MODEL:          "${AI_MODEL:-gpt-4o-mini}"
+      OPENAI_API_KEY:    "${OPENAI_API_KEY:-}"
+      VERTEX_PROJECT_ID: "${VERTEX_PROJECT_ID:-}"
+      VERTEX_LOCATION:   "${VERTEX_LOCATION:-us-central1}"
+
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN:-}"
+      SMTP_HOST:       "${SMTP_HOST:-}"
+      SMTP_PORT:       "${SMTP_PORT:-587}"
+      SMTP_USER:       "${SMTP_USER:-}"
+      SMTP_PASSWORD:   "${SMTP_PASSWORD:-}"
+
+      LOG_LEVEL:       "${LOG_LEVEL:-info}"
+      ALLOWED_ORIGINS: "${ALLOWED_ORIGINS:-https://c12.openledger.vn}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health | grep -q ok || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - osv-internal
+      - osv-public
+
+networks:
+  osv-internal:
+    driver: bridge
+    internal: true
+  osv-public:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  mongo_data:
+    driver: local
+  opensearch_data:
+    driver: local

@@ -25,6 +25,9 @@ type CVESearchOptions struct {
 
 	// Limit caps the number of results. 0 = no limit.
 	Limit int
+
+	// Skip is the pagination offset (number of documents to skip). Default 0.
+	Skip int
 }
 
 // MongoDBCVERepository defines the MongoDB data access interface for cve-search CVE documents.

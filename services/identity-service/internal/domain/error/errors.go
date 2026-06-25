@@ -48,4 +48,13 @@ var (
 
 	// ErrOAuthProviderError is returned when an OAuth provider API call fails.
 	ErrOAuthProviderError = errors.New("OAuth provider error")
+
+	// ErrTOTPNotSetup is returned when verifying TOTP but no pending secret exists.
+	ErrTOTPNotSetup = errors.New("TOTP setup not initiated")
+
+	// ErrInvalidTOTPCode is returned when the TOTP code does not match the secret.
+	ErrInvalidTOTPCode = errors.New("invalid TOTP code")
+
+	// ErrMFANotEnabled is returned when disabling TOTP but MFA is already off.
+	ErrMFANotEnabled = errors.New("MFA is not enabled for this account")
 )

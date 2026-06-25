@@ -40,7 +40,7 @@ func NewNVDCVEFetcher(db *mongo.Database, apiKey string, startYear int) *NVDCVEF
 	}
 }
 
-func (f *NVDCVEFetcher) Name() string { return "cve" }
+func (f *NVDCVEFetcher) Name() string { return string(SourceNVD) }
 
 func (f *NVDCVEFetcher) FetchAndStore(ctx context.Context, opts FetchOptions) (int, error) {
 	col := f.db.Collection("cves")

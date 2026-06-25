@@ -32,7 +32,11 @@ func New(repo repository.WebhookRepository, log zerolog.Logger) *UseCase {
 
 // Execute validates and persists a new webhook.
 func (uc *UseCase) Execute(ctx context.Context, req *Request) (*webhook.Webhook, error) {
-	w, err := webhook.New(req.URL, req.Events, req.Secret, req.OwnerID)
+	evtTypes := make([]webhook.EventType, len(req.Events))
+	for i, e := range req.Events {
+		evtTypes[i] = webhook.EventType(e)
+	}
+	w, err := webhook.New(req.URL, evtTypes, req.Secret, req.OwnerID)
 	if err != nil {
 		return nil, fmt.Errorf("register webhook: %w", err)
 	}

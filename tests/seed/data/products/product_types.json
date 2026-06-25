@@ -1,0 +1,37 @@
+[
+  {
+    "_id": "adc73488-0dc9-448b-a030-2857fcef09a8",
+    "name": "Web Application",
+    "description": "Web-based applications exposed to the internet",
+    "critical_product": true,
+    "key_product": true
+  },
+  {
+    "_id": "835d59f7-7617-4f1a-b474-23107489320b",
+    "name": "Mobile App",
+    "description": "iOS and Android mobile applications",
+    "critical_product": true,
+    "key_product": true
+  },
+  {
+    "_id": "becac973-db51-4296-95e1-bbe8309727dc",
+    "name": "API Service",
+    "description": "Backend REST/gRPC microservices",
+    "critical_product": false,
+    "key_product": true
+  },
+  {
+    "_id": "4095e2a4-d74b-420c-8e7b-4ba61909d067",
+    "name": "Infrastructure",
+    "description": "Network devices, VMs, Kubernetes clusters",
+    "critical_product": false,
+    "key_product": true
+  },
+  {
+    "_id": "2411f58e-5cfb-425e-90c0-c0d6f3d55d8e",
+    "name": "Desktop App",
+    "description": "Native desktop applications",
+    "critical_product": false,
+    "key_product": false
+  }
+]

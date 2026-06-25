@@ -2,8 +2,6 @@
 package http
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -23,6 +21,10 @@ type Config struct {
 	CORSOrigins  []string
 	MaxRPM       int
 	JWTSecret    string
+	// GRPCAddrs maps gRPC service name → host:port for readiness checks.
+	// Loaded from env: AI_SERVICE_GRPC, DATA_SERVICE_GRPC, etc.
+	// Leave empty to skip gRPC health checks.
+	GRPCAddrs map[string]string
 }
 
 // Handler holds all HTTP handlers for the GlobalCVE API gateway.
@@ -171,19 +173,4 @@ func requestLogger(log zerolog.Logger) func(http.Handler) http.Handler {
 				Msg("v2 request")
 		})
 	}
-}
-
-func respondJSON(w http.ResponseWriter, code int, v interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	fmt.Fprintf(w, "%s\n", mustJSON(v))
-}
-
-func respondError(w http.ResponseWriter, code int, message string) {
-	respondJSON(w, code, map[string]string{"error": message})
-}
-
-func mustJSON(v interface{}) []byte {
-	b, _ := json.Marshal(v)
-	return b
 }

@@ -13,16 +13,16 @@ import (
 	csvfmt "github.com/osv/finding-service/internal/formatters/csv"
 	jsonfmt "github.com/osv/finding-service/internal/formatters/json"
 
-	"github.com/osv/finding-service/internal/domain/entity"
+	"github.com/osv/finding-service/internal/domain/report"
 	"github.com/osv/finding-service/internal/formatters"
 )
 
 // ─── Test Data ────────────────────────────────────────────────────────────────
 
-var testInput = entity.ReportInput{
+var testInput = report.ReportInput{
 	ScanTarget:  "/firmware.bin",
 	GeneratedAt: time.Date(2026, 6, 4, 10, 0, 0, 0, time.UTC),
-	CVEData: map[entity.ProductInfo][]entity.CVEData{
+	CVEData: map[report.ProductInfo][]report.CVEData{
 		{Vendor: "openssl", Product: "openssl", Version: "1.1.1k"}: {
 			{CVENumber: "CVE-2022-0778", Severity: "HIGH", Score: 7.5, DataSource: "NVD", IsExploit: false},
 			{CVENumber: "CVE-2021-3711", Severity: "CRITICAL", Score: 9.8, DataSource: "NVD", IsExploit: true},
@@ -33,10 +33,10 @@ var testInput = entity.ReportInput{
 	},
 }
 
-var emptyInput = entity.ReportInput{
+var emptyInput = report.ReportInput{
 	ScanTarget:  "/clean.bin",
 	GeneratedAt: time.Now(),
-	CVEData:     map[entity.ProductInfo][]entity.CVEData{},
+	CVEData:     map[report.ProductInfo][]report.CVEData{},
 }
 
 var opts = formatters.FormatOptions{Theme: "light"}

@@ -39,7 +39,7 @@ func NewMITRECWEFetcher(db *mongo.Database) *MITRECWEFetcher {
 	}
 }
 
-func (f *MITRECWEFetcher) Name() string { return "cwe" }
+func (f *MITRECWEFetcher) Name() string { return string(SourceCWE) }
 
 // FetchAndStore downloads CWE XML catalog and upserts into MongoDB "cwe" collection.
 func (f *MITRECWEFetcher) FetchAndStore(ctx context.Context, opts FetchOptions) (int, error) {

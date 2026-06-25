@@ -21,6 +21,14 @@ service FindingService {
 
   // Called by Report Service (server-streaming to avoid OOM on large result sets)
   rpc ListFindingsForReport(ListFindingsForReportRequest) returns (stream FindingProto);
+
+  // CR-DD-001: Product context operations (called by scan-service for auto-context)
+  rpc GetOrCreateEngagement(GetOrCreateEngagementRequest) returns (GetOrCreateEngagementResponse);
+  rpc GetOrCreateTest(GetOrCreateTestRequest) returns (GetOrCreateTestResponse);
+  rpc CheckProductPermission(CheckProductPermissionRequest) returns (CheckProductPermissionResponse);
+  rpc ExistsFalsePositiveByHash(ExistsFalsePositiveByHashRequest) returns (ExistsFalsePositiveByHashResponse);
+  rpc GetSeverityCounts(GetSeverityCountsRequest) returns (GetSeverityCountsResponse);
+  rpc CountFindings(CountFindingsRequest) returns (CountFindingsResponse);
 }
 
 // ── Finding creation ──────────────────────────────────────────────────────────
@@ -176,4 +184,80 @@ message FindingProto {
   optional google.protobuf.Timestamp sla_expiration_date = 15;
   google.protobuf.Timestamp date = 16;
   repeated string tags = 17;
+}
+
+// ── CR-DD-001: Product context operations ─────────────────────────────────────
+
+message GetOrCreateEngagementRequest {
+  string product_id = 1;
+  string name = 2;
+  optional string engagement_type = 3;  // "Interactive" | "CI/CD"
+  optional string build_id = 4;
+  optional string branch_tag = 5;
+  optional string commit_hash = 6;
+  optional string source_code_management_uri = 7;
+  bool deduplication_on_engagement = 8;
+}
+
+message GetOrCreateEngagementResponse {
+  string engagement_id = 1;
+  bool created = 2;  // true = newly created, false = found existing
+}
+
+message GetOrCreateTestRequest {
+  string engagement_id = 1;
+  string scan_type = 2;
+  optional string title = 3;
+  optional string version = 4;
+  optional string branch_tag = 5;
+  optional string build_id = 6;
+  optional string commit_hash = 7;
+}
+
+message GetOrCreateTestResponse {
+  string test_id = 1;
+  bool created = 2;
+}
+
+message CheckProductPermissionRequest {
+  string user_id = 1;
+  string product_id = 2;
+  string permission = 3;  // e.g. "scan:import", "finding:add"
+}
+
+message CheckProductPermissionResponse {
+  bool allowed = 1;
+}
+
+message ExistsFalsePositiveByHashRequest {
+  string product_id = 1;
+  string hash_code = 2;
+  bool deduplication_on_engagement = 3;
+  optional string engagement_id = 4;
+}
+
+message ExistsFalsePositiveByHashResponse {
+  bool exists = 1;
+}
+
+message GetSeverityCountsRequest {
+  string product_id = 1;
+  bool active_only = 2;
+}
+
+message GetSeverityCountsResponse {
+  int32 critical = 1;
+  int32 high = 2;
+  int32 medium = 3;
+  int32 low = 4;
+  int32 info = 5;
+}
+
+message CountFindingsRequest {
+  string product_id = 1;
+  bool active_only = 2;
+}
+
+message CountFindingsResponse {
+  int64 count = 1;
 }

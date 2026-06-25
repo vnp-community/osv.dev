@@ -3,11 +3,11 @@ package service_test
 import (
 	"testing"
 
-	"github.com/osv/finding-service/internal/domain/entity"
-	"github.com/osv/finding-service/internal/domain/service"
+	"github.com/osv/finding-service/internal/domain/report"
+	"github.com/osv/finding-service/internal/domain/report/service"
 )
 
-var testCVEs = []entity.CVEData{
+var testCVEs = []report.CVEData{
 	{CVENumber: "CVE-2021-1", Severity: "CRITICAL", Score: 9.8},
 	{CVENumber: "CVE-2021-2", Severity: "HIGH", Score: 7.5},
 	{CVENumber: "CVE-2021-3", Severity: "MEDIUM", Score: 5.0},
@@ -57,7 +57,7 @@ func TestFilterByScore_Zero(t *testing.T) {
 
 func TestSortBySeverity_CriticalFirst(t *testing.T) {
 	// Shuffle input
-	mixed := []entity.CVEData{
+	mixed := []report.CVEData{
 		{CVENumber: "low", Severity: "LOW", Score: 2},
 		{CVENumber: "critical", Severity: "CRITICAL", Score: 9.8},
 		{CVENumber: "medium", Severity: "MEDIUM", Score: 5},
@@ -73,7 +73,7 @@ func TestSortBySeverity_CriticalFirst(t *testing.T) {
 }
 
 func TestSortBySeverity_SameRank_ScoreOrder(t *testing.T) {
-	mixed := []entity.CVEData{
+	mixed := []report.CVEData{
 		{CVENumber: "h1", Severity: "HIGH", Score: 7.0},
 		{CVENumber: "h2", Severity: "HIGH", Score: 8.5},
 	}
@@ -84,22 +84,22 @@ func TestSortBySeverity_SameRank_ScoreOrder(t *testing.T) {
 }
 
 func TestOutputFormat_IsValid(t *testing.T) {
-	valid := []entity.OutputFormat{
-		entity.FormatConsole, entity.FormatCSV, entity.FormatJSON,
-		entity.FormatJSON2, entity.FormatHTML, entity.FormatPDF,
+	valid := []report.OutputFormat{
+		report.OutFormatConsole, report.OutFormatCSV, report.OutFormatJSON,
+		report.OutFormatJSON2, report.OutFormatHTML, report.OutFormatPDF,
 	}
 	for _, f := range valid {
 		if !f.IsValid() {
 			t.Errorf("expected %q to be valid", f)
 		}
 	}
-	if entity.OutputFormat("invalid").IsValid() {
+	if report.OutputFormat("invalid").IsValid() {
 		t.Error("expected 'invalid' to be invalid")
 	}
 }
 
 func TestAllFormats_Count(t *testing.T) {
-	formats := entity.AllFormats()
+	formats := report.AllFormats()
 	if len(formats) != 6 {
 		t.Errorf("expected 6 formats, got %d", len(formats))
 	}

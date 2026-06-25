@@ -1,0 +1,81 @@
+[
+  {
+    "name": "admin",
+    "display_name": "Administrator",
+    "description": "Full system access — manage users, settings, all products",
+    "color": "#8B5CF6",
+    "is_system": true,
+    "permissions": [
+      "product:view",
+      "product:add",
+      "product:edit",
+      "product:delete",
+      "finding:view",
+      "finding:add",
+      "finding:edit",
+      "finding:close",
+      "finding:delete",
+      "engagement:view",
+      "engagement:add",
+      "engagement:edit",
+      "risk_acceptance:view",
+      "risk_acceptance:manage",
+      "user:view",
+      "user:add",
+      "user:edit",
+      "system:configure",
+      "report:download",
+      "scan:execute",
+      "scan:manage",
+      "ai:enrich",
+      "ai:triage",
+      "import:scan_result"
+    ]
+  },
+  {
+    "name": "user",
+    "display_name": "Security Analyst",
+    "description": "Standard analyst — view/add/edit findings and engagements, import scans",
+    "color": "#3B82F6",
+    "is_system": true,
+    "permissions": [
+      "product:view",
+      "finding:view",
+      "finding:add",
+      "finding:edit",
+      "finding:close",
+      "engagement:view",
+      "engagement:add",
+      "engagement:edit",
+      "report:download",
+      "scan:execute",
+      "ai:enrich",
+      "import:scan_result"
+    ]
+  },
+  {
+    "name": "readonly",
+    "display_name": "Read-Only Viewer",
+    "description": "Read-only access to products, findings and reports — no write operations",
+    "color": "#6B7280",
+    "is_system": true,
+    "permissions": [
+      "product:view",
+      "finding:view",
+      "engagement:view",
+      "report:download"
+    ]
+  },
+  {
+    "name": "agent",
+    "display_name": "Scan Agent",
+    "description": "Machine identity for scan agents — submit reports, import scan results",
+    "color": "#F59E0B",
+    "is_system": true,
+    "permissions": [
+      "scan:execute",
+      "import:scan_result",
+      "finding:add"
+    ]
+  }
+]

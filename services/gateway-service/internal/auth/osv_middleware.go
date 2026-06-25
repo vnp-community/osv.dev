@@ -3,11 +3,18 @@ package auth
 
 import (
 	"context"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+
+	redisinfra "github.com/osv/gateway-service/internal/infra/redis"
 )
 
 type contextKey string
@@ -27,59 +34,158 @@ type Claims struct {
 	Roles []string `json:"roles"`
 }
 
-// JWTVerify returns middleware that:
-//  1. Skips verification for paths in skipPaths (public endpoints)
-//  2. Verifies Bearer JWT token with HMAC-SHA256 (HS256)
-//  3. Injects X-User-ID and X-User-Roles headers for upstream services
-//  4. Stores claims in request context for downstream middleware (e.g. RequireRole)
-func JWTVerify(secret string, skipPaths []string) func(http.Handler) http.Handler {
+// AuthVerify returns middleware that handles JWT, X-API-Key, and Authorization: ApiKey.
+// Priority: JWT (Bearer) -> X-API-Key -> Authorization: ApiKey.
+// If valid, injects X-User-ID and X-User-Roles, and stores claims in context.
+func AuthVerify(secret string, skipPaths []string, apiKeyValidator *APIKeyValidator, cache ...*redisinfra.TokenCache) func(http.Handler) http.Handler {
+	var tokenCache *redisinfra.TokenCache
+	if len(cache) > 0 {
+		tokenCache = cache[0]
+	}
+
+	// Parse RSA public key from PEM if the secret looks like a PEM block (starts with "-----")
+	// Otherwise treat as HMAC secret.
+	var rsaPublicKey *rsa.PublicKey
+	if strings.HasPrefix(strings.TrimSpace(secret), "-----BEGIN") {
+		block, _ := pem.Decode([]byte(secret))
+		if block != nil {
+			if pub, err := x509.ParsePKIXPublicKey(block.Bytes); err == nil {
+				if rsaKey, ok := pub.(*rsa.PublicKey); ok {
+					rsaPublicKey = rsaKey
+				}
+			}
+			// Also try PKCS1
+			if rsaPublicKey == nil {
+				if rsaKey, err := x509.ParsePKCS1PublicKey(block.Bytes); err == nil {
+					rsaPublicKey = rsaKey
+				}
+			}
+		}
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Check if path is in the public skip list
+			// Use RequestURI for skip-path matching — chi.Mount() strips the prefix
+			// from r.URL.Path, so we must use the original full path from RequestURI.
+			checkPath := r.RequestURI
+			if idx := strings.Index(checkPath, "?"); idx >= 0 {
+				checkPath = checkPath[:idx]
+			}
+			if checkPath == "" {
+				checkPath = r.URL.Path
+			}
 			for _, p := range skipPaths {
-				if strings.HasPrefix(r.URL.Path, p) {
+				if strings.HasPrefix(checkPath, p) {
 					next.ServeHTTP(w, r)
 					return
 				}
 			}
 
-			// Extract Bearer token from Authorization header
+			var claims *Claims
 			authHeader := r.Header.Get("Authorization")
-			if authHeader == "" {
-				respondUnauthorized(w, "authorization header required")
-				return
-			}
 
-			tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
-			tokenStr = strings.TrimPrefix(tokenStr, "bearer ")
-			if tokenStr == authHeader {
-				// No "Bearer " prefix found
-				respondUnauthorized(w, "bearer token required")
-				return
-			}
-
-			// Parse and verify JWT signature
-			claims := &Claims{}
-			token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
-				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+			// 1. JWT (Bearer)
+			if strings.HasPrefix(strings.ToLower(authHeader), "bearer ") {
+				tokenStr := authHeader[7:]
+				if tokenCache != nil {
+					if cached, ok := tokenCache.Get(r.Context(), tokenStr); ok {
+						rolesStr := make([]string, len(cached.Roles))
+						for i, r := range cached.Roles { rolesStr[i] = string(r) }
+						claims = &Claims{
+							RegisteredClaims: jwt.RegisteredClaims{Subject: cached.ID},
+							Roles:            rolesStr,
+						}
+					}
 				}
-				return []byte(secret), nil
-			})
-			if err != nil || !token.Valid {
-				respondUnauthorized(w, "invalid or expired token")
+
+				if claims == nil {
+					parsedClaims := &Claims{}
+					token, err := jwt.ParseWithClaims(tokenStr, parsedClaims, func(t *jwt.Token) (interface{}, error) {
+						// Detect algorithm from token header to support both RS256 and HS256
+						switch t.Method.(type) {
+						case *jwt.SigningMethodRSA:
+							// RS256: verify with RSA public key
+							if rsaPublicKey != nil {
+								return rsaPublicKey, nil
+							}
+							// Fallback: if no PEM configured, try HMAC (will fail gracefully)
+							return []byte(secret), nil
+						default:
+							// HS256 / HS384 / HS512: verify with HMAC secret
+							return []byte(secret), nil
+						}
+					})
+					if err == nil && token.Valid {
+						claims = parsedClaims
+						if tokenCache != nil {
+							cp := principalFromClaims(claims)
+							var expiry time.Time
+							if exp, err := claims.GetExpirationTime(); err == nil && exp != nil {
+								expiry = exp.Time
+							}
+							tokenCache.Set(r.Context(), tokenStr, &cp, expiry)
+						}
+					}
+				}
+			}
+
+
+			// 2. X-API-Key
+			if claims == nil && apiKeyValidator != nil {
+				if rawKey := r.Header.Get("X-API-Key"); rawKey != "" {
+					if apiClaims, err := apiKeyValidator.Validate(r.Context(), rawKey); err == nil {
+						claims = &Claims{
+							RegisteredClaims: jwt.RegisteredClaims{Subject: apiClaims.UserID},
+							Roles:            apiClaims.Scopes,
+						}
+					} else if errors.Is(err, ErrExpiredAPIKey) {
+						w.Header().Set("Content-Type", "application/json")
+						w.WriteHeader(http.StatusUnauthorized)
+						fmt.Fprint(w, `{"error":"API key has expired."}`)
+						return
+					}
+				}
+			}
+
+			// 3. Authorization: ApiKey
+			if claims == nil && apiKeyValidator != nil {
+				if strings.HasPrefix(authHeader, "ApiKey ") {
+					rawKey := authHeader[7:]
+					if apiClaims, err := apiKeyValidator.Validate(r.Context(), rawKey); err == nil {
+						claims = &Claims{
+							RegisteredClaims: jwt.RegisteredClaims{Subject: apiClaims.UserID},
+							Roles:            apiClaims.Scopes,
+						}
+					} else if errors.Is(err, ErrExpiredAPIKey) {
+						w.Header().Set("Content-Type", "application/json")
+						w.WriteHeader(http.StatusUnauthorized)
+						fmt.Fprint(w, `{"error":"API key has expired."}`)
+						return
+					}
+				}
+			}
+
+			if claims == nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
+				fmt.Fprint(w, `{"error":"Authentication credentials were not provided."}`)
 				return
 			}
 
-			// Inject user info into upstream request headers
 			r.Header.Set("X-User-ID", claims.Subject)
 			r.Header.Set("X-User-Roles", strings.Join(claims.Roles, ","))
-
-			// Store in context for RequireRole middleware
 			ctx := context.WithValue(r.Context(), CtxKeyUserID, claims.Subject)
 			ctx = context.WithValue(ctx, CtxKeyUserRoles, claims.Roles)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
+	}
+}
+
+// principalFromClaims converts JWT Claims to a redisinfra-cacheable auth.Principal.
+func principalFromClaims(claims *Claims) redisinfra.CachePrincipal {
+	return redisinfra.CachePrincipal{
+		ID:    claims.Subject,
+		Roles: claims.Roles,
 	}
 }
 
@@ -107,3 +213,6 @@ func respondUnauthorized(w http.ResponseWriter, msg string) {
 	w.WriteHeader(http.StatusUnauthorized)
 	fmt.Fprintf(w, `{"error":"unauthorized","message":%q}`, msg)
 }
+
+// End of middleware.
+

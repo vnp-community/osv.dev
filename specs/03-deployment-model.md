@@ -1,20 +1,23 @@
-# OSV.dev — Deployment Model & CVE Management Specification
+# OSV Platform — Deployment Model
 
-> **Version:** 1.0
-> **Date:** 2026-06-03
-> **Status:** Proposal
+> **Version:** 2.0
+> **Date:** 2026-06-16
+> **Status:** Active
 > **Author:** Engineering Team
-> **Scope:** Mô hình triển khai hệ thống, quản lý nguồn CVE, phân loại CVE, quản lý kết nối
+> **Scope:** Mô hình triển khai Go Microservices, quản lý CVE sources, connection management, observability
 
 ---
 
 ## 1. Tổng Quan Đề Xuất
 
-Tài liệu này đề xuất **mô hình triển khai hoàn chỉnh** cho hệ thống OSV.dev dựa trên kiến trúc microservices hiện tại, tập trung vào ba nhóm vấn đề chính:
+Tài liệu này mô tả **mô hình triển khai** cho hệ thống OSV Platform Go Microservices (v2.2), tập trung vào:
 
-1. **Quản lý nguồn CVE** (Source Management) — Cấu hình, giám sát và điều phối các nguồn dữ liệu lỗ hổng
-2. **Phân loại CVE** (CVE Classification) — Pipeline làm giàu, phân nhóm và đánh nhãn tự động
-3. **Quản lý kết nối** (Connection Management) — Circuit breaker, retry, rate-limit và health check cho từng nguồn
+1. **Quản lý nguồn CVE** (Source Management) — Cấu hình, giám sát và điều phối 15+ nguồn CVE
+2. **Phân loại CVE** (CVE Classification) — Pipeline làm giàu, EPSS, CAPEC/CWE, KEV
+3. **Quản lý kết nối** (Connection Management) — Circuit breaker, retry, rate-limit và health check
+4. **Service Deployment** — 13 microservices + gateway, Docker Compose và Kubernetes
+
+> **Implemented (v2.2):** 30 CRs từ cve-search, DefectDojo, GlobalCVE — hoàn thành.
 
 ---
 
@@ -93,6 +96,40 @@ Tài liệu này đề xuất **mô hình triển khai hoàn chỉnh** cho hệ 
 | **Local Dev** | Phát triển và debug | Docker Compose | 1 replica/service |
 | **Staging** | Integration test, QA | Kubernetes (1 node) | 1-2 replicas |
 | **Production** | Live system | Kubernetes / GKE | Auto-scale |
+
+### 2.3 Service Port Map (Thực tế)
+
+#### v2.2 (Active — 13 services)
+
+| Service | HTTP Port | Vai trò |
+|---------|:----------:|--------|
+| `apps/osv` (gateway) | **8080** | API gateway, dual auth JWT+APIKey, 100+ routes |
+| `identity-service` | **8081** | LDAP auth, API key management |
+| `data-service` | **8082** | CVE fetching (15+ sources), enrichment, feeds |
+| `ranking-service` | **8084** | CPE popularity ranking |
+| `finding-service` | **8085** | Product hierarchy, findings, reports, grading |
+| `sla-service` | **8086** | SLA config, breach detection |
+| `notification-service` | **8087** | Email/Slack/Teams/Webhook/In-app |
+| `jira-service` | **8088** | Bidirectional JIRA sync |
+| `audit-service` | **8090** | Immutable event log (HMAC-SHA256) |
+| `search-service` | (internal) | OpenSearch FTS + pgvector semantic |
+| `scan-service` | (internal) | 21+ parsers, dedup engine |
+| `ai-service` | (internal) | CVE embeddings generation |
+| `shared` | — | Shared Go packages |
+
+#### v3.0 (Planned — 8 new services, gRPC + HTTP)
+
+| Service | HTTP Port | gRPC Port | Vai trò |
+|---------|:---------:|:---------:|--------|
+| `auth-service` | **8051** | **50051** | JWT RS256, Argon2id, TOTP MFA, OAuth2, API Keys `ovs_` |
+| `scan-service-ovs` | **8058** | **50058** | Nmap/ZAP/Agent scanning, SSE progress, scheduled scans |
+| `finding-service-ovs` | **8060** | **50060** | 6-state lifecycle, SHA-256 dedup, SLA audit trail |
+| `product-service` | **8061** | **50061** | ProductType/Product/Engagement/Test, CI/CD orchestrator |
+| `ai-service-ovs` | **8052** | **50052** | Embedding, LLM chain (Ollama→OpenAI→Azure), EPSS, triage |
+| `report-service` | **8065** | **50065** | PDF/HTML/CSV/Excel, MinIO, CI/CD exit code |
+| `asset-service` | **8068** | **50068** | Asset registry, tagging, risk scoring |
+| OWASP ZAP container | 8090 | — | Sidecar container cho scan-service |
+| Ollama container | 11434 | — | Local LLM backend cho ai-service |
 
 ---
 
@@ -571,78 +608,81 @@ endpoints:
 ### 6.1 Kubernetes Deployment (Production)
 
 ```yaml
-# Namespace và resource allocation đề xuất
+# Namespace và resource allocation
 namespace: osv-system
 
 services:
-  # --- Core Query Path (High Priority) ---
-  api-gateway:
-    replicas: 3
-    cpu: "500m–2000m"
-    memory: "256Mi–1Gi"
+  # --- Gateway (High Priority, external-facing) ---
+  apps-osv:  # API Gateway
+    replicas: 2–5
+    cpu: "250m–1000m"
+    memory: "256Mi–512Mi"
     autoscale: HPA (CPU > 70%)
+
+  # --- CVE Data Layer ---
+  data-service:
+    replicas: 2
+    cpu: "500m–2000m"
+    memory: "512Mi–2Gi"
+    autoscale: HPA (queue depth)
     
-  vulnerability-query:
+  search-service:
+    replicas: 2
+    cpu: "500m–1000m"
+    memory: "512Mi–1Gi"
+    
+  ranking-service:
+    replicas: 1–2
+    cpu: "250m–500m"
+    memory: "256Mi–512Mi"
+
+  # --- Finding Management Layer ---
+  finding-service:
     replicas: 2–5
     cpu: "500m–2000m"
     memory: "512Mi–2Gi"
     autoscale: HPA (RPS-based)
     
-  search:
-    replicas: 2
-    cpu: "500m–1000m"
-    memory: "512Mi–1Gi"
-    
-  web-bff:
-    replicas: 2
-    cpu: "250m–500m"
-    memory: "256Mi–512Mi"
-
-  # --- Data Pipeline (Medium Priority) ---
-  ingestion:
+  scan-service:
     replicas: 2–10
     cpu: "500m–2000m"
     memory: "512Mi–2Gi"
+    autoscale: HPA (import queue depth)
+
+  # --- Security Workflow Layer ---
+  sla-service:
+    replicas: 1           # Singleton (daily cron)
+    cpu: "250m–500m"
+    memory: "256Mi–512Mi"
+    
+  notification-service:
+    replicas: 1–3
+    cpu: "250m–1000m"
+    memory: "256Mi–512Mi"
     autoscale: HPA (NATS queue depth)
     
-  impact-analysis:
-    replicas: 2–8
-    cpu: "1000m–4000m"    # CPU-intensive (git operations)
-    memory: "1Gi–4Gi"
-    autoscale: HPA (queue depth)
+  jira-service:
+    replicas: 1–2
+    cpu: "250m–500m"
+    memory: "256Mi–512Mi"
     
-  ai-enrichment:
-    replicas: 1–4
-    cpu: "500m–2000m"
-    memory: "512Mi–2Gi"
-    autoscale: HPA (queue depth)
+  audit-service:
+    replicas: 1–2
+    cpu: "250m–500m"
+    memory: "256Mi–512Mi"
+    autoscale: HPA (NATS queue depth)
 
-  # --- Background Services (Low Priority) ---
-  source-sync:
-    replicas: 1            # Singleton
+  # --- Identity ---
+  identity-service:
+    replicas: 2
     cpu: "250m–500m"
     memory: "256Mi–512Mi"
     
-  alias-relations:
+  # --- AI (optional) ---
+  ai-service:
     replicas: 1–2
-    cpu: "250m–500m"
-    memory: "256Mi–512Mi"
-    
-  version-index-controller:
-    replicas: 1
-    cpu: "250m"
-    memory: "256Mi"
-    
-  version-index-worker:
-    replicas: 3–10
     cpu: "500m–2000m"
     memory: "512Mi–2Gi"
-    autoscale: HPA (queue depth)
-    
-  notification:
-    replicas: 1–2
-    cpu: "250m–500m"
-    memory: "256Mi–512Mi"
 ```
 
 ### 6.2 Infrastructure Components
@@ -971,70 +1011,145 @@ warning_alerts:
 
 ---
 
-## 10. Rollout Plan
+## 10. Deployment Status & Rollout
 
-### 10.1 Phase 1: Foundation (Tuần 1-2)
-
-```
-[ ] Deploy infrastructure (NATS, Redis, OpenSearch, Firestore emulator)
-[ ] Deploy core services (vulnerability-query, api-gateway)
-[ ] Migrate dữ liệu từ Python stack sang Go services
-[ ] Verify API compatibility (backward compatible)
-[ ] Setup monitoring dashboards
-[ ] Load testing với production data snapshot
-```
-
-### 10.2 Phase 2: Source Management (Tuần 3-4)
+### 10.1 ✅ Implemented (v2.2 — Current)
 
 ```
-[ ] Deploy source-sync service
-[ ] Cấu hình tất cả 30+ nguồn từ source.yaml
-[ ] Thiết lập circuit breakers và rate limiters
-[ ] Enable sync với Tier 1 sources trước (CVE, GHSA, Go, OSS-Fuzz)
-[ ] Monitor 72h, tune schedules
-[ ] Enable Tier 2-4 sources dần dần
-[ ] Thiết lập source health alerts
+[x] Deploy infrastructure (PostgreSQL 16+pgvector, Redis 7, OpenSearch 2, NATS JetStream, MinIO)
+[x] Deploy apps/osv gateway (dual auth, rate-limit, 100+ routes)
+[x] Deploy data-service (15+ CVE fetchers, EPSS, KEV, CAPEC/CWE, CPE dict)
+[x] Deploy search-service (OpenSearch FTS + pgvector semantic)
+[x] Deploy ranking-service (CPE popularity ranking)
+[x] Deploy identity-service (LDAP + API key management)
+[x] Deploy finding-service (Product hierarchy, findings, state machine, reports, grading)
+[x] Deploy scan-service (21+ parsers, 12-step pipeline, dedup engine)
+[x] Deploy sla-service (SLA config, daily breach detection)
+[x] Deploy notification-service (5 channels, 14 event types)
+[x] Deploy jira-service (AES creds, bidirectional sync)
+[x] Deploy audit-service (append-only, HMAC-SHA256, partitioned)
+[x] Setup Prometheus + Grafana + Jaeger (CR-GCV-009)
+[x] All 30 CRs implemented
 ```
 
-### 10.3 Phase 3: Classification (Tuần 5-6)
+### 10.2 🔵 Planned (v3.0 — OpenVulnScan CRs, 8 Sprints)
 
-```
-[ ] Deploy ai-enrichment service
-[ ] Pull Ollama model cho local dev
-[ ] Cấu hình Vertex AI cho production
-[ ] Enable AI tagging cho new CVEs
-[ ] Backfill tags cho existing records (batch job)
-[ ] Deploy alias-relations service
-[ ] Verify cross-source deduplication
-[ ] Enable severity auto-classification
-```
+| Sprint | Services | CR | Deliverable |
+|--------|---------|-----|------------|
+| **Sprint 1** | `auth-service` (core) | CR-OVS-003 | Register, Login, JWT RS256, Redis JTI, `ValidateToken` gRPC |
+| **Sprint 2** | `scan-service-ovs` (Nmap) | CR-OVS-001 | Nmap full/discovery, NATS publish, SSE progress stream |
+| **Sprint 3** | `finding-service-ovs` (Phase 1) | CR-OVS-002 | Finding CRUD, SHA-256 dedup, 6-state machine, SLA computation |
+| **Sprint 4** | `auth-service` (MFA+OAuth2) + `scan-service-ovs` (ZAP+Agent) | CR-OVS-001, 003 | Complete auth, web app scanning, agent Python report ingestion |
+| **Sprint 5** | `product-service` | CR-OVS-004 | Hierarchy CRUD (ProductType/Product/Engagement/Test), CI/CD orchestrator |
+| **Sprint 6** | `report-service` | CR-OVS-006 | PDF/HTML/CSV/Excel formatters, MinIO upload, CI/CD exit code |
+| **Sprint 7** | `ai-service-ovs` | CR-OVS-005 | Embedding generation, LLM provider chain, EPSS, triage recommendations |
+| **Sprint 8** | `asset-service` + scheduled scans | CR-OVS-007 | Asset registry auto-upsert, cron scheduler (1-min ticker) |
 
-### 10.4 Phase 4: Production Hardening (Tuần 7-8)
-
-```
-[ ] Enable mTLS giữa tất cả services
-[ ] Setup GCP Secret Manager integration
-[ ] Enable Workload Identity cho GCS/Firestore access
-[ ] Load test production scale
-[ ] Chaos engineering (inject failures)
-[ ] DR drill (restore từ backup)
-[ ] Documentation hoàn chỉnh
-[ ] Team training
-```
+> **Dependency**: `auth-service` (Sprint 1) phải xong trước tất cả services khác.
 
 ---
 
-## 11. Tham Khảo
+## 11. OpenVulnScan Kubernetes Deployment (v3.0)
+
+```yaml
+# v3.0 services — kubernetes deployment specs
+services:
+  # --- Auth Layer (Foundation — deploy first) ---
+  auth-service:
+    replicas: 2–3
+    cpu: "250m–500m"
+    memory: "256Mi–512Mi"
+    autoscale: HPA (CPU > 70%)
+    gRPC: 50051    # called on EVERY request by gateway
+    http: 8051
+    
+  # --- Scanning Layer ---
+  scan-service-ovs:
+    replicas: 2–10
+    cpu: "1000m–4000m"   # CPU-intensive (nmap subprocess)
+    memory: "1Gi–4Gi"
+    autoscale: HPA (scan queue depth)
+    gRPC: 50058
+    http: 8058
+    sidecar: owasp-zap:8090  # ZAP container
+    
+  # --- Finding Management ---
+  finding-service-ovs:
+    replicas: 2–5
+    cpu: "500m–2000m"
+    memory: "512Mi–2Gi"
+    autoscale: HPA (RPS)
+    gRPC: 50060
+    http: 8060
+    
+  product-service:
+    replicas: 2–3
+    cpu: "500m–1000m"
+    memory: "512Mi–1Gi"
+    gRPC: 50061
+    http: 8061
+
+  # --- AI Layer ---
+  ai-service-ovs:
+    replicas: 1–4
+    cpu: "500m–2000m"
+    memory: "1Gi–4Gi"
+    autoscale: HPA (NATS queue depth)
+    gRPC: 50052
+    http: 8052
+    
+  ollama:   # Optional sidecar/local LLM
+    replicas: 1
+    cpu: "2000m–8000m"
+    memory: "8Gi–32Gi"  # model weights
+    http: 11434
+
+  # --- Report + Asset ---
+  report-service:
+    replicas: 1–3
+    cpu: "500m‒2000m"
+    memory: "512Mi‒2Gi"
+    autoscale: HPA (report queue)
+    gRPC: 50065
+    http: 8065
+    
+  asset-service:
+    replicas: 1–2
+    cpu: "250m–500m"
+    memory: "256Mi–512Mi"
+    gRPC: 50068
+    http: 8068
+```
+
+### 11.1 Database Per Service (OpenVulnScan)
+
+| Service | PostgreSQL DB | Key Tables |
+|---------|------------|------------|
+| `auth-service` | `auth_service` | users, sessions, api_keys, oauth_accounts, audit_log |
+| `scan-service-ovs` | `scan_service` | scans, scan_findings, web_alerts, discovery_hosts, agent_findings, scheduled_scans |
+| `finding-service-ovs` | `finding_service` | findings, sla_configurations, finding_audit |
+| `product-service` | `product_service` | product_types, products, engagements, tests |
+| `ai-service-ovs` | `ai_service` | cve_embeddings (**pgvector**), severity_cache |
+| `report-service` | `report_service` | report_runs, report_artifacts |
+| `asset-service` | `asset_service` | assets (INET + GIN index on tags[]) |
+
+### 11.2 Tham Khảo
 
 | Tài liệu | Đường dẫn |
 |----------|-----------|
-| Architecture Overview | [specs/01-architecture.md](./01-architecture.md) |
-| Technical Design | [specs/02-technical-design.md](./02-technical-design.md) |
-| Service Specs | [specs/services/](./services/) |
-| Source Config | [source.yaml](../source.yaml) |
-| Docker Compose | [docker-compose.yml](../docker-compose.yml) |
-| Infrastructure | [specs/services/13-infrastructure.md](./services/13-infrastructure.md) |
+| Architecture Overview | [specs/01-architecture.md](./01-architecture.md) — Section 10 |
+| Technical Design | [specs/02-technical-design.md](./02-technical-design.md) — Section 14 |
+| PRD | [docs/PRD.md](../docs/PRD.md) |
+| SRS | [docs/SRS.md](../docs/SRS.md) |
+| CR-OVS-001 (Scan) | [specs/crs/v1/OpenVulnScan/CR-OVS-001.md](./crs/v1/OpenVulnScan/CR-OVS-001-scan-service-nmap-zap-agent.md) |
+| CR-OVS-002 (Finding) | [specs/crs/v1/OpenVulnScan/CR-OVS-002.md](./crs/v1/OpenVulnScan/CR-OVS-002-finding-service-lifecycle-sla-dedup.md) |
+| CR-OVS-003 (Auth) | [specs/crs/v1/OpenVulnScan/CR-OVS-003.md](./crs/v1/OpenVulnScan/CR-OVS-003-auth-service-jwt-rbac-mfa-apikey.md) |
+| CR-OVS-004 (Product) | [specs/crs/v1/OpenVulnScan/CR-OVS-004.md](./crs/v1/OpenVulnScan/CR-OVS-004-product-engagement-test-hierarchy.md) |
+| CR-OVS-005 (AI) | [specs/crs/v1/OpenVulnScan/CR-OVS-005.md](./crs/v1/OpenVulnScan/CR-OVS-005-ai-service-embedding-severity-epss-triage.md) |
+| CR-OVS-006 (Report) | [specs/crs/v1/OpenVulnScan/CR-OVS-006.md](./crs/v1/OpenVulnScan/CR-OVS-006-report-service-pdf-html-csv-excel.md) |
+| CR-OVS-007 (Asset) | [specs/crs/v1/OpenVulnScan/CR-OVS-007.md](./crs/v1/OpenVulnScan/CR-OVS-007-asset-management-scheduled-scans.md) |
+| Solutions Overview | [specs/crs/v1/OpenVulnScan/solutions/README.md](./crs/v1/OpenVulnScan/solutions/README.md) |
 
 ---
 
-*Tài liệu được tạo ngày 2026-06-03 — dựa trên phân tích kiến trúc hiện tại tại `/services/`, `docker-compose.yml`, và `source.yaml`.*
+*Tài liệu cập nhật ngày 2026-06-16 — phản ánh v2.2 (✅ Active) và v3.0 (🔵 Planned) OpenVulnScan architecture.*

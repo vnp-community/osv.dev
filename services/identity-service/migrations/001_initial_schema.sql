@@ -1,6 +1,12 @@
 -- auth service initial schema
 -- Run: psql $DATABASE_URL -f 001_initial_schema.sql
 
+-- Ensure schema and extensions exist before setting search_path.
+-- Without this, SET search_path fails on a fresh database.
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "citext";
+CREATE SCHEMA IF NOT EXISTS auth;
+
 SET search_path TO auth;
 
 CREATE TABLE IF NOT EXISTS users (

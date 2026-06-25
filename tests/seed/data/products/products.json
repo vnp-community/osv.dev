@@ -1,0 +1,191 @@
+[
+  {
+    "_id": "a60da6c5-1a12-4fbd-aa3c-2f920df94e29",
+    "product_type_id": "adc73488-0dc9-448b-a030-2857fcef09a8",
+    "product_type_name": "Web Application",
+    "name": "Customer Portal",
+    "description": "B2C customer-facing web portal",
+    "business_criticality": "medium",
+    "platform": "api",
+    "lifecycle": "retirement",
+    "origin": "open source",
+    "external_audience": true,
+    "internet_accessible": true,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "api"
+    ]
+  },
+  {
+    "_id": "3cc795ad-98dc-4ef0-9ad7-0a433734cae0",
+    "product_type_id": "835d59f7-7617-4f1a-b474-23107489320b",
+    "product_type_name": "Mobile App",
+    "name": "Internal HR System",
+    "description": "Internal HR management system",
+    "business_criticality": "low",
+    "platform": "mobile",
+    "lifecycle": "production",
+    "origin": "contractor",
+    "external_audience": false,
+    "internet_accessible": false,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "web-tier"
+    ]
+  },
+  {
+    "_id": "c57dbf2e-6dd4-48c6-8f55-b8932f04adf8",
+    "product_type_id": "becac973-db51-4296-95e1-bbe8309727dc",
+    "product_type_name": "API Service",
+    "name": "Payment Gateway API",
+    "description": "Core payment processing microservice",
+    "business_criticality": "high",
+    "platform": "api",
+    "lifecycle": "construction",
+    "origin": "internal",
+    "external_audience": true,
+    "internet_accessible": true,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "api"
+    ]
+  },
+  {
+    "_id": "13993f18-dce8-41cb-b340-0e9fb0d7dac3",
+    "product_type_id": "4095e2a4-d74b-420c-8e7b-4ba61909d067",
+    "product_type_name": "Infrastructure",
+    "name": "Mobile Banking App",
+    "description": "iOS/Android banking application",
+    "business_criticality": "medium",
+    "platform": "web",
+    "lifecycle": "production",
+    "origin": "internal",
+    "external_audience": true,
+    "internet_accessible": true,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "web-tier",
+      "api",
+      "production"
+    ]
+  },
+  {
+    "_id": "b170160d-8fb4-4ff6-9771-726efd4a0af5",
+    "product_type_id": "2411f58e-5cfb-425e-90c0-c0d6f3d55d8e",
+    "product_type_name": "Desktop App",
+    "name": "Admin Dashboard",
+    "description": "Internal admin tooling",
+    "business_criticality": "low",
+    "platform": "desktop",
+    "lifecycle": "retirement",
+    "origin": "contractor",
+    "external_audience": false,
+    "internet_accessible": false,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "legacy"
+    ]
+  },
+  {
+    "_id": "7a7be1e0-c905-451a-bb16-cb38ab9072a4",
+    "product_type_id": "adc73488-0dc9-448b-a030-2857fcef09a8",
+    "product_type_name": "Web Application",
+    "name": "Inventory Service",
+    "description": "Warehouse inventory management API",
+    "business_criticality": "high",
+    "platform": "web",
+    "lifecycle": "construction",
+    "origin": "purchased",
+    "external_audience": false,
+    "internet_accessible": false,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "legacy",
+      "external",
+      "api"
+    ]
+  },
+  {
+    "_id": "dd8c98ac-4ce6-4494-963b-b20707be7d98",
+    "product_type_id": "835d59f7-7617-4f1a-b474-23107489320b",
+    "product_type_name": "Mobile App",
+    "name": "Analytics Platform",
+    "description": "Data analytics and reporting pipeline",
+    "business_criticality": "low",
+    "platform": "mobile",
+    "lifecycle": "retirement",
+    "origin": "contractor",
+    "external_audience": false,
+    "internet_accessible": true,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "production",
+      "external",
+      "web-tier"
+    ]
+  },
+  {
+    "_id": "0835add2-db61-49bf-baab-2f05981c65bd",
+    "product_type_id": "becac973-db51-4296-95e1-bbe8309727dc",
+    "product_type_name": "API Service",
+    "name": "VPN Gateway",
+    "description": "Corporate VPN infrastructure",
+    "business_criticality": "high",
+    "platform": "api",
+    "lifecycle": "retirement",
+    "origin": "contractor",
+    "external_audience": false,
+    "internet_accessible": true,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "external",
+      "production"
+    ]
+  },
+  {
+    "_id": "7414ce8c-14d9-482f-b114-ee0dbb872b2a",
+    "product_type_id": "4095e2a4-d74b-420c-8e7b-4ba61909d067",
+    "product_type_name": "Infrastructure",
+    "name": "Legacy ERP",
+    "description": "On-premise ERP system (SAP)",
+    "business_criticality": "high",
+    "platform": "mobile",
+    "lifecycle": "retirement",
+    "origin": "open source",
+    "external_audience": false,
+    "internet_accessible": false,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "production"
+    ]
+  },
+  {
+    "_id": "44aff8cd-d6f5-4650-8e0b-d7c42465c308",
+    "product_type_id": "2411f58e-5cfb-425e-90c0-c0d6f3d55d8e",
+    "product_type_name": "Desktop App",
+    "name": "DevOps Toolchain",
+    "description": "Jenkins, GitLab CI, ArgoCD",
+    "business_criticality": "high",
+    "platform": "web",
+    "lifecycle": "production",
+    "origin": "contractor",
+    "external_audience": false,
+    "internet_accessible": false,
+    "enable_full_risk_acceptance": false,
+    "enable_simple_risk_acceptance": true,
+    "tags": [
+      "critical",
+      "legacy",
+      "internal"
+    ]
+  }
+]

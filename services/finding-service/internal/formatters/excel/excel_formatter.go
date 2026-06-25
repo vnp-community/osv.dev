@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/osv/finding-service/internal/domain/entity"
+	"github.com/osv/finding-service/internal/domain/report"
 	"github.com/osv/finding-service/internal/formatters"
 	"github.com/xuri/excelize/v2"
 )
@@ -28,7 +28,7 @@ func (f *Formatter) ContentType() string {
 func (f *Formatter) FileExtension() string { return ".xlsx" }
 
 // Format generates an Excel report from the given ReportInput.
-func (f *Formatter) Format(_ context.Context, data entity.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
+func (f *Formatter) Format(_ context.Context, data report.ReportInput, _ formatters.FormatOptions) ([]byte, error) {
 	xf := excelize.NewFile()
 	defer xf.Close()
 

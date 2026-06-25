@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	authv1 "github.com/osv/identity-service/internal/infra/auth/genproto/auth/v1"
+	authv1 "github.com/osv/shared/proto/gen/go/auth/v1"
 	"github.com/osv/identity-service/internal/domain/repository"
 	jwtpkg "github.com/osv/identity-service/internal/infrastructure/jwt"
 	"github.com/osv/identity-service/internal/infrastructure/cache"

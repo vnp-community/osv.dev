@@ -1370,6 +1370,742 @@ func (x *FindingProto) GetTags() []string {
 	return nil
 }
 
+type GetOrCreateEngagementRequest struct {
+	state                     protoimpl.MessageState `protogen:"open.v1"`
+	ProductId                 string                 `protobuf:"bytes,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	Name                      string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	EngagementType            *string                `protobuf:"bytes,3,opt,name=engagement_type,json=engagementType,proto3,oneof" json:"engagement_type,omitempty"` // "Interactive" | "CI/CD"
+	BuildId                   *string                `protobuf:"bytes,4,opt,name=build_id,json=buildId,proto3,oneof" json:"build_id,omitempty"`
+	BranchTag                 *string                `protobuf:"bytes,5,opt,name=branch_tag,json=branchTag,proto3,oneof" json:"branch_tag,omitempty"`
+	CommitHash                *string                `protobuf:"bytes,6,opt,name=commit_hash,json=commitHash,proto3,oneof" json:"commit_hash,omitempty"`
+	SourceCodeManagementUri   *string                `protobuf:"bytes,7,opt,name=source_code_management_uri,json=sourceCodeManagementUri,proto3,oneof" json:"source_code_management_uri,omitempty"`
+	DeduplicationOnEngagement bool                   `protobuf:"varint,8,opt,name=deduplication_on_engagement,json=deduplicationOnEngagement,proto3" json:"deduplication_on_engagement,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
+}
+
+func (x *GetOrCreateEngagementRequest) Reset() {
+	*x = GetOrCreateEngagementRequest{}
+	mi := &file_finding_v1_finding_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrCreateEngagementRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrCreateEngagementRequest) ProtoMessage() {}
+
+func (x *GetOrCreateEngagementRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrCreateEngagementRequest.ProtoReflect.Descriptor instead.
+func (*GetOrCreateEngagementRequest) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetOrCreateEngagementRequest) GetProductId() string {
+	if x != nil {
+		return x.ProductId
+	}
+	return ""
+}
+
+func (x *GetOrCreateEngagementRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GetOrCreateEngagementRequest) GetEngagementType() string {
+	if x != nil && x.EngagementType != nil {
+		return *x.EngagementType
+	}
+	return ""
+}
+
+func (x *GetOrCreateEngagementRequest) GetBuildId() string {
+	if x != nil && x.BuildId != nil {
+		return *x.BuildId
+	}
+	return ""
+}
+
+func (x *GetOrCreateEngagementRequest) GetBranchTag() string {
+	if x != nil && x.BranchTag != nil {
+		return *x.BranchTag
+	}
+	return ""
+}
+
+func (x *GetOrCreateEngagementRequest) GetCommitHash() string {
+	if x != nil && x.CommitHash != nil {
+		return *x.CommitHash
+	}
+	return ""
+}
+
+func (x *GetOrCreateEngagementRequest) GetSourceCodeManagementUri() string {
+	if x != nil && x.SourceCodeManagementUri != nil {
+		return *x.SourceCodeManagementUri
+	}
+	return ""
+}
+
+func (x *GetOrCreateEngagementRequest) GetDeduplicationOnEngagement() bool {
+	if x != nil {
+		return x.DeduplicationOnEngagement
+	}
+	return false
+}
+
+type GetOrCreateEngagementResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EngagementId  string                 `protobuf:"bytes,1,opt,name=engagement_id,json=engagementId,proto3" json:"engagement_id,omitempty"`
+	Created       bool                   `protobuf:"varint,2,opt,name=created,proto3" json:"created,omitempty"` // true = newly created, false = found existing
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrCreateEngagementResponse) Reset() {
+	*x = GetOrCreateEngagementResponse{}
+	mi := &file_finding_v1_finding_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrCreateEngagementResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrCreateEngagementResponse) ProtoMessage() {}
+
+func (x *GetOrCreateEngagementResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrCreateEngagementResponse.ProtoReflect.Descriptor instead.
+func (*GetOrCreateEngagementResponse) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetOrCreateEngagementResponse) GetEngagementId() string {
+	if x != nil {
+		return x.EngagementId
+	}
+	return ""
+}
+
+func (x *GetOrCreateEngagementResponse) GetCreated() bool {
+	if x != nil {
+		return x.Created
+	}
+	return false
+}
+
+type GetOrCreateTestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EngagementId  string                 `protobuf:"bytes,1,opt,name=engagement_id,json=engagementId,proto3" json:"engagement_id,omitempty"`
+	ScanType      string                 `protobuf:"bytes,2,opt,name=scan_type,json=scanType,proto3" json:"scan_type,omitempty"`
+	Title         *string                `protobuf:"bytes,3,opt,name=title,proto3,oneof" json:"title,omitempty"`
+	Version       *string                `protobuf:"bytes,4,opt,name=version,proto3,oneof" json:"version,omitempty"`
+	BranchTag     *string                `protobuf:"bytes,5,opt,name=branch_tag,json=branchTag,proto3,oneof" json:"branch_tag,omitempty"`
+	BuildId       *string                `protobuf:"bytes,6,opt,name=build_id,json=buildId,proto3,oneof" json:"build_id,omitempty"`
+	CommitHash    *string                `protobuf:"bytes,7,opt,name=commit_hash,json=commitHash,proto3,oneof" json:"commit_hash,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrCreateTestRequest) Reset() {
+	*x = GetOrCreateTestRequest{}
+	mi := &file_finding_v1_finding_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrCreateTestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrCreateTestRequest) ProtoMessage() {}
+
+func (x *GetOrCreateTestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrCreateTestRequest.ProtoReflect.Descriptor instead.
+func (*GetOrCreateTestRequest) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetOrCreateTestRequest) GetEngagementId() string {
+	if x != nil {
+		return x.EngagementId
+	}
+	return ""
+}
+
+func (x *GetOrCreateTestRequest) GetScanType() string {
+	if x != nil {
+		return x.ScanType
+	}
+	return ""
+}
+
+func (x *GetOrCreateTestRequest) GetTitle() string {
+	if x != nil && x.Title != nil {
+		return *x.Title
+	}
+	return ""
+}
+
+func (x *GetOrCreateTestRequest) GetVersion() string {
+	if x != nil && x.Version != nil {
+		return *x.Version
+	}
+	return ""
+}
+
+func (x *GetOrCreateTestRequest) GetBranchTag() string {
+	if x != nil && x.BranchTag != nil {
+		return *x.BranchTag
+	}
+	return ""
+}
+
+func (x *GetOrCreateTestRequest) GetBuildId() string {
+	if x != nil && x.BuildId != nil {
+		return *x.BuildId
+	}
+	return ""
+}
+
+func (x *GetOrCreateTestRequest) GetCommitHash() string {
+	if x != nil && x.CommitHash != nil {
+		return *x.CommitHash
+	}
+	return ""
+}
+
+type GetOrCreateTestResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TestId        string                 `protobuf:"bytes,1,opt,name=test_id,json=testId,proto3" json:"test_id,omitempty"`
+	Created       bool                   `protobuf:"varint,2,opt,name=created,proto3" json:"created,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrCreateTestResponse) Reset() {
+	*x = GetOrCreateTestResponse{}
+	mi := &file_finding_v1_finding_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrCreateTestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrCreateTestResponse) ProtoMessage() {}
+
+func (x *GetOrCreateTestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrCreateTestResponse.ProtoReflect.Descriptor instead.
+func (*GetOrCreateTestResponse) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetOrCreateTestResponse) GetTestId() string {
+	if x != nil {
+		return x.TestId
+	}
+	return ""
+}
+
+func (x *GetOrCreateTestResponse) GetCreated() bool {
+	if x != nil {
+		return x.Created
+	}
+	return false
+}
+
+type CheckProductPermissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ProductId     string                 `protobuf:"bytes,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	Permission    string                 `protobuf:"bytes,3,opt,name=permission,proto3" json:"permission,omitempty"` // e.g. "scan:import", "finding:add"
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckProductPermissionRequest) Reset() {
+	*x = CheckProductPermissionRequest{}
+	mi := &file_finding_v1_finding_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckProductPermissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckProductPermissionRequest) ProtoMessage() {}
+
+func (x *CheckProductPermissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckProductPermissionRequest.ProtoReflect.Descriptor instead.
+func (*CheckProductPermissionRequest) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *CheckProductPermissionRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CheckProductPermissionRequest) GetProductId() string {
+	if x != nil {
+		return x.ProductId
+	}
+	return ""
+}
+
+func (x *CheckProductPermissionRequest) GetPermission() string {
+	if x != nil {
+		return x.Permission
+	}
+	return ""
+}
+
+type CheckProductPermissionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Allowed       bool                   `protobuf:"varint,1,opt,name=allowed,proto3" json:"allowed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckProductPermissionResponse) Reset() {
+	*x = CheckProductPermissionResponse{}
+	mi := &file_finding_v1_finding_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckProductPermissionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckProductPermissionResponse) ProtoMessage() {}
+
+func (x *CheckProductPermissionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckProductPermissionResponse.ProtoReflect.Descriptor instead.
+func (*CheckProductPermissionResponse) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *CheckProductPermissionResponse) GetAllowed() bool {
+	if x != nil {
+		return x.Allowed
+	}
+	return false
+}
+
+type ExistsFalsePositiveByHashRequest struct {
+	state                     protoimpl.MessageState `protogen:"open.v1"`
+	ProductId                 string                 `protobuf:"bytes,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	HashCode                  string                 `protobuf:"bytes,2,opt,name=hash_code,json=hashCode,proto3" json:"hash_code,omitempty"`
+	DeduplicationOnEngagement bool                   `protobuf:"varint,3,opt,name=deduplication_on_engagement,json=deduplicationOnEngagement,proto3" json:"deduplication_on_engagement,omitempty"`
+	EngagementId              *string                `protobuf:"bytes,4,opt,name=engagement_id,json=engagementId,proto3,oneof" json:"engagement_id,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
+}
+
+func (x *ExistsFalsePositiveByHashRequest) Reset() {
+	*x = ExistsFalsePositiveByHashRequest{}
+	mi := &file_finding_v1_finding_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExistsFalsePositiveByHashRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExistsFalsePositiveByHashRequest) ProtoMessage() {}
+
+func (x *ExistsFalsePositiveByHashRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExistsFalsePositiveByHashRequest.ProtoReflect.Descriptor instead.
+func (*ExistsFalsePositiveByHashRequest) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *ExistsFalsePositiveByHashRequest) GetProductId() string {
+	if x != nil {
+		return x.ProductId
+	}
+	return ""
+}
+
+func (x *ExistsFalsePositiveByHashRequest) GetHashCode() string {
+	if x != nil {
+		return x.HashCode
+	}
+	return ""
+}
+
+func (x *ExistsFalsePositiveByHashRequest) GetDeduplicationOnEngagement() bool {
+	if x != nil {
+		return x.DeduplicationOnEngagement
+	}
+	return false
+}
+
+func (x *ExistsFalsePositiveByHashRequest) GetEngagementId() string {
+	if x != nil && x.EngagementId != nil {
+		return *x.EngagementId
+	}
+	return ""
+}
+
+type ExistsFalsePositiveByHashResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Exists        bool                   `protobuf:"varint,1,opt,name=exists,proto3" json:"exists,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExistsFalsePositiveByHashResponse) Reset() {
+	*x = ExistsFalsePositiveByHashResponse{}
+	mi := &file_finding_v1_finding_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExistsFalsePositiveByHashResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExistsFalsePositiveByHashResponse) ProtoMessage() {}
+
+func (x *ExistsFalsePositiveByHashResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExistsFalsePositiveByHashResponse.ProtoReflect.Descriptor instead.
+func (*ExistsFalsePositiveByHashResponse) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *ExistsFalsePositiveByHashResponse) GetExists() bool {
+	if x != nil {
+		return x.Exists
+	}
+	return false
+}
+
+type GetSeverityCountsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProductId     string                 `protobuf:"bytes,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	ActiveOnly    bool                   `protobuf:"varint,2,opt,name=active_only,json=activeOnly,proto3" json:"active_only,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSeverityCountsRequest) Reset() {
+	*x = GetSeverityCountsRequest{}
+	mi := &file_finding_v1_finding_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSeverityCountsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSeverityCountsRequest) ProtoMessage() {}
+
+func (x *GetSeverityCountsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSeverityCountsRequest.ProtoReflect.Descriptor instead.
+func (*GetSeverityCountsRequest) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *GetSeverityCountsRequest) GetProductId() string {
+	if x != nil {
+		return x.ProductId
+	}
+	return ""
+}
+
+func (x *GetSeverityCountsRequest) GetActiveOnly() bool {
+	if x != nil {
+		return x.ActiveOnly
+	}
+	return false
+}
+
+type GetSeverityCountsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Critical      int32                  `protobuf:"varint,1,opt,name=critical,proto3" json:"critical,omitempty"`
+	High          int32                  `protobuf:"varint,2,opt,name=high,proto3" json:"high,omitempty"`
+	Medium        int32                  `protobuf:"varint,3,opt,name=medium,proto3" json:"medium,omitempty"`
+	Low           int32                  `protobuf:"varint,4,opt,name=low,proto3" json:"low,omitempty"`
+	Info          int32                  `protobuf:"varint,5,opt,name=info,proto3" json:"info,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSeverityCountsResponse) Reset() {
+	*x = GetSeverityCountsResponse{}
+	mi := &file_finding_v1_finding_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSeverityCountsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSeverityCountsResponse) ProtoMessage() {}
+
+func (x *GetSeverityCountsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSeverityCountsResponse.ProtoReflect.Descriptor instead.
+func (*GetSeverityCountsResponse) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *GetSeverityCountsResponse) GetCritical() int32 {
+	if x != nil {
+		return x.Critical
+	}
+	return 0
+}
+
+func (x *GetSeverityCountsResponse) GetHigh() int32 {
+	if x != nil {
+		return x.High
+	}
+	return 0
+}
+
+func (x *GetSeverityCountsResponse) GetMedium() int32 {
+	if x != nil {
+		return x.Medium
+	}
+	return 0
+}
+
+func (x *GetSeverityCountsResponse) GetLow() int32 {
+	if x != nil {
+		return x.Low
+	}
+	return 0
+}
+
+func (x *GetSeverityCountsResponse) GetInfo() int32 {
+	if x != nil {
+		return x.Info
+	}
+	return 0
+}
+
+type CountFindingsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProductId     string                 `protobuf:"bytes,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	ActiveOnly    bool                   `protobuf:"varint,2,opt,name=active_only,json=activeOnly,proto3" json:"active_only,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CountFindingsRequest) Reset() {
+	*x = CountFindingsRequest{}
+	mi := &file_finding_v1_finding_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CountFindingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CountFindingsRequest) ProtoMessage() {}
+
+func (x *CountFindingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CountFindingsRequest.ProtoReflect.Descriptor instead.
+func (*CountFindingsRequest) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *CountFindingsRequest) GetProductId() string {
+	if x != nil {
+		return x.ProductId
+	}
+	return ""
+}
+
+func (x *CountFindingsRequest) GetActiveOnly() bool {
+	if x != nil {
+		return x.ActiveOnly
+	}
+	return false
+}
+
+type CountFindingsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Count         int64                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CountFindingsResponse) Reset() {
+	*x = CountFindingsResponse{}
+	mi := &file_finding_v1_finding_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CountFindingsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CountFindingsResponse) ProtoMessage() {}
+
+func (x *CountFindingsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_finding_v1_finding_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CountFindingsResponse.ProtoReflect.Descriptor instead.
+func (*CountFindingsResponse) Descriptor() ([]byte, []int) {
+	return file_finding_v1_finding_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *CountFindingsResponse) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
 var File_finding_v1_finding_proto protoreflect.FileDescriptor
 
 const file_finding_v1_finding_proto_rawDesc = "" +
@@ -1510,7 +2246,82 @@ const file_finding_v1_finding_proto_rawDesc = "" +
 	"\x04date\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampR\x04date\x12\x12\n" +
 	"\x04tags\x18\x11 \x03(\tR\x04tagsB\x10\n" +
 	"\x0e_cvss_v3_scoreB\x16\n" +
-	"\x14_sla_expiration_date2\x9a\x06\n" +
+	"\x14_sla_expiration_date\"\xca\x03\n" +
+	"\x1cGetOrCreateEngagementRequest\x12\x1d\n" +
+	"\n" +
+	"product_id\x18\x01 \x01(\tR\tproductId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12,\n" +
+	"\x0fengagement_type\x18\x03 \x01(\tH\x00R\x0eengagementType\x88\x01\x01\x12\x1e\n" +
+	"\bbuild_id\x18\x04 \x01(\tH\x01R\abuildId\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"branch_tag\x18\x05 \x01(\tH\x02R\tbranchTag\x88\x01\x01\x12$\n" +
+	"\vcommit_hash\x18\x06 \x01(\tH\x03R\n" +
+	"commitHash\x88\x01\x01\x12@\n" +
+	"\x1asource_code_management_uri\x18\a \x01(\tH\x04R\x17sourceCodeManagementUri\x88\x01\x01\x12>\n" +
+	"\x1bdeduplication_on_engagement\x18\b \x01(\bR\x19deduplicationOnEngagementB\x12\n" +
+	"\x10_engagement_typeB\v\n" +
+	"\t_build_idB\r\n" +
+	"\v_branch_tagB\x0e\n" +
+	"\f_commit_hashB\x1d\n" +
+	"\x1b_source_code_management_uri\"^\n" +
+	"\x1dGetOrCreateEngagementResponse\x12#\n" +
+	"\rengagement_id\x18\x01 \x01(\tR\fengagementId\x12\x18\n" +
+	"\acreated\x18\x02 \x01(\bR\acreated\"\xc0\x02\n" +
+	"\x16GetOrCreateTestRequest\x12#\n" +
+	"\rengagement_id\x18\x01 \x01(\tR\fengagementId\x12\x1b\n" +
+	"\tscan_type\x18\x02 \x01(\tR\bscanType\x12\x19\n" +
+	"\x05title\x18\x03 \x01(\tH\x00R\x05title\x88\x01\x01\x12\x1d\n" +
+	"\aversion\x18\x04 \x01(\tH\x01R\aversion\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"branch_tag\x18\x05 \x01(\tH\x02R\tbranchTag\x88\x01\x01\x12\x1e\n" +
+	"\bbuild_id\x18\x06 \x01(\tH\x03R\abuildId\x88\x01\x01\x12$\n" +
+	"\vcommit_hash\x18\a \x01(\tH\x04R\n" +
+	"commitHash\x88\x01\x01B\b\n" +
+	"\x06_titleB\n" +
+	"\n" +
+	"\b_versionB\r\n" +
+	"\v_branch_tagB\v\n" +
+	"\t_build_idB\x0e\n" +
+	"\f_commit_hash\"L\n" +
+	"\x17GetOrCreateTestResponse\x12\x17\n" +
+	"\atest_id\x18\x01 \x01(\tR\x06testId\x12\x18\n" +
+	"\acreated\x18\x02 \x01(\bR\acreated\"w\n" +
+	"\x1dCheckProductPermissionRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"product_id\x18\x02 \x01(\tR\tproductId\x12\x1e\n" +
+	"\n" +
+	"permission\x18\x03 \x01(\tR\n" +
+	"permission\":\n" +
+	"\x1eCheckProductPermissionResponse\x12\x18\n" +
+	"\aallowed\x18\x01 \x01(\bR\aallowed\"\xda\x01\n" +
+	" ExistsFalsePositiveByHashRequest\x12\x1d\n" +
+	"\n" +
+	"product_id\x18\x01 \x01(\tR\tproductId\x12\x1b\n" +
+	"\thash_code\x18\x02 \x01(\tR\bhashCode\x12>\n" +
+	"\x1bdeduplication_on_engagement\x18\x03 \x01(\bR\x19deduplicationOnEngagement\x12(\n" +
+	"\rengagement_id\x18\x04 \x01(\tH\x00R\fengagementId\x88\x01\x01B\x10\n" +
+	"\x0e_engagement_id\";\n" +
+	"!ExistsFalsePositiveByHashResponse\x12\x16\n" +
+	"\x06exists\x18\x01 \x01(\bR\x06exists\"Z\n" +
+	"\x18GetSeverityCountsRequest\x12\x1d\n" +
+	"\n" +
+	"product_id\x18\x01 \x01(\tR\tproductId\x12\x1f\n" +
+	"\vactive_only\x18\x02 \x01(\bR\n" +
+	"activeOnly\"\x89\x01\n" +
+	"\x19GetSeverityCountsResponse\x12\x1a\n" +
+	"\bcritical\x18\x01 \x01(\x05R\bcritical\x12\x12\n" +
+	"\x04high\x18\x02 \x01(\x05R\x04high\x12\x16\n" +
+	"\x06medium\x18\x03 \x01(\x05R\x06medium\x12\x10\n" +
+	"\x03low\x18\x04 \x01(\x05R\x03low\x12\x12\n" +
+	"\x04info\x18\x05 \x01(\x05R\x04info\"V\n" +
+	"\x14CountFindingsRequest\x12\x1d\n" +
+	"\n" +
+	"product_id\x18\x01 \x01(\tR\tproductId\x12\x1f\n" +
+	"\vactive_only\x18\x02 \x01(\bR\n" +
+	"activeOnly\"-\n" +
+	"\x15CountFindingsResponse\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x03R\x05count2\x87\v\n" +
 	"\x0eFindingService\x12f\n" +
 	"\x13BatchCreateFindings\x12&.finding.v1.BatchCreateFindingsRequest\x1a'.finding.v1.BatchCreateFindingsResponse\x12]\n" +
 	"\x10CloseOldFindings\x12#.finding.v1.CloseOldFindingsRequest\x1a$.finding.v1.CloseOldFindingsResponse\x12W\n" +
@@ -1519,7 +2330,13 @@ const file_finding_v1_finding_proto_rawDesc = "" +
 	"\tApplyTags\x12\x1c.finding.v1.ApplyTagsRequest\x1a\x1d.finding.v1.ApplyTagsResponse\x12f\n" +
 	"\x13BatchUpdateSLADates\x12&.finding.v1.BatchUpdateSLADatesRequest\x1a'.finding.v1.BatchUpdateSLADatesResponse\x12r\n" +
 	"\x17ListFindingsForSLACheck\x12*.finding.v1.ListFindingsForSLACheckRequest\x1a+.finding.v1.ListFindingsForSLACheckResponse\x12]\n" +
-	"\x15ListFindingsForReport\x12(.finding.v1.ListFindingsForReportRequest\x1a\x18.finding.v1.FindingProto0\x01B2Z0github.com/defectdojo/proto/finding/v1;findingv1b\x06proto3"
+	"\x15ListFindingsForReport\x12(.finding.v1.ListFindingsForReportRequest\x1a\x18.finding.v1.FindingProto0\x01\x12l\n" +
+	"\x15GetOrCreateEngagement\x12(.finding.v1.GetOrCreateEngagementRequest\x1a).finding.v1.GetOrCreateEngagementResponse\x12Z\n" +
+	"\x0fGetOrCreateTest\x12\".finding.v1.GetOrCreateTestRequest\x1a#.finding.v1.GetOrCreateTestResponse\x12o\n" +
+	"\x16CheckProductPermission\x12).finding.v1.CheckProductPermissionRequest\x1a*.finding.v1.CheckProductPermissionResponse\x12x\n" +
+	"\x19ExistsFalsePositiveByHash\x12,.finding.v1.ExistsFalsePositiveByHashRequest\x1a-.finding.v1.ExistsFalsePositiveByHashResponse\x12`\n" +
+	"\x11GetSeverityCounts\x12$.finding.v1.GetSeverityCountsRequest\x1a%.finding.v1.GetSeverityCountsResponse\x12T\n" +
+	"\rCountFindings\x12 .finding.v1.CountFindingsRequest\x1a!.finding.v1.CountFindingsResponseB2Z0github.com/defectdojo/proto/finding/v1;findingv1b\x06proto3"
 
 var (
 	file_finding_v1_finding_proto_rawDescOnce sync.Once
@@ -1533,39 +2350,51 @@ func file_finding_v1_finding_proto_rawDescGZIP() []byte {
 	return file_finding_v1_finding_proto_rawDescData
 }
 
-var file_finding_v1_finding_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_finding_v1_finding_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
 var file_finding_v1_finding_proto_goTypes = []any{
-	(*FindingInput)(nil),                    // 0: finding.v1.FindingInput
-	(*BatchCreateFindingsRequest)(nil),      // 1: finding.v1.BatchCreateFindingsRequest
-	(*BatchCreateFindingsResponse)(nil),     // 2: finding.v1.BatchCreateFindingsResponse
-	(*CloseOldFindingsRequest)(nil),         // 3: finding.v1.CloseOldFindingsRequest
-	(*CloseOldFindingsResponse)(nil),        // 4: finding.v1.CloseOldFindingsResponse
-	(*FindByHashCodeRequest)(nil),           // 5: finding.v1.FindByHashCodeRequest
-	(*FindByHashCodeResponse)(nil),          // 6: finding.v1.FindByHashCodeResponse
-	(*ReactivateFindingsRequest)(nil),       // 7: finding.v1.ReactivateFindingsRequest
-	(*ReactivateFindingsResponse)(nil),      // 8: finding.v1.ReactivateFindingsResponse
-	(*ApplyTagsRequest)(nil),                // 9: finding.v1.ApplyTagsRequest
-	(*ApplyTagsResponse)(nil),               // 10: finding.v1.ApplyTagsResponse
-	(*SLAUpdate)(nil),                       // 11: finding.v1.SLAUpdate
-	(*BatchUpdateSLADatesRequest)(nil),      // 12: finding.v1.BatchUpdateSLADatesRequest
-	(*BatchUpdateSLADatesResponse)(nil),     // 13: finding.v1.BatchUpdateSLADatesResponse
-	(*ListFindingsForSLACheckRequest)(nil),  // 14: finding.v1.ListFindingsForSLACheckRequest
-	(*FindingForSLA)(nil),                   // 15: finding.v1.FindingForSLA
-	(*ListFindingsForSLACheckResponse)(nil), // 16: finding.v1.ListFindingsForSLACheckResponse
-	(*ListFindingsForReportRequest)(nil),    // 17: finding.v1.ListFindingsForReportRequest
-	(*FindingProto)(nil),                    // 18: finding.v1.FindingProto
-	(*timestamppb.Timestamp)(nil),           // 19: google.protobuf.Timestamp
+	(*FindingInput)(nil),                      // 0: finding.v1.FindingInput
+	(*BatchCreateFindingsRequest)(nil),        // 1: finding.v1.BatchCreateFindingsRequest
+	(*BatchCreateFindingsResponse)(nil),       // 2: finding.v1.BatchCreateFindingsResponse
+	(*CloseOldFindingsRequest)(nil),           // 3: finding.v1.CloseOldFindingsRequest
+	(*CloseOldFindingsResponse)(nil),          // 4: finding.v1.CloseOldFindingsResponse
+	(*FindByHashCodeRequest)(nil),             // 5: finding.v1.FindByHashCodeRequest
+	(*FindByHashCodeResponse)(nil),            // 6: finding.v1.FindByHashCodeResponse
+	(*ReactivateFindingsRequest)(nil),         // 7: finding.v1.ReactivateFindingsRequest
+	(*ReactivateFindingsResponse)(nil),        // 8: finding.v1.ReactivateFindingsResponse
+	(*ApplyTagsRequest)(nil),                  // 9: finding.v1.ApplyTagsRequest
+	(*ApplyTagsResponse)(nil),                 // 10: finding.v1.ApplyTagsResponse
+	(*SLAUpdate)(nil),                         // 11: finding.v1.SLAUpdate
+	(*BatchUpdateSLADatesRequest)(nil),        // 12: finding.v1.BatchUpdateSLADatesRequest
+	(*BatchUpdateSLADatesResponse)(nil),       // 13: finding.v1.BatchUpdateSLADatesResponse
+	(*ListFindingsForSLACheckRequest)(nil),    // 14: finding.v1.ListFindingsForSLACheckRequest
+	(*FindingForSLA)(nil),                     // 15: finding.v1.FindingForSLA
+	(*ListFindingsForSLACheckResponse)(nil),   // 16: finding.v1.ListFindingsForSLACheckResponse
+	(*ListFindingsForReportRequest)(nil),      // 17: finding.v1.ListFindingsForReportRequest
+	(*FindingProto)(nil),                      // 18: finding.v1.FindingProto
+	(*GetOrCreateEngagementRequest)(nil),      // 19: finding.v1.GetOrCreateEngagementRequest
+	(*GetOrCreateEngagementResponse)(nil),     // 20: finding.v1.GetOrCreateEngagementResponse
+	(*GetOrCreateTestRequest)(nil),            // 21: finding.v1.GetOrCreateTestRequest
+	(*GetOrCreateTestResponse)(nil),           // 22: finding.v1.GetOrCreateTestResponse
+	(*CheckProductPermissionRequest)(nil),     // 23: finding.v1.CheckProductPermissionRequest
+	(*CheckProductPermissionResponse)(nil),    // 24: finding.v1.CheckProductPermissionResponse
+	(*ExistsFalsePositiveByHashRequest)(nil),  // 25: finding.v1.ExistsFalsePositiveByHashRequest
+	(*ExistsFalsePositiveByHashResponse)(nil), // 26: finding.v1.ExistsFalsePositiveByHashResponse
+	(*GetSeverityCountsRequest)(nil),          // 27: finding.v1.GetSeverityCountsRequest
+	(*GetSeverityCountsResponse)(nil),         // 28: finding.v1.GetSeverityCountsResponse
+	(*CountFindingsRequest)(nil),              // 29: finding.v1.CountFindingsRequest
+	(*CountFindingsResponse)(nil),             // 30: finding.v1.CountFindingsResponse
+	(*timestamppb.Timestamp)(nil),             // 31: google.protobuf.Timestamp
 }
 var file_finding_v1_finding_proto_depIdxs = []int32{
-	19, // 0: finding.v1.FindingInput.date:type_name -> google.protobuf.Timestamp
+	31, // 0: finding.v1.FindingInput.date:type_name -> google.protobuf.Timestamp
 	0,  // 1: finding.v1.BatchCreateFindingsRequest.findings:type_name -> finding.v1.FindingInput
-	19, // 2: finding.v1.SLAUpdate.expiration_date:type_name -> google.protobuf.Timestamp
+	31, // 2: finding.v1.SLAUpdate.expiration_date:type_name -> google.protobuf.Timestamp
 	11, // 3: finding.v1.BatchUpdateSLADatesRequest.updates:type_name -> finding.v1.SLAUpdate
-	19, // 4: finding.v1.FindingForSLA.date:type_name -> google.protobuf.Timestamp
-	19, // 5: finding.v1.FindingForSLA.sla_expiration_date:type_name -> google.protobuf.Timestamp
+	31, // 4: finding.v1.FindingForSLA.date:type_name -> google.protobuf.Timestamp
+	31, // 5: finding.v1.FindingForSLA.sla_expiration_date:type_name -> google.protobuf.Timestamp
 	15, // 6: finding.v1.ListFindingsForSLACheckResponse.findings:type_name -> finding.v1.FindingForSLA
-	19, // 7: finding.v1.FindingProto.sla_expiration_date:type_name -> google.protobuf.Timestamp
-	19, // 8: finding.v1.FindingProto.date:type_name -> google.protobuf.Timestamp
+	31, // 7: finding.v1.FindingProto.sla_expiration_date:type_name -> google.protobuf.Timestamp
+	31, // 8: finding.v1.FindingProto.date:type_name -> google.protobuf.Timestamp
 	1,  // 9: finding.v1.FindingService.BatchCreateFindings:input_type -> finding.v1.BatchCreateFindingsRequest
 	3,  // 10: finding.v1.FindingService.CloseOldFindings:input_type -> finding.v1.CloseOldFindingsRequest
 	5,  // 11: finding.v1.FindingService.FindByHashCode:input_type -> finding.v1.FindByHashCodeRequest
@@ -1574,16 +2403,28 @@ var file_finding_v1_finding_proto_depIdxs = []int32{
 	12, // 14: finding.v1.FindingService.BatchUpdateSLADates:input_type -> finding.v1.BatchUpdateSLADatesRequest
 	14, // 15: finding.v1.FindingService.ListFindingsForSLACheck:input_type -> finding.v1.ListFindingsForSLACheckRequest
 	17, // 16: finding.v1.FindingService.ListFindingsForReport:input_type -> finding.v1.ListFindingsForReportRequest
-	2,  // 17: finding.v1.FindingService.BatchCreateFindings:output_type -> finding.v1.BatchCreateFindingsResponse
-	4,  // 18: finding.v1.FindingService.CloseOldFindings:output_type -> finding.v1.CloseOldFindingsResponse
-	6,  // 19: finding.v1.FindingService.FindByHashCode:output_type -> finding.v1.FindByHashCodeResponse
-	8,  // 20: finding.v1.FindingService.ReactivateFindings:output_type -> finding.v1.ReactivateFindingsResponse
-	10, // 21: finding.v1.FindingService.ApplyTags:output_type -> finding.v1.ApplyTagsResponse
-	13, // 22: finding.v1.FindingService.BatchUpdateSLADates:output_type -> finding.v1.BatchUpdateSLADatesResponse
-	16, // 23: finding.v1.FindingService.ListFindingsForSLACheck:output_type -> finding.v1.ListFindingsForSLACheckResponse
-	18, // 24: finding.v1.FindingService.ListFindingsForReport:output_type -> finding.v1.FindingProto
-	17, // [17:25] is the sub-list for method output_type
-	9,  // [9:17] is the sub-list for method input_type
+	19, // 17: finding.v1.FindingService.GetOrCreateEngagement:input_type -> finding.v1.GetOrCreateEngagementRequest
+	21, // 18: finding.v1.FindingService.GetOrCreateTest:input_type -> finding.v1.GetOrCreateTestRequest
+	23, // 19: finding.v1.FindingService.CheckProductPermission:input_type -> finding.v1.CheckProductPermissionRequest
+	25, // 20: finding.v1.FindingService.ExistsFalsePositiveByHash:input_type -> finding.v1.ExistsFalsePositiveByHashRequest
+	27, // 21: finding.v1.FindingService.GetSeverityCounts:input_type -> finding.v1.GetSeverityCountsRequest
+	29, // 22: finding.v1.FindingService.CountFindings:input_type -> finding.v1.CountFindingsRequest
+	2,  // 23: finding.v1.FindingService.BatchCreateFindings:output_type -> finding.v1.BatchCreateFindingsResponse
+	4,  // 24: finding.v1.FindingService.CloseOldFindings:output_type -> finding.v1.CloseOldFindingsResponse
+	6,  // 25: finding.v1.FindingService.FindByHashCode:output_type -> finding.v1.FindByHashCodeResponse
+	8,  // 26: finding.v1.FindingService.ReactivateFindings:output_type -> finding.v1.ReactivateFindingsResponse
+	10, // 27: finding.v1.FindingService.ApplyTags:output_type -> finding.v1.ApplyTagsResponse
+	13, // 28: finding.v1.FindingService.BatchUpdateSLADates:output_type -> finding.v1.BatchUpdateSLADatesResponse
+	16, // 29: finding.v1.FindingService.ListFindingsForSLACheck:output_type -> finding.v1.ListFindingsForSLACheckResponse
+	18, // 30: finding.v1.FindingService.ListFindingsForReport:output_type -> finding.v1.FindingProto
+	20, // 31: finding.v1.FindingService.GetOrCreateEngagement:output_type -> finding.v1.GetOrCreateEngagementResponse
+	22, // 32: finding.v1.FindingService.GetOrCreateTest:output_type -> finding.v1.GetOrCreateTestResponse
+	24, // 33: finding.v1.FindingService.CheckProductPermission:output_type -> finding.v1.CheckProductPermissionResponse
+	26, // 34: finding.v1.FindingService.ExistsFalsePositiveByHash:output_type -> finding.v1.ExistsFalsePositiveByHashResponse
+	28, // 35: finding.v1.FindingService.GetSeverityCounts:output_type -> finding.v1.GetSeverityCountsResponse
+	30, // 36: finding.v1.FindingService.CountFindings:output_type -> finding.v1.CountFindingsResponse
+	23, // [23:37] is the sub-list for method output_type
+	9,  // [9:23] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
 	9,  // [9:9] is the sub-list for extension extendee
 	0,  // [0:9] is the sub-list for field type_name
@@ -1600,13 +2441,16 @@ func file_finding_v1_finding_proto_init() {
 	file_finding_v1_finding_proto_msgTypes[15].OneofWrappers = []any{}
 	file_finding_v1_finding_proto_msgTypes[17].OneofWrappers = []any{}
 	file_finding_v1_finding_proto_msgTypes[18].OneofWrappers = []any{}
+	file_finding_v1_finding_proto_msgTypes[19].OneofWrappers = []any{}
+	file_finding_v1_finding_proto_msgTypes[21].OneofWrappers = []any{}
+	file_finding_v1_finding_proto_msgTypes[25].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_finding_v1_finding_proto_rawDesc), len(file_finding_v1_finding_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   31,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

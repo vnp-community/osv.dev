@@ -1,0 +1,72 @@
+[
+  {
+    "_id": "d7bbee3c-e81a-45ff-a083-40ef987eb343",
+    "name": "Agent-Prod-WEB-0001",
+    "hostname": "web-0001.production.internal",
+    "ip_address": "10.0.1.2",
+    "os": "Windows Server 2022",
+    "tags": [
+      "web-tier",
+      "dmz",
+      "production",
+      "production"
+    ],
+    "asset_id": "43652624-0ac5-4017-88f3-d91217826edf"
+  },
+  {
+    "_id": "04e73206-3fa6-428a-8fb3-471cf43dcac0",
+    "name": "Agent-Prod-DB-0002",
+    "hostname": "db-0002.production.internal",
+    "ip_address": "10.0.2.3",
+    "os": "Windows Server 2022",
+    "tags": [
+      "database",
+      "critical",
+      "production",
+      "production"
+    ],
+    "asset_id": "8a592af5-84e3-4b4a-9c2c-61917c99b6df"
+  },
+  {
+    "_id": "42304cc0-77cb-4b18-a972-2aac4d1ebfb8",
+    "name": "Agent-Prod-API-0003",
+    "hostname": "api-0003.production.internal",
+    "ip_address": "10.0.3.4",
+    "os": "Ubuntu 20.04 LTS",
+    "tags": [
+      "api-tier",
+      "internal",
+      "production",
+      "production"
+    ],
+    "asset_id": "e2fe5b38-d9eb-4f0f-a607-c6efd83a254b"
+  },
+  {
+    "_id": "bd929301-ded8-42a0-92c1-1249746482c7",
+    "name": "Agent-Prod-CI-0004",
+    "hostname": "ci-0004.devops.internal",
+    "ip_address": "10.0.4.5",
+    "os": "Rocky Linux 9",
+    "tags": [
+      "ci-cd",
+      "internal",
+      "devops",
+      "devops"
+    ],
+    "asset_id": "a5665171-0e6d-4eab-a71f-9848d2adb5f5"
+  },
+  {
+    "_id": "494314a8-1ed8-4f4b-911b-280f503a7d68",
+    "name": "Agent-Prod-GW-0005",
+    "hostname": "gw-0005.production.internal",
+    "ip_address": "10.0.5.6",
+    "os": "CentOS 7",
+    "tags": [
+      "gateway",
+      "core",
+      "production",
+      "production"
+    ],
+    "asset_id": "10cdd0be-7e3e-4d87-880f-ea4f8605d8a4"
+  }
+]

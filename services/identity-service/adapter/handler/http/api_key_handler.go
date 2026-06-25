@@ -36,11 +36,17 @@ func (h *APIKeyHTTPHandler) CreateAPIKey(w http.ResponseWriter, r *http.Request)
 	var req struct {
 		Name        string   `json:"name"`
 		Permissions []string `json:"permissions"`
+		Scopes      []string `json:"scopes"` // alias for permissions — frontend sends scopes
 		ExpiresAt   *string  `json:"expires_at"` // RFC3339
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeJSON(w, http.StatusBadRequest, errResp("invalid_request", err.Error()))
 		return
+	}
+
+	// Accept 'scopes' as alias for 'permissions'
+	if len(req.Permissions) == 0 && len(req.Scopes) > 0 {
+		req.Permissions = req.Scopes
 	}
 
 	var exp *time.Time
@@ -64,13 +70,22 @@ func (h *APIKeyHTTPHandler) CreateAPIKey(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	// Response: CR-012 schema — {key: {...}, raw_key: string}
+	// Frontend expects: key (object) + raw_key (the plaintext key shown ONCE)
 	writeJSON(w, http.StatusCreated, map[string]any{
-		"key_id":     resp.KeyID,
-		"full_key":   resp.FullKey, // ⚠ shown ONCE
-		"prefix":     resp.Prefix,
-		"name":       resp.Name,
-		"expires_at": resp.ExpiresAt,
-		"warning":    "Copy this key now. It will not be shown again.",
+		"key": map[string]any{
+			"id":          resp.KeyID,
+			"name":        resp.Name,
+			"prefix":      resp.Prefix,
+			"scopes":      req.Permissions,
+			"created_at":  time.Now().UTC(),
+			"last_used_at": nil,
+			"expires_at":  resp.ExpiresAt,
+			"status":      "active",
+			"created_by":  r.Header.Get("X-User-Email"),
+		},
+		"raw_key": resp.FullKey, // shown ONCE — copy now
+		"warning": "Copy this key now. It will not be shown again.",
 	})
 }
 
@@ -89,30 +104,51 @@ func (h *APIKeyHTTPHandler) ListAPIKeys(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Response: align with frontend APIKey interface
+	// frontend expects: { items: APIKey[], total: number }
 	type keyItem struct {
-		KeyID      string     `json:"key_id"`
+		ID         string     `json:"id"`
 		Name       string     `json:"name"`
 		Prefix     string     `json:"prefix"`
-		Perms      []string   `json:"permissions"`
+		Scopes     []string   `json:"scopes"`
 		CreatedAt  time.Time  `json:"created_at"`
 		LastUsedAt *time.Time `json:"last_used_at"`
 		ExpiresAt  *time.Time `json:"expires_at"`
-		IsActive   bool       `json:"is_active"`
+		Status     string     `json:"status"`
+		CreatedBy  string     `json:"created_by"`
 	}
 	items := make([]keyItem, 0, len(keys))
 	for _, k := range keys {
+		status := "active"
+		if k.RevokedAt != nil {
+			status = "revoked"
+		} else if k.ExpiresAt != nil && time.Now().After(*k.ExpiresAt) {
+			status = "expired"
+		}
+		// Use Scopes if set, fall back to Permissions for backward compat
+		scopes := k.Scopes
+		if len(scopes) == 0 {
+			scopes = k.Permissions
+		}
+		if scopes == nil {
+			scopes = []string{}
+		}
 		items = append(items, keyItem{
-			KeyID:      k.ID.String(),
+			ID:         k.ID.String(),
 			Name:       k.Name,
 			Prefix:     k.Prefix,
-			Perms:      k.Permissions,
+			Scopes:     scopes,
 			CreatedAt:  k.CreatedAt,
 			LastUsedAt: k.LastUsedAt,
 			ExpiresAt:  k.ExpiresAt,
-			IsActive:   k.IsActive(),
+			Status:     status,
+			CreatedBy:  "", // not stored in current schema
 		})
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"api_keys": items})
+	writeJSON(w, http.StatusOK, map[string]any{
+		"keys":  items,
+		"total": len(items),
+	})
 }
 
 // RevokeAPIKey handles DELETE /api/v1/auth/api-keys/{key_id}

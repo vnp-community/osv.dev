@@ -36,3 +36,22 @@ func (s *ScheduledScan) CalculateNextRun(from time.Time) time.Time {
 	}
 	return from.Add(24 * time.Hour) // fallback: daily
 }
+
+// ComputeNextRun is an alias matching the task spec.
+func (s *ScheduledScan) ComputeNextRun() (time.Time, error) {
+    return s.CalculateNextRun(time.Now().UTC()), nil
+}
+
+// FrequencyCronMap maps predefined frequency names to cron expressions
+var FrequencyCronMap = map[string]string{
+    "hourly": "0 * * * *",    // Every hour at :00
+    "daily":  "0 2 * * *",    // Daily at 2:00 AM UTC
+    "weekly": "0 2 * * 0",    // Sunday at 2:00 AM UTC
+}
+
+// SetFrequency sets the cron expression from a named frequency
+func (s *ScheduledScan) SetFrequency(frequency string) {
+    if cronExpr, ok := FrequencyCronMap[frequency]; ok {
+        s.CronExpr = cronExpr
+    }
+}

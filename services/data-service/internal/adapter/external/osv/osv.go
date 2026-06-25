@@ -1,0 +1,272 @@
+// Package osv provides a DataSource adapter for the OSV (Open Source Vulnerabilities) database.
+// It downloads per-ecosystem all.zip archives from osv.dev and maps OSV entries to CVE rows.
+package osv
+
+import (
+	"archive/zip"
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/osv/data-service/internal/adapter/external/sources"
+)
+
+// DefaultBaseURL is the OSV API base endpoint.
+const DefaultBaseURL = "https://storage.googleapis.com/osv-vulnerabilities"
+
+// DefaultEcosystems is the default list of ecosystems to fetch.
+var DefaultEcosystems = []string{
+	"PyPI", "npm", "Go", "Maven", "Cargo", "NuGet",
+	"RubyGems", "Packagist", "Alpine", "Debian", "crates.io",
+}
+
+// OSVSource implements sources.DataSource for osv.dev.
+type OSVSource struct {
+	baseURL    string
+	httpClient *http.Client
+	ecosystems []string
+}
+
+// New creates a new OSVSource. Pass empty ecosystems to use defaults.
+func New(baseURL string, ecosystems []string, httpClient *http.Client) *OSVSource {
+	if baseURL == "" {
+		baseURL = DefaultBaseURL
+	}
+	if len(ecosystems) == 0 {
+		ecosystems = DefaultEcosystems
+	}
+	if httpClient == nil {
+		httpClient = &http.Client{Timeout: 120 * time.Second}
+	}
+	return &OSVSource{
+		baseURL:    strings.TrimRight(baseURL, "/"),
+		httpClient: httpClient,
+		ecosystems: ecosystems,
+	}
+}
+
+// Name returns the source identifier.
+func (s *OSVSource) Name() string { return "OSV" }
+
+// FetchCVEData downloads and parses all OSV entries across configured ecosystems.
+func (s *OSVSource) FetchCVEData(ctx context.Context) (sources.CVEData, error) {
+	data := sources.CVEData{Source: s.Name()}
+
+	for _, eco := range s.ecosystems {
+		if err := ctx.Err(); err != nil {
+			return data, err
+		}
+		sev, ranges, err := s.fetchEcosystem(ctx, eco)
+		if err != nil {
+			// Log but continue with other ecosystems
+			continue
+		}
+		data.Severities = append(data.Severities, sev...)
+		data.Ranges = append(data.Ranges, ranges...)
+	}
+
+	return data, nil
+}
+
+// fetchEcosystem downloads the all.zip for one ecosystem and parses entries.
+func (s *OSVSource) fetchEcosystem(ctx context.Context, ecosystem string) ([]sources.CVESeverityRow, []sources.CVERangeRow, error) {
+	url := fmt.Sprintf("%s/%s/all.zip", s.baseURL, ecosystem)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return nil, nil, fmt.Errorf("osv: fetch %s: %w", ecosystem, err)
+	}
+	defer resp.Body.Close() //nolint:errcheck
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil, nil // ecosystem not available
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, nil, fmt.Errorf("osv: %s: status %d", ecosystem, resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, nil, fmt.Errorf("osv: read body: %w", err)
+	}
+
+	return parseZip(body, ecosystem)
+}
+
+// osvEntry is the OSV JSON schema.
+type osvEntry struct {
+	ID      string   `json:"id"`
+	Aliases []string `json:"aliases"`
+	Summary string   `json:"summary"`
+	Details string   `json:"details"`
+	Severity []struct {
+		Type  string `json:"type"`
+		Score string `json:"score"`
+	} `json:"severity"`
+	Affected []struct {
+		Package struct {
+			Name      string `json:"name"`
+			Ecosystem string `json:"ecosystem"`
+			PURL      string `json:"purl"`
+		} `json:"package"`
+		Ranges []struct {
+			Type   string `json:"type"` // SEMVER|ECOSYSTEM|GIT
+			Events []struct {
+				Introduced   string `json:"introduced"`
+				Fixed        string `json:"fixed"`
+				LastAffected string `json:"last_affected"`
+			} `json:"events"`
+		} `json:"ranges"`
+		Versions []string `json:"versions"` // exact affected versions
+	} `json:"affected"`
+}
+
+func parseZip(data []byte, ecosystem string) ([]sources.CVESeverityRow, []sources.CVERangeRow, error) {
+	zr, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	if err != nil {
+		return nil, nil, fmt.Errorf("osv: open zip: %w", err)
+	}
+
+	var severities []sources.CVESeverityRow
+	var ranges []sources.CVERangeRow
+
+	for _, f := range zr.File {
+		if !strings.HasSuffix(f.Name, ".json") {
+			continue
+		}
+		rc, err := f.Open()
+		if err != nil {
+			continue
+		}
+		var entry osvEntry
+		if err := json.NewDecoder(rc).Decode(&entry); err != nil {
+			rc.Close() //nolint:errcheck
+			continue
+		}
+		rc.Close() //nolint:errcheck
+
+		// Only process entries with CVE aliases
+		cveAliases := extractCVEAliases(entry.Aliases)
+		if len(cveAliases) == 0 {
+			continue
+		}
+
+		// Map severity
+		score, vector := extractCVSS(entry)
+		severity := sources.SeverityFromScore(score)
+
+		desc := entry.Summary
+		if desc == "" {
+			desc = entry.Details
+		}
+
+		for _, cveNum := range cveAliases {
+			severities = append(severities, sources.CVESeverityRow{
+				CVENumber:   cveNum,
+				Severity:    severity,
+				Description: desc,
+				Score:       score,
+				CVSSVersion: 3,
+				CVSSVector:  vector,
+				DataSource:  "OSV",
+			})
+
+			// Map version ranges
+			for _, aff := range entry.Affected {
+				vendor := strings.ToLower(aff.Package.Ecosystem)
+				product := strings.ToLower(aff.Package.Name)
+				if vendor == "" || product == "" {
+					continue
+				}
+
+				for _, r := range aff.Ranges {
+					if r.Type == "GIT" {
+						continue // skip git commit ranges
+					}
+					rangeRow := convertOSVRange(cveNum, vendor, product, r.Events)
+					if rangeRow != nil {
+						ranges = append(ranges, *rangeRow)
+					}
+				}
+
+				// Exact version matches
+				for _, ver := range aff.Versions {
+					ranges = append(ranges, sources.CVERangeRow{
+						CVENumber:  cveNum,
+						Vendor:     vendor,
+						Product:    product,
+						Version:    ver,
+						DataSource: "OSV",
+					})
+				}
+			}
+		}
+	}
+	return severities, ranges, nil
+}
+
+func extractCVEAliases(aliases []string) []string {
+	var out []string
+	for _, a := range aliases {
+		if strings.HasPrefix(a, "CVE-") {
+			out = append(out, a)
+		}
+	}
+	return out
+}
+
+func extractCVSS(entry osvEntry) (score float64, vector string) {
+	for _, s := range entry.Severity {
+		if s.Type == "CVSS_V3" || s.Type == "CVSS_V3_1" {
+			vector = s.Score
+			return 0, vector
+		}
+	}
+	return 0, ""
+}
+
+func convertOSVRange(cveNum, vendor, product string, events []struct {
+	Introduced   string `json:"introduced"`
+	Fixed        string `json:"fixed"`
+	LastAffected string `json:"last_affected"`
+}) *sources.CVERangeRow {
+	var introduced, fixed, lastAffected string
+	for _, e := range events {
+		if e.Introduced != "" && e.Introduced != "0" {
+			introduced = e.Introduced
+		}
+		if e.Fixed != "" {
+			fixed = e.Fixed
+		}
+		if e.LastAffected != "" {
+			lastAffected = e.LastAffected
+		}
+	}
+
+	if introduced == "" && fixed == "" && lastAffected == "" {
+		return nil
+	}
+
+	r := &sources.CVERangeRow{
+		CVENumber:             cveNum,
+		Vendor:                vendor,
+		Product:               product,
+		VersionStartIncluding: introduced,
+		DataSource:            "OSV",
+	}
+	if fixed != "" {
+		r.VersionEndExcluding = fixed
+	} else if lastAffected != "" {
+		r.VersionEndIncluding = lastAffected
+	}
+	return r
+}

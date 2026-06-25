@@ -79,7 +79,7 @@ func (r *SessionRepo) Create(ctx context.Context, s *entity.Session) error {
 		ID:               s.ID.String(),
 		UserID:           s.UserID.String(),
 		RefreshTokenHash: s.RefreshTokenHash,
-		TokenFamily:      s.TokenFamily,
+		TokenFamily:      s.TokenFamily.String(), // uuid.UUID → string for MongoDB
 		IPAddress:        s.IPAddress,
 		UserAgent:        s.UserAgent,
 		ExpiresAt:        s.ExpiresAt,
@@ -120,10 +120,10 @@ func (r *SessionRepo) RevokeByID(ctx context.Context, id uuid.UUID) error {
 }
 
 // RevokeByFamily revokes all sessions in a token family (replay attack response).
-func (r *SessionRepo) RevokeByFamily(ctx context.Context, family string) error {
+func (r *SessionRepo) RevokeByFamily(ctx context.Context, family uuid.UUID) error {
 	now := time.Now().UTC()
 	_, err := r.col.UpdateMany(ctx,
-		bson.M{"token_family": family},
+		bson.M{"token_family": family.String()},
 		bson.M{"$set": bson.M{"revoked_at": now}},
 	)
 	return err
@@ -159,11 +159,16 @@ func sessionToEntity(doc *sessionDocument) (*entity.Session, error) {
 	if err != nil {
 		return nil, fmt.Errorf("parse session UserID %q: %w", doc.UserID, err)
 	}
+	// TokenFamily stored as string in MongoDB, parse back to uuid.UUID
+	family, err := uuid.Parse(doc.TokenFamily)
+	if err != nil {
+		family = uuid.Nil // graceful: old sessions without valid UUID
+	}
 	return &entity.Session{
 		ID:               id,
 		UserID:           userID,
 		RefreshTokenHash: doc.RefreshTokenHash,
-		TokenFamily:      doc.TokenFamily,
+		TokenFamily:      family, // string → uuid.UUID
 		IPAddress:        doc.IPAddress,
 		UserAgent:        doc.UserAgent,
 		ExpiresAt:        doc.ExpiresAt,

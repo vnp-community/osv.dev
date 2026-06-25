@@ -1,0 +1,142 @@
+[
+  {
+    "_id": "a6a6636d-1f21-4d49-8d44-87a6a87194ff",
+    "finding_id": "6f58d5cb-4a14-4142-a00a-256df8b35abf",
+    "author_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "content": "Triaged during Q2 review. Component nginx confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "bea77e55-79ae-4ad8-a40a-21f2d9165ff4",
+    "finding_id": "817027d2-ea37-4f78-9c17-087c94da0b1d",
+    "author_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "content": "Triaged during Q2 review. Component nginx confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "bf70ee8e-a47c-4396-9dc5-ca772a680be9",
+    "finding_id": "756c50fb-fb48-4fee-9901-be5fe2b08240",
+    "author_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "content": "Triaged during Q2 review. Component jquery confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "6893a948-2fc5-44ba-89ef-5e341fe1f30e",
+    "finding_id": "e924c046-043f-4150-86ca-aeffac0948cb",
+    "author_id": "87e4d75c-fcd2-42b1-a421-40006be2e34f",
+    "content": "Triaged during Q2 review. Component jackson-databind confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "efde497f-2993-40cb-8ced-71ef08db6408",
+    "finding_id": "7337a104-b2f2-4e1c-ba74-51cf32835744",
+    "author_id": "da1291e1-57d8-4edb-9932-0b287daff906",
+    "content": "Triaged during Q2 review. Component jackson-databind confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "6f515d3d-edf7-433f-adf3-0e1fcd39ac9c",
+    "finding_id": "d173bd8b-c733-4884-b7de-035b188ce591",
+    "author_id": "62d887af-5f61-4bcd-ae4d-d2c14f4b6082",
+    "content": "Triaged during Q2 review. Component nginx confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "130bd829-f4f2-46a6-a33a-0b9358a128a3",
+    "finding_id": "417f7cf0-aea9-431b-aa9e-43e8e96ca40f",
+    "author_id": "62d887af-5f61-4bcd-ae4d-d2c14f4b6082",
+    "content": "Triaged during Q2 review. Component spring-webmvc confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "8d5db17e-e467-43b3-9f1d-420c3087aa1e",
+    "finding_id": "d7c08d24-78d9-4b1f-b012-a01e401fa1b1",
+    "author_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "content": "Triaged during Q2 review. Component nginx confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "9d64b1df-ac41-4233-b22a-add224b9f9c5",
+    "finding_id": "f6e51bbb-6027-4d74-97ab-3364b4689a13",
+    "author_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "content": "Triaged during Q2 review. Component spring-webmvc confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "b34c27e0-99c8-409b-bd98-33c32cd678b2",
+    "finding_id": "96bdace4-9b0c-4d35-b798-238fa953367b",
+    "author_id": "87e4d75c-fcd2-42b1-a421-40006be2e34f",
+    "content": "Triaged during Q2 review. Component spring-webmvc confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "a631ca91-69ff-425c-9aa6-0b7e795da52d",
+    "finding_id": "75a0c559-99af-4b64-b43e-e5346e29f43e",
+    "author_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "content": "Triaged during Q2 review. Component openssl confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "2701b2e2-9343-4f6a-8f65-fc7bf14a0f14",
+    "finding_id": "43fda2b5-befa-44ac-ae71-6f5858b99625",
+    "author_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "content": "Triaged during Q2 review. Component apache-struts confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "63a4cfc6-2300-4987-a5d9-914333c96f1c",
+    "finding_id": "a7ae78ea-3fbf-49ae-a71a-a352a2b5a571",
+    "author_id": "88fd1dfd-d706-4c4a-8074-715ec3e347dc",
+    "content": "Triaged during Q2 review. Component jquery confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "e5df129b-a970-474e-a1d9-52a3db1c7124",
+    "finding_id": "7e7edeba-c091-4ee3-bde8-817d025e1738",
+    "author_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "content": "Triaged during Q2 review. Component spring-webmvc confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "caeb1c78-6a51-4dc3-b594-0ab3f37ac23b",
+    "finding_id": "0eef7a64-ed1e-42ed-8d36-39bdc8c3cb13",
+    "author_id": "62d887af-5f61-4bcd-ae4d-d2c14f4b6082",
+    "content": "Triaged during Q2 review. Component commons-text confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "987e15a7-4cff-4a07-9272-4aa2d68925dc",
+    "finding_id": "e7332163-da3f-4355-b361-54e48dcb15ad",
+    "author_id": "1c973b81-d8db-4e2e-b0b1-f61c9cd87536",
+    "content": "Triaged during Q2 review. Component jquery confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "4d8b3af6-41fa-43ac-b1ed-6eb62b6eb5a1",
+    "finding_id": "77d64444-ae24-4edb-997e-344592b4795f",
+    "author_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "content": "Triaged during Q2 review. Component log4j-core confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "4d5e83c7-1c59-490e-8344-12e8ad13cf8a",
+    "finding_id": "18c90677-e147-43fc-a103-ecb96c349239",
+    "author_id": "1c973b81-d8db-4e2e-b0b1-f61c9cd87536",
+    "content": "Triaged during Q2 review. Component jackson-databind confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "75076fec-6983-48c2-92db-4ca7d507ddc0",
+    "finding_id": "519f1d76-3c0c-4181-ade2-d3b7c1c0b68f",
+    "author_id": "88fd1dfd-d706-4c4a-8074-715ec3e347dc",
+    "content": "Triaged during Q2 review. Component spring-webmvc confirmed.",
+    "is_private": false
+  },
+  {
+    "_id": "82267848-1c19-45a9-870d-74333642e1ac",
+    "finding_id": "d81b50a2-bcec-4bdd-bb11-096a29713bad",
+    "author_id": "3f07415e-4e43-47ba-91e7-75c4bc8a0766",
+    "content": "Triaged during Q2 review. Component spring-webmvc confirmed.",
+    "is_private": false
+  }
+]

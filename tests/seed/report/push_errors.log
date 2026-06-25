@@ -1,0 +1,301 @@
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user admin@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user bob1@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user carol2@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user dave3@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user eve4@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user frank5@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user grace6@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user hank7@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user iris8@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ user jack9@company.com failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ api_key 'Admin Master Key' failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ api_key 'CI/CD Pipeline' failed: HTTP 404 — {"error":"not_found","message":"no route matches this path"}
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ sla_config 'Standard SLA' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ sla_config 'Critical Assets SLA' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ sla_config 'Relaxed SLA' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ product_type 'Web Application' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ product_type 'Mobile App' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:41 [ERROR] seed.push —   ✗ product_type 'API Service' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product_type 'Infrastructure' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product_type 'Desktop App' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'Customer Portal' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'Internal HR System' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'Payment Gateway API' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'Mobile Banking App' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'Admin Dashboard' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'Inventory Service' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'Analytics Platform' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'VPN Gateway' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'Legacy ERP' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ product 'DevOps Toolchain' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:42 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q1 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ engagement 'Security Assessment Q2 2026' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:43 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Trivy Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ test 'Bandit Scan — 2026-06-18' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in log4j-core' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ finding 'spring-webmvc — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ finding 'nginx — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:44 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:44 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in commons-text' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2022-1388 in log4j-core' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in nginx' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2022-22965 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'commons-text — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'nginx — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2021-26084 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'apache-struts — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2022-1388 in commons-text' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in commons-text' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2021-26084 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'CVE-2021-26084 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'log4j-core — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:45 [ERROR] seed.push —   ✗ finding 'openssl — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'jquery — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'spring-webmvc — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2022-22965 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2022-22965 in commons-text' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2023-44487 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in apache-struts' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2022-22965 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'nginx — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in log4j-core' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2021-26084 in commons-text' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:46 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:46 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'commons-text — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'log4j-core — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'commons-text — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in apache-struts' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in log4j-core' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'jquery — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in nginx' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in commons-text' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'jackson-databind — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'log4j-core — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'jquery — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'CVE-2023-44487 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:47 [ERROR] seed.push —   ✗ finding 'jquery — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'spring-webmvc — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2022-1388 in log4j-core' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'spring-webmvc — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2022-22965 in apache-struts' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in nginx' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2023-44487 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in log4j-core' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'spring-webmvc — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2021-26084 in nginx' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'spring-webmvc — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2023-44487 in nginx' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'commons-text — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:48 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2021-26084 in apache-struts' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2021-26084 in commons-text' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'jackson-databind — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'jackson-databind — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2022-22965 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in apache-struts' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2022-1388 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in apache-struts' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'spring-webmvc — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2021-26084 in log4j-core' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in commons-text' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in nginx' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'jquery — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2021-26084 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'openssl — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'apache-struts — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in openssl' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:49 [ERROR] seed.push —   ✗ finding 'CVE-2022-22965 in jackson-databind' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'CVE-2022-1388 in nginx' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'CVE-2022-1388 in log4j-core' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'nginx — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in log4j-core' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'CVE-2022-42889 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'nginx — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'CVE-2022-1388 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'log4j-core — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'spring-webmvc — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'CVE-2023-34362 in spring-webmvc' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'jquery — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'CVE-2022-22965 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'log4j-core — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'CVE-2023-20198 in nginx' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'commons-text — High vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [WARNING] seed.push — bulk-create failed (HTTP 404) — falling back to individual POST
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'CVE-2021-44228 in jquery' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'log4j-core — Low vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [ERROR] seed.push —   ✗ finding 'jquery — Medium vulnerability' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:50 [WARNING] seed.push —   ✗ finding_note for 94076470-0300-4d87-b529-4217c60afafc failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 078e5487-6a10-40d5-bb7f-7ab7634987e0 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for df3aaa69-a161-42ad-a9f6-74811de42afa failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 981be1f7-06ea-49b7-a16d-0c4324bac24c failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 4fa0dced-0c9f-4f38-a651-5993c15d2c5f failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for a96fe64f-463a-4e9a-a58f-7e414bc1d570 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for fc81f85c-d34b-41a4-aa6b-e1540051f171 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 6128a2b0-212f-4c28-8ea3-42ecdc25d738 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 2a546939-3a33-45d9-9453-7c336bbef1d6 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for b46b26ec-50d4-41eb-a552-80eca205fc21 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for cc92049b-c872-4a01-87a3-b48d9fbf89fe failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for aaa8660e-1558-4562-8c76-01d393e97291 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 29aeecaf-3934-4529-ab27-675e417fc896 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 17d14ff5-ec5d-4735-b2bb-a5724fa5575b failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for db300a45-74a5-4f22-b716-6afca4de7ead failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 189bee0e-5101-4d40-ad88-33891da9553d failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for dacd9ba7-f6c8-446e-9e82-a90503e23458 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 6f82cf03-ed18-4887-b76e-849823676a27 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 4d6016bc-8357-4bb6-811c-99ecd7922b42 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_note for 806ed696-20bc-4a2f-af12-7620c8ae0f9a failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_group 'Log4Shell variants' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ finding_group 'Spring4Shell cluster' failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ notif_rule for product 61667a93-28ea-4e76-8c64-cc4dc6e4b913 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ notif_rule for product f80a6466-5f87-46be-9a3f-9561b4f624d7 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ notif_rule for product 8b884a30-e05e-4ecd-a3c9-af385d0188e7 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ notif_rule for product fef7ffa0-6eed-4ef2-856c-5de236a1df2c failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ notif_rule for product 3defd3a7-c294-48a8-b29b-ebe6e80f14c3 failed: HTTP 404
+2026-06-18T18:13:51 [WARNING] seed.push —   ✗ notif_rule for product 73329832-48ad-4d09-8dfc-8e6c02f30f85 failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ notif_rule for product 00274eaf-9154-4262-801a-20f0d8822ea3 failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ notif_rule for product 60b673e6-c75b-46de-9d33-1cd895aab7be failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ notif_rule for product 18e50d6b-e5ee-4f40-9656-6e078fe42e7e failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ notif_rule for product b38a9474-99f2-4276-807c-183ae66aad26 failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ subscription type=vendor value=apache failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ subscription type=vendor value=microsoft failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ subscription type=vendor value=oracle failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ subscription type=product value=log4j failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ subscription type=product value=spring failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ subscription type=kev value= failed: HTTP 404
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ webhook https://hooks.slack.com/services/T00/B00 failed: HTTP 404 — 404 page not found
+2026-06-18T18:13:52 [WARNING] seed.push —   ✗ webhook https://ci.company.internal/hooks/securi failed: HTTP 404 — 404 page not found
+2026-06-18T18:14:04 [WARNING] seed.push — bulk assets failed (HTTP 502) — falling back to individual POST
+2026-06-18T18:14:16 [ERROR] seed.push —   ✗ asset 10.0.0.1 failed: HTTP 502 — {"error":"upstream_not_configured"}
+2026-06-18T18:14:28 [ERROR] seed.push —   ✗ asset 10.0.0.2 failed: HTTP 502 — {"error":"upstream_not_configured"}
+2026-06-18T18:14:41 [ERROR] seed.push —   ✗ asset 10.0.0.3 failed: HTTP 502 — {"error":"upstream_not_configured"}
+2026-06-18T18:14:53 [ERROR] seed.push —   ✗ asset 10.0.0.4 failed: HTTP 502 — {"error":"upstream_not_configured"}
+2026-06-18T18:15:05 [ERROR] seed.push —   ✗ asset 10.0.0.5 failed: HTTP 502 — {"error":"upstream_not_configured"}
+2026-06-18T18:15:17 [ERROR] seed.push —   ✗ asset 10.0.0.6 failed: HTTP 502 — {"error":"upstream_not_configured"}
+2026-06-18T18:15:29 [ERROR] seed.push —   ✗ asset 10.0.0.7 failed: HTTP 502 — {"error":"upstream_not_configured"}
+2026-06-18T18:15:42 [ERROR] seed.push —   ✗ asset 10.0.0.8 failed: HTTP 502 — {"error":"upstream_not_configured"}
+2026-06-18T18:15:54 [ERROR] seed.push —   ✗ asset 10.0.0.9 failed: HTTP 502 — {"error":"upstream_not_configured"}
+2026-06-18T18:16:06 [ERROR] seed.push —   ✗ asset 10.0.0.10 failed: HTTP 502 — {"error":"upstream_not_configured"}

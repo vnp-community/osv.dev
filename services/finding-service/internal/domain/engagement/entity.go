@@ -49,6 +49,8 @@ type Engagement struct {
 	BranchTag                 string
 	SourceCodeManagementURI   string
 	DeduplicationOnEngagement bool
+	BuildServerID             *uuid.UUID // FK ToolConfiguration
+	OrchestrationEngineID     *uuid.UUID // FK ToolConfiguration
 	Tags                      []string
 	CreatedAt                 time.Time
 	UpdatedAt                 time.Time

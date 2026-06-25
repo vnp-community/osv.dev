@@ -1,0 +1,52 @@
+[
+  {
+    "_id": "87a30e84-7452-413a-ade0-31f82a9dfe3d",
+    "product_id": "a60da6c5-1a12-4fbd-aa3c-2f920df94e29",
+    "sla_configuration_id": "5915cdb6-cb38-4a3b-b7a1-ecdb6a7da4fb"
+  },
+  {
+    "_id": "cba0d199-e8cc-4aab-a5c0-dbf6c6bd720a",
+    "product_id": "3cc795ad-98dc-4ef0-9ad7-0a433734cae0",
+    "sla_configuration_id": "a06d870a-ce80-4228-b262-cbd42d045320"
+  },
+  {
+    "_id": "e2feca44-fa12-43b6-81ad-6bf51e4f4346",
+    "product_id": "c57dbf2e-6dd4-48c6-8f55-b8932f04adf8",
+    "sla_configuration_id": "5915cdb6-cb38-4a3b-b7a1-ecdb6a7da4fb"
+  },
+  {
+    "_id": "99222735-2ea1-414c-b677-fef2806feea3",
+    "product_id": "13993f18-dce8-41cb-b340-0e9fb0d7dac3",
+    "sla_configuration_id": "5915cdb6-cb38-4a3b-b7a1-ecdb6a7da4fb"
+  },
+  {
+    "_id": "52ff2264-8278-4d13-831f-381fcabcd5cd",
+    "product_id": "b170160d-8fb4-4ff6-9771-726efd4a0af5",
+    "sla_configuration_id": "a06d870a-ce80-4228-b262-cbd42d045320"
+  },
+  {
+    "_id": "4efcabe3-cd39-426a-8fc6-b11565756ab4",
+    "product_id": "7a7be1e0-c905-451a-bb16-cb38ab9072a4",
+    "sla_configuration_id": "a06d870a-ce80-4228-b262-cbd42d045320"
+  },
+  {
+    "_id": "6d9470bb-997c-4b0f-9f25-888e351ce6b8",
+    "product_id": "dd8c98ac-4ce6-4494-963b-b20707be7d98",
+    "sla_configuration_id": "5915cdb6-cb38-4a3b-b7a1-ecdb6a7da4fb"
+  },
+  {
+    "_id": "68057485-7050-42cf-9c61-b2c924d6970d",
+    "product_id": "0835add2-db61-49bf-baab-2f05981c65bd",
+    "sla_configuration_id": "5915cdb6-cb38-4a3b-b7a1-ecdb6a7da4fb"
+  },
+  {
+    "_id": "c04717d5-ac8d-4e3e-b7ca-9b63bbc50ffb",
+    "product_id": "7414ce8c-14d9-482f-b114-ee0dbb872b2a",
+    "sla_configuration_id": "a06d870a-ce80-4228-b262-cbd42d045320"
+  },
+  {
+    "_id": "dc3452ce-2303-46b0-8460-71afa3be45b3",
+    "product_id": "44aff8cd-d6f5-4650-8e0b-d7c42465c308",
+    "sla_configuration_id": "a06d870a-ce80-4228-b262-cbd42d045320"
+  }
+]

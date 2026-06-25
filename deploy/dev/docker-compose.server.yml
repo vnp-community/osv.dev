@@ -1,0 +1,389 @@
+version: '3.8'
+# =============================================================
+# OSV Platform — Server Deployment (pre-built binary)
+# Build binary locally: bash deploy/dev/deploy_backend.sh
+# Upload to server:     rsync + docker compose up -d
+#
+# On server (172.20.2.48):
+#   docker compose -f docker-compose.server.yml up -d
+#
+# Memory budget (for ~4GB RAM server):
+#   OpenSearch:  512MB heap   → ~700MB RSS
+#   MongoDB:     512MB WiredTiger cache → ~700MB RSS
+#   PostgreSQL:  128MB shared_buffers → ~200MB RSS
+#   Redis:       64MB maxmemory → ~100MB RSS
+#   NATS:        64MB → ~80MB RSS
+#   osv-server:  ~150MB
+#   OS + misc:   ~600MB
+#   Total:       ~2.5GB — safe for 4GB server
+# =============================================================
+
+services:
+  # ============================================================
+  # Infrastructure
+  # ============================================================
+
+  postgres:
+    image: pgvector/pgvector:pg16   # pgvector required for cves.embedding vector(1536)
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     osv
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB:       ${POSTGRES_DB:-osvdb}
+    command: >
+      postgres
+        -c shared_buffers=128MB
+        -c work_mem=8MB
+        -c maintenance_work_mem=64MB
+        -c max_connections=50
+        -c effective_cache_size=256MB
+    mem_limit: 384m
+    memswap_limit: 384m
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U osv -d ${POSTGRES_DB:-osvdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - osv-internal
+
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    # Giới hạn WiredTiger cache để tránh OOM
+    command: ["mongod", "--wiredTigerCacheSizeGB", "0.5", "--quiet"]
+    mem_limit: 768m
+    memswap_limit: 768m
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - osv-internal
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: >
+      redis-server
+        ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}
+        --maxmemory 64mb
+        --maxmemory-policy allkeys-lru
+        --save ""
+        --appendonly no
+    mem_limit: 128m
+    memswap_limit: 128m
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - osv-internal
+
+  nats:
+    image: nats:2.10-alpine
+    restart: unless-stopped
+    # FIX: nats:alpine không có curl → dùng wget hoặc /usr/local/bin/nats-server -sl=ping
+    # wget -q -O- http://localhost:8222/varz là cách đúng với alpine image
+    command: ["-js", "-m", "8222", "--name", "osv-nats"]
+    mem_limit: 128m
+    memswap_limit: 128m
+    healthcheck:
+      # nats:alpine có wget nhưng không có curl → dùng wget
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:8222/varz 2>/dev/null | grep -q server_name || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - osv-internal
+
+  opensearch:
+    image: opensearchproject/opensearch:2.13.0
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      # FIX: Giảm từ 1g → 512m để tránh OOM trên server RAM thấp
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - cluster.name=osv-search
+      # Tắt bootstrap checks cho single-node dev
+      - bootstrap.memory_lock=false
+    mem_limit: 1g
+    memswap_limit: 1g
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - osv-internal
+
+  # ============================================================
+  # OSV Server — pre-built static binary (distroless image)
+  # FIX: Binary path: ./osv-server (root của deploy/dev/) thay vì ./bin/osv-server
+  # deploy_backend.sh build vào: ../../deploy/dev/osv-server
+  # ============================================================
+  osv-server:
+    image: gcr.io/distroless/static-debian12:nonroot
+    restart: unless-stopped
+    user: "65532:65532"
+    volumes:
+      - ./osv-server:/service:ro    # FIX: đổi từ ./bin/osv-server → ./osv-server
+      - ./secrets:/run/secrets:ro   # JWT RSA keys
+    entrypoint: ["/service"]
+    mem_limit: 512m
+    memswap_limit: 512m
+    ports:
+      - "172.20.2.48:8080:8080"   # gateway — accessible từ nginx proxy server (172.20.2.16)
+      - "172.20.2.48:18082:8082"  # data-service — /api/v2/, /cve/ routes (host:18082→container:8082)
+      - "172.20.2.48:9101:8081"   # identity HTTP — JWKS, login, register (internal :8081 → external :9101)
+    environment:
+      # ── Gateway ─────────────────────────────────────────────
+      OSV_MODE: "microservices"
+      HTTP_PORT: "8080"
+
+      # ── PostgreSQL ───────────────────────────────────────────
+      POSTGRES_DSN: "postgres://osv:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      IDENTITY_DATABASE_URL: "postgres://osv:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      DATA_DATABASE_URL:     "postgres://osv:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      NOTIFICATION_DATABASE_URL: "postgres://osv:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+
+      # ── MongoDB ─────────────────────────────────────────────
+      MONGO_URI: "mongodb://mongodb:27017"
+      MONGO_DB:  "${MONGO_DB:-cvedb}"
+
+      # ── Redis ───────────────────────────────────────────────
+      REDIS_ADDR:     "redis:6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_URL:      "redis://redis:6379/0"
+
+      # ── NATS ────────────────────────────────────────────────
+      NATS_URL:     "nats://nats:4222"
+      NATS_ENABLED: "${NATS_ENABLED:-true}"
+
+      # ── Search ──────────────────────────────────────────────
+      OPENSEARCH_URL:     "http://opensearch:9200"
+      OPENSEARCH_INDEX:   "${OPENSEARCH_INDEX:-vulnerabilities}"
+      SEARCH_BACKEND:     "${SEARCH_BACKEND:-auto}"
+      OPENSEARCH_ENABLED: "${OPENSEARCH_ENABLED:-true}"  # FIX: enable OpenSearch full-text search (was missing)
+
+      # ── Identity & JWT ───────────────────────────────────────
+      IDENTITY_HTTP_PORT:   "8081"  # embedded identity binds on :8081 (external Docker port: 9101→8081)
+      IDENTITY_GRPC_PORT:   "9001"
+      JWT_PRIVATE_KEY_PATH: "/run/secrets/jwt_private.pem"
+      JWT_SECRET:           "${JWT_SECRET}"
+      JWT_ISSUER:           "${JWT_ISSUER:-https://auth.openvulnscan.io}"
+      JWT_AUDIENCE:         "${JWT_AUDIENCE:-openvulnscan}"
+      JWKS_URL:             "http://localhost:9101/.well-known/jwks.json"
+      JWT_EXPIRY:           "${JWT_EXPIRY:-24h}"
+
+      # ── Service ports ────────────────────────────────────────
+      DATA_HTTP_PORT:         "8082"
+      DATA_GRPC_PORT:         "50053"
+      SEARCH_HTTP_PORT:       "8083"
+      SEARCH_GRPC_PORT:       "50056"
+      RANKING_PORT:           "8088"
+      NOTIFICATION_HTTP_PORT: "8086"
+      NOTIFICATION_GRPC_PORT: "50063"
+      AI_GRPC_PORT:           "50052"
+
+      # ── Upstream HTTP addresses ──────────────────────────────
+      # NOTE: In embedded monolith, all services run in-process on localhost.
+      # Port numbers must match the embedded service bindings in wire.go/embedded.go.
+      IDENTITY_SERVICE_HTTP: "http://localhost:8081"  # identity binds :8081 (not :9101 which is the Docker external port)
+      DATA_SERVICE_HTTP:     "http://localhost:8082"
+      SEARCH_SERVICE_HTTP:   "http://localhost:8083"
+      RANKING_SERVICE_HTTP:  "http://localhost:8088"
+      NOTIFICATION_HTTP:     "http://localhost:8087"
+      # ── External microservices (separate containers) ─────────
+      FINDING_SERVICE_ADDR:  "http://finding-service:8085"  # finding-service external container
+
+      # ── Storage ─────────────────────────────────────────────
+      ALIAS_GROUP_BACKEND: "${ALIAS_GROUP_BACKEND:-postgres}"
+
+      # ── Admin seed ───────────────────────────────────────────
+      INIT_ADMIN_EMAIL:    "${INIT_ADMIN_EMAIL}"
+      INIT_ADMIN_USERNAME: "${INIT_ADMIN_USERNAME:-admin}"
+      INIT_ADMIN_PASSWORD: "${INIT_ADMIN_PASSWORD}"
+
+      # ── AI — P2-01: Ollama backend ───────────────────────
+      AI_BACKEND:        "${AI_BACKEND:-ollama}"
+      AI_MODEL:          "${AI_MODEL:-qwen2.5:1.5b}"
+      AI_BASE_URL:       "${AI_BASE_URL:-http://ollama:11434}"
+      OPENAI_API_KEY:    "${OPENAI_API_KEY:-}"
+      VERTEX_PROJECT_ID: "${VERTEX_PROJECT_ID:-}"
+      VERTEX_LOCATION:   "${VERTEX_LOCATION:-us-central1}"
+
+      # ── Notifications ────────────────────────────────────────────────
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN:-}"
+      SMTP_HOST:       "${SMTP_HOST:-}"
+      SMTP_PORT:       "${SMTP_PORT:-587}"
+      SMTP_USER:       "${SMTP_USER:-}"
+      SMTP_PASSWORD:   "${SMTP_PASSWORD:-}"
+
+      # ── Storage (MinIO) ─────────────────────────────────────────
+      MINIO_ENDPOINT:        "minio:9000"
+      MINIO_ACCESS_KEY:      "${MINIO_ACCESS_KEY:-osv_minio}"
+      MINIO_SECRET_KEY:      "${MINIO_SECRET_KEY:-osv_minio_secret}"
+      MINIO_BUCKET:          "${MINIO_BUCKET:-osv-reports}"
+      MINIO_USE_SSL:         "false"
+      REPORT_STORAGE_BACKEND: "minio"  # enables report download via MinIO presigned URLs
+
+      # ── Misc ─────────────────────────────────────────────────
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      ALLOWED_ORIGINS: "${ALLOWED_ORIGINS:-https://c12.openledger.vn}"
+
+      # ── Data-service scheduler ────────────────────────────────
+      NVD_API_KEY: "${NVD_API_KEY:-}"
+      STARTUP_SYNC_ENABLED: "${STARTUP_SYNC_ENABLED:-true}"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+    healthcheck:
+      # distroless image has no shell/curl — disable docker healthcheck.
+      # Health is verified externally: curl http://172.20.2.48:8080/health
+      test: ["NONE"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - osv-internal
+      - osv-public
+
+  # ============================================================
+  # MinIO — S3-compatible object storage for reports
+  # P3-01: Required for report download feature
+  # Console: http://172.20.2.48:9001 (admin/osv_minio_secret)
+  # ============================================================
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    mem_limit: 256m
+    memswap_limit: 256m
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER:     "${MINIO_ACCESS_KEY:-osv_minio}"
+      MINIO_ROOT_PASSWORD: "${MINIO_SECRET_KEY:-osv_minio_secret}"
+    volumes:
+      - minio_data:/data
+    # Only expose console on internal network for security
+    # API (9000) accessible within osv-internal network only
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - osv-internal
+
+  # ============================================================
+  # finding-service — pre-built binary (port 8085)
+  # Built by: deploy_backend.sh (GOOS=linux GOARCH=amd64)
+  # Handles: /api/v1/findings, /api/v2/findings, /api/v1/products, etc.
+  # ============================================================
+  finding-service:
+    image: gcr.io/distroless/static-debian12:nonroot
+    restart: unless-stopped
+    user: "65532:65532"
+    volumes:
+      - ./finding-server:/service:ro   # pre-compiled linux/amd64 binary
+    entrypoint: ["/service"]
+    mem_limit: 256m
+    memswap_limit: 256m
+    ports:
+      - "172.20.2.48:8085:8085"        # finding API — accessible from osv-server gateway
+    environment:
+      HTTP_PORT:    "8085"
+      GRPC_PORT:    "50055"
+      DATABASE_URL: "postgres://osv:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      NATS_URL:     "nats://nats:4222"
+      NATS_ENABLED: "${NATS_ENABLED:-true}"
+      LOG_LEVEL:    "${LOG_LEVEL:-info}"
+      JIRA_ENCRYPTION_KEY: "${JIRA_ENCRYPTION_KEY:-}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    healthcheck:
+      test: ["NONE"]   # distroless has no shell — health verified externally
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - osv-internal
+
+  # ============================================================
+  # Ollama — local LLM server (P2-01: replaces OpenAI dependency)
+  # ============================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: osv-ollama
+    restart: unless-stopped
+    mem_limit: 4g
+    memswap_limit: 4g
+    volumes:
+      - ollama_data:/root/.ollama
+    # No external ports — only accessible within osv-internal network
+    environment:
+      OLLAMA_KEEP_ALIVE: "24h"
+    networks:
+      - osv-internal
+
+  # ============================================================
+  # Frontend static files (served by nginx)
+  # ============================================================
+  osv-frontend:
+    image: nginx:alpine
+    container_name: osv-frontend
+    restart: unless-stopped
+    mem_limit: 64m
+    memswap_limit: 64m
+    ports:
+      - "0.0.0.0:3000:80"
+    volumes:
+      - ./ui-dist:/usr/share/nginx/html:ro
+      - ./ui-nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - osv-public
+
+networks:
+  osv-internal:
+    driver: bridge
+    internal: true          # infra containers không có internet access trực tiếp
+  osv-public:
+    driver: bridge          # osv-server và nginx reachable từ host
+
+volumes:
+  postgres_data:
+    driver: local
+  mongo_data:
+    driver: local
+  opensearch_data:
+    driver: local
+  ollama_data:
+    driver: local  # P2-01: persists downloaded models between restarts
+  minio_data:
+    driver: local  # P3-01: persists report files between restarts

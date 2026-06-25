@@ -1,0 +1,87 @@
+/**
+ * Design Tokens — CSS custom properties cho OSV Platform UI.
+ * Tập trung tất cả màu sắc lặp lại để tránh magic hex values.
+ *
+ * Import file này vào src/styles/index.css:
+ *   @import './tokens.css';
+ *
+ * Usage trong component:
+ *   style={{ background: 'var(--color-bg-page)' }}
+ *
+ * @see architecture.md Section 5.5 — No-Hardcode Data Rule
+ */
+
+:root {
+  /* ─── Background ─────────────────────────────────────────────────────── */
+  --color-bg-page:       #0B1020;
+  --color-bg-card:       #151B2F;
+  --color-bg-sidebar:    #0F1629;
+  --color-bg-hover:      rgba(255, 255, 255, 0.02);
+  --color-bg-input:      rgba(255, 255, 255, 0.05);
+  --color-bg-overlay:    rgba(0, 0, 0, 0.7);
+
+  /* ─── Borders ────────────────────────────────────────────────────────── */
+  --color-border-subtle:  rgba(255, 255, 255, 0.07);
+  --color-border-input:   rgba(255, 255, 255, 0.1);
+  --color-border-section: rgba(255, 255, 255, 0.06);
+  --color-border-card:    rgba(255, 255, 255, 0.08);
+
+  /* ─── Text ───────────────────────────────────────────────────────────── */
+  --color-text-primary:   #E5E7EB;
+  --color-text-secondary: #9CA3AF;
+  --color-text-muted:     #6B7280;
+  --color-text-faint:     #4B5563;
+  --color-text-disabled:  #374151;
+
+  /* ─── Brand (Primary Blue) ───────────────────────────────────────────── */
+  --color-primary:        #4F8CFF;
+  --color-primary-dark:   #3B6FCC;
+  --color-primary-bg:     rgba(79, 140, 255, 0.1);
+  --color-primary-border: rgba(79, 140, 255, 0.3);
+  --color-primary-grad:   linear-gradient(135deg, #4F8CFF, #3B6FCC);
+
+  /* ─── Severity Colors ────────────────────────────────────────────────── */
+  --color-severity-critical:    #EF4444;
+  --color-severity-critical-bg: rgba(239, 68, 68, 0.1);
+  --color-severity-high:        #F97316;
+  --color-severity-high-bg:     rgba(249, 115, 22, 0.15);
+  --color-severity-medium:      #EAB308;
+  --color-severity-medium-bg:   rgba(234, 179, 8, 0.15);
+  --color-severity-low:         #3B82F6;
+  --color-severity-low-bg:      rgba(59, 130, 246, 0.15);
+
+  /* ─── Status Colors ──────────────────────────────────────────────────── */
+  --color-status-success:        #10B981;
+  --color-status-success-bg:     rgba(16, 185, 129, 0.1);
+  --color-status-success-border: rgba(16, 185, 129, 0.3);
+  --color-status-warning:        #F59E0B;
+  --color-status-warning-bg:     rgba(245, 158, 11, 0.1);
+  --color-status-warning-border: rgba(245, 158, 11, 0.2);
+  --color-status-error:          #EF4444;
+  --color-status-error-bg:       rgba(239, 68, 68, 0.1);
+  --color-status-error-border:   rgba(239, 68, 68, 0.2);
+  --color-status-info:           #4F8CFF;
+  --color-status-info-bg:        rgba(79, 140, 255, 0.1);
+  --color-status-neutral:        #6B7280;
+  --color-status-neutral-bg:     rgba(107, 114, 128, 0.1);
+
+  /* ─── AI / Purple Accent ─────────────────────────────────────────────── */
+  --color-ai:    #A78BFA;
+  --color-ai-bg: rgba(167, 139, 250, 0.1);
+
+  /* ─── Role Colors ────────────────────────────────────────────────────── */
+  --color-role-admin:    #EF4444;
+  --color-role-user:     #4F8CFF;
+  --color-role-readonly: #9CA3AF;
+  --color-role-agent:    #10B981;
+
+  /* ─── Charts ─────────────────────────────────────────────────────────── */
+  --color-chart-grid:         rgba(255, 255, 255, 0.05);
+  --color-chart-tooltip-bg:   #1E2A45;
+  --color-chart-tooltip-border: rgba(255, 255, 255, 0.1);
+
+  /* ─── Misc ───────────────────────────────────────────────────────────── */
+  --color-skeleton:  rgba(255, 255, 255, 0.06);
+  --color-divider:   rgba(255, 255, 255, 0.06);
+  --color-scrollbar: rgba(255, 255, 255, 0.1);
+}

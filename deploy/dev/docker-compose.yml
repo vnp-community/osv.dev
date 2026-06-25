@@ -1,25 +1,32 @@
 # =============================================================
 # OSV Platform — Local Development docker-compose
-# Build context: repository root (/Users/binhnt/Lab/sec/cve/osv.dev)
+# Build context: repository root
 # Usage: docker-compose -f deploy/dev/docker-compose.yml up -d
+#
+# Infra: PostgreSQL 16 + pgvector, MongoDB 7, Redis 7, NATS JetStream,
+#        OpenSearch 2 (search backend)
+#
+# Service: apps/osv (built from source via Dockerfile)
+# Env:     deploy/dev/.env (copy from .env.example)
 # =============================================================
 
 services:
-  # ==============================
+  # ============================================================
   # Infrastructure
-  # ==============================
+  # ============================================================
+
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16   # pgvector extension required for cves.embedding
     restart: unless-stopped
     environment:
-      POSTGRES_USER: osv
-      POSTGRES_PASSWORD: osv_dev
-      POSTGRES_DB: osv
+      POSTGRES_USER:     ${POSTGRES_USER:-osv}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-osv_dev_secret}
+      POSTGRES_DB:       ${POSTGRES_DB:-osvdb}      # consistent with POSTGRES_DSN
     ports: ["5432:5432"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U osv"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-osv} -d ${POSTGRES_DB:-osvdb}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,6 +46,9 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
+    command: >
+      redis-server
+      ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}
     ports: ["6379:6379"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -51,221 +61,168 @@ services:
     restart: unless-stopped
     command: ["-js", "-m", "8222", "--name", "osv-nats"]
     ports:
-      - "4222:4222"  # client
-      - "8222:8222"  # monitoring
+      - "4222:4222"   # client
+      - "8222:8222"   # monitoring
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8222/varz | grep -q server_name || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+  opensearch:
+    image: opensearchproject/opensearch:2.13.0
     restart: unless-stopped
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
       - cluster.name=osv-search
     ports: ["9200:9200"]
     volumes:
-      - es_data:/usr/share/elasticsearch/data
+      - opensearch_data:/usr/share/opensearch/data
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
 
-  # ==============================
-  # Core Services
-  # ==============================
-  identity-service:
+  # ============================================================
+  # OSV Unified Gateway (apps/osv) — built from source
+  # Spec: 01-architecture.md §2.1 — OSV_MODE=microservices
+  # ============================================================
+  osv-server:
     build:
       context: ../..
-      dockerfile: services/identity-service/Dockerfile
+      dockerfile: apps/osv/Dockerfile
     restart: unless-stopped
     ports:
-      - "8081:8081"
-      - "50051:50051"
+      - "8080:8080"    # Gateway HTTP (apps/osv)
+      - "9101:9101"    # identity-service HTTP (JWKS, login, register)
+      - "9001:9001"    # identity-service gRPC
     environment:
-      HTTP_PORT: "8081"
-      GRPC_PORT: "50051"
-      POSTGRES_DSN: "postgres://osv:osv_dev@postgres:5432/osv?sslmode=disable"
-      REDIS_ADDR: "redis:6379"
-      JWT_SECRET: "dev-secret-change-in-production-min-32-chars"
-      JWT_EXPIRY: "24h"
-      LOG_LEVEL: "debug"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  data-service:
-    build:
-      context: ../..
-      dockerfile: services/data-service/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8082:8082"
-      - "50052:50052"
-    environment:
-      HTTP_PORT: "8082"
-      GRPC_PORT: "50052"
-      POSTGRES_DSN: "postgres://osv:osv_dev@postgres:5432/osv?sslmode=disable"
-      MONGO_URI: "mongodb://mongodb:27017"
-      MONGO_DB: "osv"
-      NATS_URL: "nats://nats:4222"
-      LOG_LEVEL: "debug"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-      nats:
-        condition: service_started
-
-  search-service:
-    build:
-      context: ../..
-      dockerfile: services/search-service/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8083:8083"
-      - "50053:50053"
-    environment:
-      HTTP_PORT: "8083"
-      GRPC_PORT: "50053"
-      ES_ADDR: "http://elasticsearch:9200"
-      REDIS_ADDR: "redis:6379"
-      NATS_URL: "nats://nats:4222"
-      SEARCH_BACKEND: "elasticsearch"
-      LOG_LEVEL: "debug"
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      nats:
-        condition: service_started
-
-  scan-service:
-    build:
-      context: ../..
-      dockerfile: services/scan-service/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8084:8084"
-      - "50054:50054"
-    environment:
-      HTTP_PORT: "8084"
-      GRPC_PORT: "50054"
-      POSTGRES_DSN: "postgres://osv:osv_dev@postgres:5432/osv?sslmode=disable"
-      REDIS_ADDR: "redis:6379"
-      NATS_URL: "nats://nats:4222"
-      LOG_LEVEL: "debug"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      nats:
-        condition: service_started
-
-  finding-service:
-    build:
-      context: ../..
-      dockerfile: services/finding-service/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8085:8085"
-      - "50055:50055"
-    environment:
-      HTTP_PORT: "8085"
-      GRPC_PORT: "50055"
-      POSTGRES_DSN: "postgres://osv:osv_dev@postgres:5432/osv?sslmode=disable"
-      MONGO_URI: "mongodb://mongodb:27017"
-      NATS_URL: "nats://nats:4222"
-      LOG_LEVEL: "debug"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-      nats:
-        condition: service_started
-
-  ai-service:
-    build:
-      context: ../..
-      dockerfile: services/ai-service/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8086:8086"
-      - "50056:50056"
-    environment:
-      HTTP_PORT: "8086"
-      GRPC_PORT: "50056"
-      REDIS_ADDR: "redis:6379"
-      NATS_URL: "nats://nats:4222"
-      AI_PROVIDER: "openai"
-      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
-      VERTEX_PROJECT: "${VERTEX_PROJECT:-}"
-      LOG_LEVEL: "debug"
-    depends_on:
-      redis:
-        condition: service_healthy
-      nats:
-        condition: service_started
-
-  notification-service:
-    build:
-      context: ../..
-      dockerfile: services/notification-service/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8087:8087"
-      - "50057:50057"
-    environment:
-      HTTP_PORT: "8087"
-      GRPC_PORT: "50057"
-      POSTGRES_DSN: "postgres://osv:osv_dev@postgres:5432/osv?sslmode=disable"
-      NATS_URL: "nats://nats:4222"
-      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN:-}"
-      LOG_LEVEL: "debug"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      nats:
-        condition: service_started
-
-  gateway-service:
-    build:
-      context: ../..
-      dockerfile: services/gateway-service/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    environment:
+      # ── Gateway mode ────────────────────────────────────────
+      OSV_MODE: "microservices"
       HTTP_PORT: "8080"
-      IDENTITY_SERVICE_ADDR: "identity-service:50051"
-      DATA_SERVICE_ADDR: "data-service:50052"
-      SEARCH_SERVICE_ADDR: "search-service:50053"
-      SCAN_SERVICE_ADDR: "scan-service:50054"
-      FINDING_SERVICE_ADDR: "finding-service:50055"
-      AI_SERVICE_ADDR: "ai-service:50056"
-      NOTIFICATION_SERVICE_ADDR: "notification-service:50057"
-      REDIS_ADDR: "redis:6379"
-      JWT_SECRET: "dev-secret-change-in-production-min-32-chars"
-      LOG_LEVEL: "debug"
+
+      # ── PostgreSQL ───────────────────────────────────────────
+      # Spec: 01-architecture.md §4.1 — Schema-per-service (auth, vuln, notif)
+      POSTGRES_DSN: "postgres://${POSTGRES_USER:-osv}:${POSTGRES_PASSWORD:-osv_dev_secret}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      IDENTITY_DATABASE_URL: "postgres://${POSTGRES_USER:-osv}:${POSTGRES_PASSWORD:-osv_dev_secret}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      DATA_DATABASE_URL:     "postgres://${POSTGRES_USER:-osv}:${POSTGRES_PASSWORD:-osv_dev_secret}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+      NOTIFICATION_DATABASE_URL: "postgres://${POSTGRES_USER:-osv}:${POSTGRES_PASSWORD:-osv_dev_secret}@postgres:5432/${POSTGRES_DB:-osvdb}?sslmode=disable"
+
+      # ── MongoDB ─────────────────────────────────────────────
+      MONGO_URI: "mongodb://mongodb:27017"
+      MONGO_DB:  "${MONGO_DB:-cvedb}"
+
+      # ── Redis ───────────────────────────────────────────────
+      REDIS_ADDR:     "redis:6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_URL:      "redis://redis:6379/0"
+
+      # ── NATS ────────────────────────────────────────────────
+      NATS_URL:     "nats://nats:4222"
+      NATS_ENABLED: "${NATS_ENABLED:-true}"
+
+      # ── Search ──────────────────────────────────────────────
+      OPENSEARCH_URL:   "http://opensearch:9200"
+      OPENSEARCH_INDEX: "${OPENSEARCH_INDEX:-vulnerabilities}"
+      SEARCH_BACKEND:   "${SEARCH_BACKEND:-auto}"
+
+      # ── Identity service ────────────────────────────────────
+      # Spec: 01-architecture.md §3.10 — Auth Chain + JWKS
+      IDENTITY_HTTP_PORT: "9101"
+      IDENTITY_GRPC_PORT: "9001"
+      JWT_PRIVATE_KEY_PATH: "/run/secrets/jwt_private.pem"
+      JWT_ISSUER:    "${JWT_ISSUER:-https://auth.openvulnscan.io}"
+      JWT_AUDIENCE:  "${JWT_AUDIENCE:-openvulnscan}"
+      JWKS_URL:      "http://localhost:9101/.well-known/jwks.json"
+      JWT_SECRET:    "${JWT_SECRET:-dev-secret-change-in-production-min-32-chars}"
+
+      # ── Service ports (spec §2.2 Port Map) ──────────────────
+      DATA_HTTP_PORT:           "8082"
+      DATA_GRPC_PORT:           "50053"
+      SEARCH_HTTP_PORT:         "8083"
+      SEARCH_GRPC_PORT:         "50056"
+      RANKING_PORT:             "8088"
+      NOTIFICATION_HTTP_PORT:   "8086"
+      NOTIFICATION_GRPC_PORT:   "50063"
+      AI_GRPC_PORT:             "50052"
+
+      # ── Upstream HTTP addresses (EmbeddedConfig) ─────────────
+      # Code: services/gateway-service/embedded.go — WireEmbedded()
+      IDENTITY_SERVICE_HTTP: "http://localhost:9101"
+      DATA_SERVICE_HTTP:     "http://localhost:8082"
+      SEARCH_SERVICE_HTTP:   "http://localhost:8083"
+      RANKING_SERVICE_HTTP:  "http://localhost:8088"
+      NOTIFICATION_HTTP:     "http://localhost:8086"
+
+      # ── AI ───────────────────────────────────────────────────
+      AI_BACKEND:    "${AI_BACKEND:-ollama}"
+      AI_MODEL:      "${AI_MODEL:-llama3}"
+      AI_BASE_URL:   "${AI_BASE_URL:-http://host.docker.internal:11434}"
+      OPENAI_API_KEY:  "${OPENAI_API_KEY:-}"
+      VERTEX_PROJECT_ID: "${VERTEX_PROJECT_ID:-}"
+      VERTEX_LOCATION:   "${VERTEX_LOCATION:-us-central1}"
+
+      # ── Storage backend ─────────────────────────────────────
+      # Code: services/data-service/internal/config/storage_config.go
+      ALIAS_GROUP_BACKEND: "${ALIAS_GROUP_BACKEND:-postgres}"
+
+      # ── Admin seed account ───────────────────────────────────
+      INIT_ADMIN_EMAIL:    "${INIT_ADMIN_EMAIL:-admin@openvulnscan.io}"
+      INIT_ADMIN_USERNAME: "${INIT_ADMIN_USERNAME:-admin}"
+      INIT_ADMIN_PASSWORD: "${INIT_ADMIN_PASSWORD:-Admin@123!ChangeMe}"
+
+      # ── Notifications ────────────────────────────────────────
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN:-}"
+      SMTP_HOST:       "${SMTP_HOST:-}"
+      SMTP_PORT:       "${SMTP_PORT:-587}"
+      SMTP_USER:       "${SMTP_USER:-}"
+      SMTP_PASSWORD:   "${SMTP_PASSWORD:-}"
+
+      # ── Misc ─────────────────────────────────────────────────
+      LOG_LEVEL:       "${LOG_LEVEL:-debug}"
+      FORCE_INSECURE:  "${FORCE_INSECURE:-true}"   # dev only — disable JWT secret check
+      ALLOWED_ORIGINS: "${ALLOWED_ORIGINS:-http://localhost:3001,http://localhost:5173}"
     depends_on:
-      - identity-service
-      - data-service
-      - search-service
-      - scan-service
-      - finding-service
-      - ai-service
-      - notification-service
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health | grep -q ok || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # Ollama on host
+
+  # ============================================================
+  # Frontend (pre-built via vite/npm run build)
+  # ============================================================
+  osv-frontend:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    volumes:
+      - ../../ui/dist:/usr/share/nginx/html:ro
+      - ./ui-nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - osv-server
 
 volumes:
   postgres_data:
     driver: local
   mongo_data:
     driver: local
-  es_data:
+  opensearch_data:
     driver: local

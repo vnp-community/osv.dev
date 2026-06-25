@@ -1,5 +1,4 @@
-// Package entity defines domain entities for the report service.
-package entity
+package report
 
 import "time"
 
@@ -7,18 +6,18 @@ import "time"
 type OutputFormat string
 
 const (
-	FormatConsole OutputFormat = "console"
-	FormatCSV     OutputFormat = "csv"
-	FormatJSON    OutputFormat = "json"
-	FormatJSON2   OutputFormat = "json2"
-	FormatHTML    OutputFormat = "html"
-	FormatPDF     OutputFormat = "pdf"
+	OutFormatConsole OutputFormat = "console"
+	OutFormatCSV     OutputFormat = "csv"
+	OutFormatJSON    OutputFormat = "json"
+	OutFormatJSON2   OutputFormat = "json2"
+	OutFormatHTML    OutputFormat = "html"
+	OutFormatPDF     OutputFormat = "pdf"
 )
 
 // AllFormats returns all supported output formats.
 func AllFormats() []OutputFormat {
 	return []OutputFormat{
-		FormatConsole, FormatCSV, FormatJSON, FormatJSON2, FormatHTML, FormatPDF,
+		OutFormatConsole, OutFormatCSV, OutFormatJSON, OutFormatJSON2, OutFormatHTML, OutFormatPDF,
 	}
 }
 

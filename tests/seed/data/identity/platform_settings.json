@@ -1,0 +1,66 @@
+{
+  "max_scan_concurrent": {
+    "value": 5,
+    "description": "Maximum number of concurrent scan jobs"
+  },
+  "default_scan_timeout": {
+    "value": 3600,
+    "description": "Default scan timeout in seconds"
+  },
+  "ai_enrichment_enabled": {
+    "value": true,
+    "description": "Enable automatic AI enrichment for new CVEs"
+  },
+  "ai_enrichment_batch_size": {
+    "value": 20,
+    "description": "Number of CVEs per AI batch-enrich job"
+  },
+  "ai_enrichment_concurrency": {
+    "value": 5,
+    "description": "Max concurrent goroutines in batch_enrich"
+  },
+  "smtp_from_address": {
+    "value": "security-noreply@company.com",
+    "description": "From address for system emails (invitations, alerts)"
+  },
+  "smtp_from_name": {
+    "value": "OSV Security Platform",
+    "description": "Display name for system emails"
+  },
+  "invitation_expiry_hours": {
+    "value": 48,
+    "description": "User invitation token expiry in hours"
+  },
+  "session_max_devices": {
+    "value": 5,
+    "description": "Maximum concurrent sessions per user"
+  },
+  "finding_report_date_mode": {
+    "value": "dynamic",
+    "description": "How report dates are computed: dynamic (now) | fixed | creation_date"
+  },
+  "sla_warning_days": {
+    "value": 3,
+    "description": "Days before SLA breach to send warning notification"
+  },
+  "rate_limit_login_per_minute": {
+    "value": 10,
+    "description": "Max login attempts per IP per minute"
+  },
+  "cve_fetch_sources": {
+    "value": [
+      "NVD",
+      "OSV",
+      "EPSS"
+    ],
+    "description": "Default CVE fetch sources for data-service PopulateDB"
+  },
+  "jira_sync_interval_minutes": {
+    "value": 30,
+    "description": "Interval for bidirectional Jira sync"
+  },
+  "scan_scheduled_enabled": {
+    "value": true,
+    "description": "Enable/disable scheduled scan execution"
+  }
+}

@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/osv/pkg/models"
-	"github.com/osv/pkg/logger"
+	"github.com/osv/shared/pkg/models"
+	"github.com/osv/shared/pkg/logger"
 	"google.golang.org/grpc"
-	pb "github.com/osv/pkg/clients/api"
+	pb "github.com/osv/shared/pkg/clients/api"
 )
 
 type server struct {

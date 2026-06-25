@@ -34,8 +34,10 @@ const (
 type SortOrder string
 
 const (
-	SortNewest SortOrder = "newest"
-	SortOldest SortOrder = "oldest"
+	SortNewest   SortOrder = "newest"
+	SortOldest   SortOrder = "oldest"
+	SortEPSSDesc SortOrder = "epss_desc" // CR-GCV-002: sort by EPSS score descending
+	SortCVSS3    SortOrder = "cvss3_desc" // sort by CVSS3 score descending
 )
 
 var cvePattern = regexp.MustCompile(`^CVE-\d{4}-\d{4,}$`)
@@ -52,21 +54,37 @@ type CVE struct {
 	Severity    Severity  `json:"severity"`
 	Published   time.Time `json:"published"`
 	Source      Source    `json:"source"`
-	IsKEV       bool      `json:"kev"`
+	IsKEV       bool      `json:"is_kev"`
+	IsExploit   bool      `json:"is_exploit,omitempty"` // CR-GCV-003
 	Link        string    `json:"link,omitempty"`
 	CVSSScore   *float64  `json:"cvss,omitempty"`
+	CVSS3Score  *float64  `json:"cvss3,omitempty"`
+	EPSS        *float64  `json:"epss,omitempty"`        // CR-GCV-002
+	EPSSPct     *float64  `json:"epss_percentile,omitempty"` // CR-GCV-002
+	Vendors     []string  `db:"vendors" json:"vendors,omitempty"` // CR-GCV-005
+	Products    []string  `db:"products" json:"products,omitempty"` // CR-GCV-005
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 // SearchFilter holds all search parameters.
 type SearchFilter struct {
-	Query    string
-	Severity *Severity
-	Source   *Source
-	Sort     SortOrder
-	Page     int
-	Limit    int
+	Query     string
+	Severity  *Severity
+	Source    *Source
+	Sort      SortOrder
+	Page      int
+	Limit     int
+	// CR-GCV-002: EPSS filter
+	MinEPSS   *float64
+	MaxEPSS   *float64
+	// CR-GCV-003: Exploit/KEV filter
+	IsKEV     *bool
+	IsExploit *bool
+	// CR-GCV-005: CWE/Vendor/Product filter
+	CWE       string
+	Vendor    string
+	Product   string
 }
 
 // Validate clamps and defaults filter values.
@@ -77,7 +95,10 @@ func (f *SearchFilter) Validate() {
 	if f.Page < 0 {
 		f.Page = 0
 	}
-	if f.Sort != SortOldest {
+	switch f.Sort {
+	case SortOldest, SortEPSSDesc, SortCVSS3:
+		// valid
+	default:
 		f.Sort = SortNewest
 	}
 }

@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -18,7 +17,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 
-	authv1 "github.com/osv/identity-service/internal/infra/auth/genproto/auth/v1"
+	authv1 "github.com/osv/shared/proto/gen/go/auth/v1"
 
 	// Adapters
 	grpcHandler "github.com/osv/identity-service/adapter/handler/grpc"
@@ -36,6 +35,7 @@ import (
 	ucoauth "github.com/osv/identity-service/internal/usecase/oauth"
 	ucrefresh "github.com/osv/identity-service/internal/usecase/refresh_token"
 	ucregister "github.com/osv/identity-service/internal/usecase/register"
+	uctotp "github.com/osv/identity-service/internal/usecase/totp"
 	ucvalidate "github.com/osv/identity-service/internal/usecase/validate_token"
 )
 
@@ -47,7 +47,12 @@ func main() {
 	defer stop()
 
 	// ── PostgreSQL ────────────────────────────────────────────────────────
-	dbURL := getEnv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/authdb?sslmode=disable")
+	// IDENTITY_DATABASE_URL takes priority, falls back to DATABASE_URL, then default.
+	dbURL := getEnvFallback(
+		"postgres://osv:osv_dev@localhost:5432/osvdb?sslmode=disable",
+		"IDENTITY_DATABASE_URL",
+		"DATABASE_URL",
+	)
 	dbPool, err := pgxpool.New(ctx, dbURL)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("postgres connect failed")
@@ -109,9 +114,12 @@ func main() {
 	validateUC := ucvalidate.NewUseCase(jwtSvc, tokenCache)
 	oauthUC := ucoauth.NewUseCase(userRepo, sessionRepo, oauthAcctRepo, jwtSvc, googleProvider, githubProvider)
 	apiKeyUC := ucapikey.NewUseCase(apiKeyRepo)
+	totpUC := uctotp.New(userRepo)
+
+	notifPrefRepo := pgRepo.NewPostgresNotifPrefRepo(dbPool)
 
 	// ── gRPC Server ───────────────────────────────────────────────────────
-	grpcPort := getEnv("GRPC_PORT", "9001")
+	grpcPort := getEnvFallback("9001", "IDENTITY_GRPC_PORT", "GRPC_PORT")
 	grpcLis, err := net.Listen("tcp", ":"+grpcPort)
 	if err != nil {
 		logger.Fatal().Err(err).Str("port", grpcPort).Msg("gRPC listen failed")
@@ -129,17 +137,21 @@ func main() {
 	}()
 
 	// ── HTTP Server ───────────────────────────────────────────────────────
-	httpPort := getEnv("HTTP_PORT", "9101")
+	httpPort := getEnvFallback("9101", "IDENTITY_HTTP_PORT", "HTTP_PORT")
 	router := httpHandler.NewRouter(httpHandler.RouterDeps{
-		RegisterUC: registerUC,
-		LoginUC:    loginUC,
-		RefreshUC:  refreshUC,
-		LogoutUC:   logoutUC,
-		ValidateUC: validateUC,
-		OAuthUC:    oauthUC,
-		APIKeyUC:   apiKeyUC,
-		JWTSvc:     jwtSvc,
-		Log:        logger,
+		RegisterUC:    registerUC,
+		LoginUC:       loginUC,
+		RefreshUC:     refreshUC,
+		LogoutUC:      logoutUC,
+		ValidateUC:    validateUC,
+		OAuthUC:       oauthUC,
+		APIKeyUC:      apiKeyUC,
+		TotpUC:        totpUC,
+		UserRepo:      userRepo,
+		SessionRepo:   sessionRepo,
+		NotifPrefRepo: notifPrefRepo,
+		JWTSvc:        jwtSvc,
+		Log:           logger,
 	})
 
 	httpSrv := httpHandler.StartHTTPServer(httpPort, router)
@@ -174,5 +186,16 @@ func getEnv(key, def string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
 	}
-	return fmt.Sprintf("%s", def)
+	return def
+}
+
+// getEnvFallback returns the value of the first non-empty env var from keys,
+// or defaultVal if all are empty. Supports IDENTITY_-prefixed overrides.
+func getEnvFallback(defaultVal string, keys ...string) string {
+	for _, k := range keys {
+		if v := os.Getenv(k); v != "" {
+			return v
+		}
+	}
+	return defaultVal
 }

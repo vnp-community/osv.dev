@@ -1,0 +1,127 @@
+DANH SÁCH FAILURES:
+  ✗ auth::auth_me_user_schema_valid
+      → auth/me.user.created_at is missing
+  ✗ auth::auth_logout_returns_204
+      → Got 200
+  ✗ dashboard::sla_dashboard_returns_200
+      → Got 500: {"error":"INTERNAL_ERROR","message":"Failed to parse SLA response"}
+
+  ✗ cve::cve_search_returns_200
+      → Got 500: {"error":"search failed"}
+
+  ✗ cve::cve_search_severity_filter
+      → Got 500
+  ✗ cve::cve_search_kev_only
+      → Got 500
+  ✗ cve::cve_search_sort_epss_desc
+      → Got 500
+  ✗ cve::semantic_search_response_schema
+      → SemanticSearchResponse.total is missing; SemanticSearchResponse.query_embedding_ms is missing
+  ✗ cve::semantic_search_embedding_ms_is_int
+      → query_embedding_ms=None
+  ✗ cve::semantic_search_returns_200
+      → Exception: 'NoneType' object is not subscriptable
+  ✗ cve::cve_detail_CVE-2021-44228
+      → Got 500: {"error":"internal error"}
+
+  ✗ cve::cve_export_json_returns_200
+      → Got 500
+  ✗ kev_epss::kev_entry_0_schema
+      → kev[0].cve_id is missing; kev[0].vendor is missing; kev[0].vulnerability_name is missing; kev[0].date_added is missing; kev[0].due_date is missing; kev[0].known_ransomware_campaign_use is missing
+  ✗ kev_epss::kev_ransomware_only_filter
+      → Exception: 'NoneType' object is not iterable
+  ✗ kev_epss::kev_ransomware_endpoint_schema
+      → KEVListResponse.data is missing; KEVListResponse.page_size is missing; KEVListResponse.stats is missing
+  ✗ kev_epss::epss_top_response_schema
+      → EPSSTopResponse.cves is missing; EPSSTopResponse.total is missing
+  ✗ kev_epss::epss_distribution_response_schema
+      → EPSSDistributionResponse.buckets is missing; EPSSDistributionResponse.total_cves is missing; EPSSDistributionResponse.mean_epss is missing; EPSSDistributionResponse.median_epss is missing
+  ✗ kev_epss::epss_distribution_mean_epss_is_number
+      → mean_epss=None type=<class 'NoneType'>
+  ✗ kev_epss::epss_distribution_median_epss_is_number
+      → median_epss=None type=<class 'NoneType'>
+  ✗ taxonomy::cwe_list_response_schema
+      → CWEListResponse.cwe_list is missing; CWEListResponse.page is missing; CWEListResponse.page_size is missing
+  ✗ taxonomy::cwe_list_pagination
+      → missing pagination field 'page'; missing pagination field 'page_size'
+  ✗ taxonomy::cwe_search_response_schema
+      → CWEListResponse.cwe_list is missing; CWEListResponse.page is missing; CWEListResponse.page_size is missing
+  ✗ taxonomy::cwe_detail_response_schema
+      → CWEDetail.likelihood is missing; CWEDetail.mitigations is missing; CWEDetail.capec_patterns is missing; CWEDetail.related_cve_count is missing
+  ✗ taxonomy::cwe_detail_mitigations_is_list
+      → type=<class 'NoneType'>
+  ✗ taxonomy::vendors_items_are_strings
+      → Non-string vendors: [{'vendor': '7-zip', 'product_count': 1}, {'vendor': 'accellion', 'product_count': 1}, {'vendor': 'acclaim_systems', 'product_count': 1}]
+  ✗ taxonomy::vendors_prefix_search
+      → Exception: 'dict' object has no attribute 'lower'
+  ✗ findings_scans::findings_item_0_schema
+      → findings[0].created_by is missing; findings[0].status='Active' not in valid values
+  ✗ findings_scans::findings_status_filter_works
+      → Non-active findings: ['5a8772cc-bd84-4613-879e-d14b5c820fd2', 'ed23c741-5405-48cc-ba52-3a0b7a218754', '13011b9f-41b1-4509-acb3-936e332edd93']
+  ✗ findings_scans::findings_stats_returns_200
+      → Got 400
+  ✗ findings_scans::scans_list_response_schema
+      → ScansListResponse.page_size is missing; ScansListResponse.stats is missing
+  ✗ findings_scans::scans_stats_schema
+      → ScansStats.active_scans is missing; ScansStats.completed_today is missing; ScansStats.total_findings_today is missing; ScansStats.scheduled_scans is missing
+  ✗ findings_scans::sla_config_schema
+      → SLAConfig.global is missing; SLAConfig.product_overrides is missing
+  ✗ findings_scans::sla_config_global_schema
+      → SLAConfig.global.critical_days is missing; SLAConfig.global.high_days is missing; SLAConfig.global.medium_days is missing; SLAConfig.global.low_days is missing
+  ✗ findings_scans::sla_config_product_overrides_is_array
+      → not a list
+  ✗ findings_scans::sla_overview_schema
+      → SLASummary.total_active_findings is missing; SLASummary.compliance_percent is missing; SLASummary.ok is missing
+  ✗ assets_products::assets_list_is_array
+      → not a list
+  ✗ assets_products::products_list_schema
+      → products.products is missing; products.total is missing
+  ✗ assets_products::products_types_is_string_array
+      → types is not an array of strings
+  ✗ admin_notifications::admin_health_services_is_object
+      → type=<class 'list'>
+  ✗ admin_notifications::admin_role_0_schema
+      → missing 'name' or 'permissions'
+  ✗ ai_reports::ai_triage_queue_returns_200
+      → Got 503: {"error":"SERVICE_UNAVAILABLE","message":"Upstream service unavailable"}
+
+  ✗ ai_reports::ai_triage_queue_status_filter
+      → Got 503
+  ✗ ai_reports::ai_enrichment_status_returns_200
+      → Got 503
+  ✗ ai_reports::ai_enrichment_CVE-2021-44228
+      → Got 503
+  ✗ ai_reports::webhook_0_schema
+      → webhook[0].id is missing; webhook[0].name is missing; webhook[0].url is missing; webhook[0].events is missing; webhook[0].secret is missing; webhook[0].active is missing; webhook[0].created_at is missing
+  ✗ scan_stats::scans_list_has_stats_field
+      → 'stats' field missing from ScansListResponse
+  ✗ webhook_deliveries::webhook_deliveries_list_returns_200
+      → Got 405: 
+  ✗ webhook_deliveries::webhook_deliveries_status_filter
+      → Got 405
+  ✗ webhook_deliveries::webhook_deliveries_requires_auth
+      → Expected 401/403, got 405
+  ✗ admin_extended::rbac_matrix_response_schema
+      → RBACMatrixResponse.permission_categories is missing
+  ✗ admin_extended::rbac_role_0_schema
+      → role[0].name is missing; role[0].display_name is missing; role[0].user_count is missing; role[0].permissions is missing
+  ✗ admin_extended::rbac_roles_have_user_count
+      → user_count missing for roles: [None, None, None, None]
+  ✗ admin_extended::rbac_roles_include_admin_role
+      → 'admin' role missing. Found: {None}
+  ✗ admin_extended::admin_users_status_locked_filter
+      → Non-locked users in locked filter: ['0a9606c5-2ce3-4623-8e94-2445db195765', '8a10a585-b478-40bf-9b59-13537e018e06', 'd6c29d67-6c31-4d8d-b4fd-b37854b86a70']
+  ✗ public_stats::public_stats_accessible_without_auth_200
+      → Got 401 — public endpoint should NOT require auth
+  ✗ ai_triage_queue::ai_triage_queue_returns_200
+      → Got 503: {"error":"SERVICE_UNAVAILABLE","message":"Upstream service unavailable"}
+
+  ✗ ai_triage_queue::ai_triage_pending_filter
+      → Got 503
+  ✗ ai_triage_queue::ai_triage_severity_filter
+      → Got 503
+  ✗ ai_triage_queue::ai_triage_remarks_filter
+      → Got 503
+  ✗ ai_triage_queue::ai_triage_stats_consistency
+      → Got 503
+

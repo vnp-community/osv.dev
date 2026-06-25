@@ -32,4 +32,10 @@ type KEVRepository interface {
 
 	// Stats returns statistical information about the catalog.
 	Stats(ctx context.Context) (*keventity.KEVStats, error)
+
+	// DeleteByIDs removes KEV entries whose CVE IDs are not in the current catalog.
+	// Used for diff-based sync to remove entries that CISA removed.
+	// Returns the count of deleted records.
+	DeleteByIDs(ctx context.Context, keepIDs []string) (deleted int, err error)
 }
+

@@ -17,6 +17,11 @@ type Request struct {
 	Query         string
 	VendorProject string
 	Since         *time.Time
+	IsRansomware  bool // CR-GCV-007
+	// CR-007: advanced filters
+	DateFrom *time.Time // filter by date_added >= DateFrom
+	DateTo   *time.Time // filter by date_added <= DateTo
+	SortBy   string     // "date_added_desc" | "date_added_asc" | "vendor_asc"
 }
 
 // Response is the paginated response for KEV list queries.
@@ -46,6 +51,19 @@ func (uc *UseCase) Execute(ctx context.Context, req *Request) (*Response, error)
 		Since:         req.Since,
 		Page:          req.Page,
 		Limit:         req.Limit,
+	}
+	if req.IsRansomware {
+		filter.IsRansomware = &req.IsRansomware
+	}
+	// CR-007: additional filters
+	if req.DateFrom != nil {
+		filter.DateFrom = req.DateFrom
+	}
+	if req.DateTo != nil {
+		filter.DateTo = req.DateTo
+	}
+	if req.SortBy != "" {
+		filter.SortBy = req.SortBy
 	}
 	filter.Validate()
 

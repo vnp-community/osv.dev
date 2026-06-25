@@ -1,0 +1,116 @@
+/Users/binhnt/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+
+[1m======================================================================
+  OSV PLATFORM — CRASH REPORT VERIFICATION
+  Checking known broken endpoints from crash.md
+======================================================================[0m
+============================================================
+TEST CLIENT CONFIGURATION
+============================================================
+  API_BASE_URL_V1  : https://c12.openledger.vn/api/v1
+  API_BASE_URL_V2  : https://c12.openledger.vn/api/v2
+  TEST_EMAIL       : admin@openvulnscan.io
+  TEST_PASSWORD    : ******************
+  ACCESS_TOKEN     : (auto-login)
+  REQUEST_TIMEOUT  : 60s
+  VERBOSE          : True
+  SAMPLE_CVE_ID    : CVE-2021-44228
+  SAMPLE_CWE_ID    : CWE-89
+  SAMPLE_VENDOR    : apache
+============================================================
+[96m→ Logging in as admin@openvulnscan.io ...[0m
+[92m✓ Logged in. Token: eyJhbGciOiJSUzI1NiIsInR5cCI6Ik...[0m
+  GET    https://c12.openledger.vn/api/v1/sla/overview  →  [91m404[0m  (37ms)
+  POST   https://c12.openledger.vn/api/v2/cves/search  →  [91m500[0m  (38ms)
+  GET    https://c12.openledger.vn/api/v2/vendors  →  [91m404[0m  (36ms)
+  GET    https://c12.openledger.vn/api/v2/cwe  →  [91m404[0m  (43ms)
+  GET    https://c12.openledger.vn/api/v1/scans  →  [91m404[0m  (36ms)
+  GET    https://c12.openledger.vn/api/v1/scans  →  [91m404[0m  (40ms)
+  GET    https://c12.openledger.vn/api/v1/dashboard  →  [92m200[0m  (61ms)
+  GET    https://c12.openledger.vn/api/v1/dashboard/sla  →  [91m500[0m  (34ms)
+  GET    https://c12.openledger.vn/api/v1/products  →  [92m200[0m  (37ms)
+  GET    https://c12.openledger.vn/api/v1/assets  →  [92m200[0m  (37ms)
+  GET    https://c12.openledger.vn/api/v2/kev  →  [92m200[0m  (128ms)
+  GET    https://c12.openledger.vn/api/v2/epss/top  →  [91m404[0m  (36ms)
+
+[1m======================================================================
+  CRASH REPORT — Kết quả kiểm tra endpoints bị lỗi
+  Server: https://c12.openledger.vn
+======================================================================[0m
+
+  [91m[BROKEN]    [0m [1mBUG-01[0m Dashboard SLA: GET /api/v1/sla/overview → 404
+           GET v1/sla/overview
+           Reported: [93m404[0m  Actual: [93m404[0m  Expected: [92m200[0m  (37ms)
+           Response: 404 page not found 
+
+  [91m[BROKEN]    [0m [1mBUG-02[0m CVE Search: POST /api/v2/cves/search → 500
+           POST v2/cves/search
+           Reported: [93m500[0m  Actual: [91m500[0m  Expected: [92m200[0m  (38ms)
+           Response: {"error":"search failed"} 
+
+  [91m[BROKEN]    [0m [1mBUG-03[0m Vendors: GET /api/v2/vendors → 404
+           GET v2/vendors?limit=5
+           Reported: [93m404[0m  Actual: [93m404[0m  Expected: [92m200[0m  (36ms)
+           Response: 404 page not found 
+
+  [91m[BROKEN]    [0m [1mBUG-04[0m CWE List: GET /api/v2/cwe → 404
+           GET v2/cwe?page=1&page_size=10
+           Reported: [93m404[0m  Actual: [93m404[0m  Expected: [92m200[0m  (43ms)
+           Response: 404 page not found 
+
+  [91m[BROKEN]    [0m [1mBUG-05[0m Scans List: GET /api/v1/scans → 404
+           GET v1/scans?page=1&page_size=10
+           Reported: [93m404[0m  Actual: [93m404[0m  Expected: [92m200[0m  (36ms)
+           Response: 404 page not found 
+
+  [96m[CHECK]     [0m [1mBUG-06[0m Scans Running: GET /api/v1/scans?status=running → 500
+           GET v1/scans?status=running
+           Reported: [93m500[0m  Actual: [93m404[0m  Expected: [92m200[0m  (40ms)
+           Response: 404 page not found 
+
+  [92m[OK]        [0m [1mBUG-07[0m Dashboard: GET /api/v1/dashboard → check status
+           GET v1/dashboard
+           Reported: [93m?[0m  Actual: [92m200[0m  Expected: [92m200[0m  (61ms)
+
+  [91m[ERROR]     [0m [1mBUG-08[0m Dashboard SLA Full: GET /api/v1/dashboard/sla → 404
+           GET v1/dashboard/sla
+           Reported: [93m404[0m  Actual: [91m500[0m  Expected: [92m200[0m  (34ms)
+           Response: {"error":"INTERNAL_ERROR","message":"Failed to parse SLA response"} 
+
+  [92m[OK]        [0m [1mBUG-09[0m Products: GET /api/v1/products → check status
+           GET v1/products?page=1
+           Reported: [93m?[0m  Actual: [92m200[0m  Expected: [92m200[0m  (37ms)
+
+  [92m[OK]        [0m [1mBUG-10[0m Assets: GET /api/v1/assets → check status
+           GET v1/assets?page=1&pageSize=10
+           Reported: [93m?[0m  Actual: [92m200[0m  Expected: [92m200[0m  (37ms)
+
+  [92m[OK]        [0m [1mBUG-11[0m KEV Catalog: GET /api/v2/kev → check status
+           GET v2/kev?page=1&page_size=10
+           Reported: [93m?[0m  Actual: [92m200[0m  Expected: [92m200[0m  (128ms)
+
+  [96m[CHECK]     [0m [1mBUG-12[0m EPSS Top: GET /api/v2/epss/top → check status
+           GET v2/epss/top?limit=10
+           Reported: [93m?[0m  Actual: [93m404[0m  Expected: [92m200[0m  (36ms)
+           Response: 404 page not found 
+
+[1m======================================================================[0m
+  [1mSUMMARY[0m
+======================================================================
+  Tổng endpoints kiểm tra : 12
+  [92mĐã sửa (FIXED)          : 0[0m
+  [91mVẫn còn lỗi (BROKEN)    : 5[0m
+  [91mLỗi mới (NEW ISSUE)     : 1[0m
+  [96mHoạt động đúng (OK)      : 4[0m
+
+[91m  CÁC ENDPOINT VẪN BỊ LỖI:[0m
+    - BUG-01: Dashboard SLA: GET /api/v1/sla/overview → 404  (HTTP 404)
+    - BUG-02: CVE Search: POST /api/v2/cves/search → 500  (HTTP 500)
+    - BUG-03: Vendors: GET /api/v2/vendors → 404  (HTTP 404)
+    - BUG-04: CWE List: GET /api/v2/cwe → 404  (HTTP 404)
+    - BUG-05: Scans List: GET /api/v1/scans → 404  (HTTP 404)
+    - BUG-06: Scans Running: GET /api/v1/scans?status=running → 500  (HTTP 404)
+    - BUG-08: Dashboard SLA Full: GET /api/v1/dashboard/sla → 404  (HTTP 500)
+======================================================================
+

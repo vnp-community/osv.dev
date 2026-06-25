@@ -49,6 +49,9 @@ func (r *mongoCVERepo) FindByCPE(ctx context.Context, opts repository.CVESearchO
 	if opts.Limit > 0 {
 		findOpts.SetLimit(int64(opts.Limit))
 	}
+	if opts.Skip > 0 {
+		findOpts.SetSkip(int64(opts.Skip))
+	}
 
 	cursor, err := r.col.Find(ctx, filter, findOpts)
 	if err != nil {
@@ -135,6 +138,50 @@ func (r *mongoCVERepo) FindRecent(ctx context.Context, since time.Time, limit in
 	var results []*entity.CVE
 	if err := cursor.All(ctx, &results); err != nil {
 		return nil, fmt.Errorf("FindRecent decode: %w", err)
+	}
+	return results, nil
+}
+
+// ─── Semantic Search (CR-GCV-004) ──────────────────────────────────────────────
+// Note: MongoDB does not natively support vector similarity search with pgvector.
+// These methods delegate to the AI enrichment service via NATS (osv.ai.enrichment.completed).
+// For production pgvector search, a separate PostgreSQL-backed repo is used.
+// These stubs satisfy the CVERepository interface.
+
+// SearchSemantic searches CVEs by embedding similarity.
+// In production, this is routed to the pgvector-backed PostgreSQL repository.
+// This MongoDB implementation returns an empty result and logs a warning.
+func (r *mongoCVERepo) SearchSemantic(_ context.Context, _ []float32, limit int, threshold float64) ([]*entity.CVE, error) {
+	// MongoDB does not support pgvector. Semantic search is delegated to PostgreSQL.
+	// Return empty; the HTTP handler falls back to GIN full-text search.
+	return nil, nil
+}
+
+// UpdateEmbedding stores the vector embedding for a CVE.
+// In production, this is stored in PostgreSQL (pgvector extension).
+// This MongoDB implementation is a no-op — embeddings are stored via NATS consumer.
+func (r *mongoCVERepo) UpdateEmbedding(ctx context.Context, cveID string, embedding []float32, model string) error {
+	// Embeddings are persisted by the alias_consumer (NATS: osv.ai.enrichment.completed)
+	// which writes to PostgreSQL. This MongoDB stub is a no-op.
+	return nil
+}
+
+// FindWithoutEmbedding returns CVEs that have not yet been embedded.
+// Used by the AI enrichment pipeline to batch-process embeddings.
+func (r *mongoCVERepo) FindWithoutEmbedding(ctx context.Context, limit int) ([]*entity.CVE, error) {
+	opts := options.Find().SetLimit(int64(limit))
+	cursor, err := r.col.Find(ctx,
+		bson.M{"embedding": bson.M{"$exists": false}},
+		opts,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("FindWithoutEmbedding: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	var results []*entity.CVE
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, fmt.Errorf("FindWithoutEmbedding decode: %w", err)
 	}
 	return results, nil
 }

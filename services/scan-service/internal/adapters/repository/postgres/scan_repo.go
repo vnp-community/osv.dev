@@ -160,5 +160,65 @@ func (r *FindingRepo) FindByScanID(ctx context.Context, scanID uuid.UUID, page, 
 }
 
 func (r *FindingRepo) FindByID(ctx context.Context, id uuid.UUID) (*entity.Finding, error) {
-	return nil, nil // simplified; expand as needed
+	var f entity.Finding
+	var cveIDs, openPorts, services []byte
+	err := r.db.QueryRow(ctx, `
+		SELECT id, scan_id, ip_address, hostname, os, open_ports, services, cve_ids, severity, created_at
+		FROM scan.findings WHERE id=$1`, id).Scan(
+		&f.ID, &f.ScanID, &f.IPAddress, &f.Hostname, &f.OS,
+		&openPorts, &services, &cveIDs, &f.Severity, &f.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	json.Unmarshal(cveIDs, &f.CVEIDs)
+	json.Unmarshal(openPorts, &f.OpenPorts)
+	json.Unmarshal(services, &f.Services)
+	return &f, nil
+}
+
+// WebAlertRepo implements repository.WebAlertRepository backed by scan.web_alerts.
+type WebAlertRepo struct{ db *pgxpool.Pool }
+
+func NewWebAlertRepo(db *pgxpool.Pool) *WebAlertRepo { return &WebAlertRepo{db: db} }
+
+func (r *WebAlertRepo) CreateBatch(ctx context.Context, alerts []*entity.WebAlert) error {
+	for _, a := range alerts {
+		if a.ID == uuid.Nil {
+			a.ID = uuid.New()
+		}
+		_, err := r.db.Exec(ctx, `
+			INSERT INTO scan.web_alerts
+			  (id, scan_id, target_url, alert_name, risk, confidence, description, solution, reference, evidence, created_at)
+			VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW())
+			ON CONFLICT DO NOTHING`,
+			a.ID, a.ScanID, a.TargetURL, a.AlertName,
+			a.Risk, a.Confidence, a.Description, a.Solution, a.Reference, a.Evidence,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *WebAlertRepo) FindByScanID(ctx context.Context, scanID uuid.UUID) ([]*entity.WebAlert, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT id, scan_id, target_url, alert_name, risk, confidence, description, solution, reference, evidence, created_at
+		FROM scan.web_alerts
+		WHERE scan_id=$1
+		ORDER BY risk DESC, created_at`,
+		scanID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var alerts []*entity.WebAlert
+	for rows.Next() {
+		var a entity.WebAlert
+		rows.Scan(&a.ID, &a.ScanID, &a.TargetURL, &a.AlertName,
+			&a.Risk, &a.Confidence, &a.Description, &a.Solution, &a.Reference, &a.Evidence, &a.CreatedAt)
+		alerts = append(alerts, &a)
+	}
+	return alerts, rows.Err()
 }

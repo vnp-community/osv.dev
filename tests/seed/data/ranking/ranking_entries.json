@@ -1,0 +1,124 @@
+[
+  {
+    "_id": "25acdedb-0e2d-4a4d-8234-a5417e9776f9",
+    "cpe": "apache:log4j",
+    "rank": [
+      {
+        "group": "it",
+        "rank": 10
+      },
+      {
+        "group": "engineering",
+        "rank": 9
+      },
+      {
+        "group": "finance",
+        "rank": 3
+      }
+    ]
+  },
+  {
+    "_id": "8f9a7a29-9d20-44c1-a3f0-76a0ffd3ea48",
+    "cpe": "oracle:database",
+    "rank": [
+      {
+        "group": "it",
+        "rank": 8
+      },
+      {
+        "group": "finance",
+        "rank": 10
+      },
+      {
+        "group": "engineering",
+        "rank": 5
+      }
+    ]
+  },
+  {
+    "_id": "537d96ba-0935-4a6a-9a72-b8512c295377",
+    "cpe": "microsoft:windows_server",
+    "rank": [
+      {
+        "group": "it",
+        "rank": 9
+      },
+      {
+        "group": "engineering",
+        "rank": 6
+      },
+      {
+        "group": "operations",
+        "rank": 10
+      }
+    ]
+  },
+  {
+    "_id": "3f08bf2b-8b0c-4bf3-8096-6e4fee077d34",
+    "cpe": "nginx:nginx",
+    "rank": [
+      {
+        "group": "it",
+        "rank": 7
+      },
+      {
+        "group": "engineering",
+        "rank": 8
+      },
+      {
+        "group": "operations",
+        "rank": 7
+      }
+    ]
+  },
+  {
+    "_id": "dc70fc81-d267-4974-9248-a2d6a12728f3",
+    "cpe": "openssl:openssl",
+    "rank": [
+      {
+        "group": "it",
+        "rank": 9
+      },
+      {
+        "group": "engineering",
+        "rank": 9
+      },
+      {
+        "group": "security",
+        "rank": 10
+      }
+    ]
+  },
+  {
+    "_id": "4957ed51-e701-488e-8ccb-c9abbc060c00",
+    "cpe": "cisco:ios",
+    "rank": [
+      {
+        "group": "it",
+        "rank": 10
+      },
+      {
+        "group": "network-ops",
+        "rank": 10
+      },
+      {
+        "group": "security",
+        "rank": 9
+      }
+    ]
+  },
+  {
+    "_id": "f71c67ad-1593-4da6-abca-b6c7db400073",
+    "cpe": "vmware:vcenter_server",
+    "rank": [
+      {
+        "group": "it",
+        "rank": 9
+      },
+      {
+        "group": "operations",
+        "rank": 9
+      }
+    ]
+  }
+]

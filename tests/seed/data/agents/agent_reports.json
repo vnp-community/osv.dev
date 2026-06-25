@@ -1,0 +1,411 @@
+[
+  {
+    "_id": "058590b3-6aa7-4a09-ba4d-4d1577855cb1",
+    "agent_id": "d7bbee3c-e81a-45ff-a083-40ef987eb343",
+    "hostname": "web-0001.production.internal",
+    "ip_address": "10.0.1.2",
+    "os_info": "Windows Server 2022",
+    "kernel_version": "5.15.0-91-generic",
+    "reported_at": "2026-06-24T11:07:40Z",
+    "packages": [
+      {
+        "name": "apache-commons-text",
+        "version": "1.9",
+        "ecosystem": "maven",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "openssl",
+        "version": "3.0.2-0ubuntu1",
+        "ecosystem": "debian",
+        "architecture": "noarch"
+      },
+      {
+        "name": "express",
+        "version": "4.17.1",
+        "ecosystem": "npm",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "lodash",
+        "version": "4.17.20",
+        "ecosystem": "npm",
+        "architecture": "noarch"
+      },
+      {
+        "name": "spring-core",
+        "version": "5.3.18",
+        "ecosystem": "maven",
+        "architecture": "amd64"
+      },
+      {
+        "name": "jackson-databind",
+        "version": "2.13.0",
+        "ecosystem": "maven",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "nodejs",
+        "version": "18.12.0",
+        "ecosystem": "rpm",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "requests",
+        "version": "2.27.1",
+        "ecosystem": "pypi",
+        "architecture": "noarch"
+      },
+      {
+        "name": "curl",
+        "version": "7.68.0-1ubuntu2.18",
+        "ecosystem": "debian",
+        "architecture": "amd64"
+      },
+      {
+        "name": "libssl1.1",
+        "version": "1.1.1f-1ubuntu2",
+        "ecosystem": "debian",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "log4j",
+        "version": "2.14.1",
+        "ecosystem": "maven",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "nginx",
+        "version": "1.24.0",
+        "ecosystem": "debian",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "python3",
+        "version": "3.10.6",
+        "ecosystem": "ubuntu",
+        "architecture": "noarch"
+      }
+    ]
+  },
+  {
+    "_id": "1f0dff5a-41ae-44af-88e1-3072bfad06e9",
+    "agent_id": "04e73206-3fa6-428a-8fb3-471cf43dcac0",
+    "hostname": "db-0002.production.internal",
+    "ip_address": "10.0.2.3",
+    "os_info": "Windows Server 2022",
+    "kernel_version": "5.14.0-362.18.1.el9_3.x86_64",
+    "reported_at": "2026-06-22T11:07:40Z",
+    "packages": [
+      {
+        "name": "python3",
+        "version": "3.10.6",
+        "ecosystem": "ubuntu",
+        "architecture": "noarch"
+      },
+      {
+        "name": "apache-commons-text",
+        "version": "1.9",
+        "ecosystem": "maven",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "libssl1.1",
+        "version": "1.1.1f-1ubuntu2",
+        "ecosystem": "debian",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "openssl",
+        "version": "3.0.2-0ubuntu1",
+        "ecosystem": "debian",
+        "architecture": "amd64"
+      },
+      {
+        "name": "lodash",
+        "version": "4.17.20",
+        "ecosystem": "npm",
+        "architecture": "amd64"
+      },
+      {
+        "name": "spring-core",
+        "version": "5.3.18",
+        "ecosystem": "maven",
+        "architecture": "noarch"
+      },
+      {
+        "name": "express",
+        "version": "4.17.1",
+        "ecosystem": "npm",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "nodejs",
+        "version": "18.12.0",
+        "ecosystem": "rpm",
+        "architecture": "noarch"
+      },
+      {
+        "name": "nginx",
+        "version": "1.24.0",
+        "ecosystem": "debian",
+        "architecture": "amd64"
+      },
+      {
+        "name": "curl",
+        "version": "7.68.0-1ubuntu2.18",
+        "ecosystem": "debian",
+        "architecture": "noarch"
+      },
+      {
+        "name": "log4j",
+        "version": "2.14.1",
+        "ecosystem": "maven",
+        "architecture": "noarch"
+      },
+      {
+        "name": "requests",
+        "version": "2.27.1",
+        "ecosystem": "pypi",
+        "architecture": "amd64"
+      },
+      {
+        "name": "jackson-databind",
+        "version": "2.13.0",
+        "ecosystem": "maven",
+        "architecture": "x86_64"
+      }
+    ]
+  },
+  {
+    "_id": "e74a18f8-7ddc-4144-9a55-536117184bad",
+    "agent_id": "42304cc0-77cb-4b18-a972-2aac4d1ebfb8",
+    "hostname": "api-0003.production.internal",
+    "ip_address": "10.0.3.4",
+    "os_info": "Ubuntu 20.04 LTS",
+    "kernel_version": "10.0.20348.2340",
+    "reported_at": "2026-06-21T11:07:40Z",
+    "packages": [
+      {
+        "name": "requests",
+        "version": "2.27.1",
+        "ecosystem": "pypi",
+        "architecture": "amd64"
+      },
+      {
+        "name": "curl",
+        "version": "7.68.0-1ubuntu2.18",
+        "ecosystem": "debian",
+        "architecture": "noarch"
+      },
+      {
+        "name": "apache-commons-text",
+        "version": "1.9",
+        "ecosystem": "maven",
+        "architecture": "amd64"
+      },
+      {
+        "name": "python3",
+        "version": "3.10.6",
+        "ecosystem": "ubuntu",
+        "architecture": "noarch"
+      },
+      {
+        "name": "nginx",
+        "version": "1.24.0",
+        "ecosystem": "debian",
+        "architecture": "amd64"
+      },
+      {
+        "name": "spring-core",
+        "version": "5.3.18",
+        "ecosystem": "maven",
+        "architecture": "amd64"
+      },
+      {
+        "name": "lodash",
+        "version": "4.17.20",
+        "ecosystem": "npm",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "libssl1.1",
+        "version": "1.1.1f-1ubuntu2",
+        "ecosystem": "debian",
+        "architecture": "amd64"
+      },
+      {
+        "name": "express",
+        "version": "4.17.1",
+        "ecosystem": "npm",
+        "architecture": "amd64"
+      },
+      {
+        "name": "log4j",
+        "version": "2.14.1",
+        "ecosystem": "maven",
+        "architecture": "noarch"
+      },
+      {
+        "name": "openssl",
+        "version": "3.0.2-0ubuntu1",
+        "ecosystem": "debian",
+        "architecture": "x86_64"
+      }
+    ]
+  },
+  {
+    "_id": "a381f47c-a8db-4aa8-855f-fa45d468a336",
+    "agent_id": "bd929301-ded8-42a0-92c1-1249746482c7",
+    "hostname": "ci-0004.devops.internal",
+    "ip_address": "10.0.4.5",
+    "os_info": "Rocky Linux 9",
+    "kernel_version": "5.14.0-362.18.1.el9_3.x86_64",
+    "reported_at": "2026-06-24T11:07:40Z",
+    "packages": [
+      {
+        "name": "curl",
+        "version": "7.68.0-1ubuntu2.18",
+        "ecosystem": "debian",
+        "architecture": "noarch"
+      },
+      {
+        "name": "lodash",
+        "version": "4.17.20",
+        "ecosystem": "npm",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "apache-commons-text",
+        "version": "1.9",
+        "ecosystem": "maven",
+        "architecture": "noarch"
+      },
+      {
+        "name": "log4j",
+        "version": "2.14.1",
+        "ecosystem": "maven",
+        "architecture": "amd64"
+      },
+      {
+        "name": "nodejs",
+        "version": "18.12.0",
+        "ecosystem": "rpm",
+        "architecture": "amd64"
+      },
+      {
+        "name": "libssl1.1",
+        "version": "1.1.1f-1ubuntu2",
+        "ecosystem": "debian",
+        "architecture": "noarch"
+      },
+      {
+        "name": "python3",
+        "version": "3.10.6",
+        "ecosystem": "ubuntu",
+        "architecture": "noarch"
+      },
+      {
+        "name": "express",
+        "version": "4.17.1",
+        "ecosystem": "npm",
+        "architecture": "noarch"
+      },
+      {
+        "name": "requests",
+        "version": "2.27.1",
+        "ecosystem": "pypi",
+        "architecture": "amd64"
+      },
+      {
+        "name": "spring-core",
+        "version": "5.3.18",
+        "ecosystem": "maven",
+        "architecture": "amd64"
+      },
+      {
+        "name": "openssl",
+        "version": "3.0.2-0ubuntu1",
+        "ecosystem": "debian",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "jackson-databind",
+        "version": "2.13.0",
+        "ecosystem": "maven",
+        "architecture": "noarch"
+      },
+      {
+        "name": "nginx",
+        "version": "1.24.0",
+        "ecosystem": "debian",
+        "architecture": "x86_64"
+      }
+    ]
+  },
+  {
+    "_id": "ff38afb2-7e51-4299-843f-c0dd16b2c870",
+    "agent_id": "494314a8-1ed8-4f4b-911b-280f503a7d68",
+    "hostname": "gw-0005.production.internal",
+    "ip_address": "10.0.5.6",
+    "os_info": "CentOS 7",
+    "kernel_version": "10.0.20348.2340",
+    "reported_at": "2026-06-24T11:07:40Z",
+    "packages": [
+      {
+        "name": "log4j",
+        "version": "2.14.1",
+        "ecosystem": "maven",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "curl",
+        "version": "7.68.0-1ubuntu2.18",
+        "ecosystem": "debian",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "python3",
+        "version": "3.10.6",
+        "ecosystem": "ubuntu",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "apache-commons-text",
+        "version": "1.9",
+        "ecosystem": "maven",
+        "architecture": "amd64"
+      },
+      {
+        "name": "openssl",
+        "version": "3.0.2-0ubuntu1",
+        "ecosystem": "debian",
+        "architecture": "noarch"
+      },
+      {
+        "name": "lodash",
+        "version": "4.17.20",
+        "ecosystem": "npm",
+        "architecture": "noarch"
+      },
+      {
+        "name": "jackson-databind",
+        "version": "2.13.0",
+        "ecosystem": "maven",
+        "architecture": "amd64"
+      },
+      {
+        "name": "spring-core",
+        "version": "5.3.18",
+        "ecosystem": "maven",
+        "architecture": "x86_64"
+      },
+      {
+        "name": "libssl1.1",
+        "version": "1.1.1f-1ubuntu2",
+        "ecosystem": "debian",
+        "architecture": "noarch"
+      }
+    ]
+  }
+]

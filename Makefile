@@ -16,6 +16,13 @@ COMMIT       := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown"
 BUILD_DATE   := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 LDFLAGS      := -ldflags="-X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.buildDate=$(BUILD_DATE)"
 
+# Server deployment
+DEPLOY_SERVER := 172.20.2.48
+NGINX_SERVER  := 172.20.2.16
+DEPLOY_USER   ?= ubuntu
+NGINX_USER    ?= ubuntu
+SSH_KEY       ?= $(HOME)/.ssh/id_ed25519
+
 # Colors
 CYAN  := \033[36m
 GREEN := \033[32m
@@ -64,6 +71,31 @@ build: ## Build all service binaries
 		(cd services/$$svc && go build $(LDFLAGS) ./cmd/...) || exit 1; \
 	done
 	@echo "$(GREEN)All services built$(RESET)"
+
+.PHONY: build-linux
+build-linux: ## Cross-compile osv-server for Linux/amd64 (output: dist/osv-server)
+	@echo "$(CYAN)Cross-compiling osv-server for linux/amd64...$(RESET)"
+	@mkdir -p dist
+	@(cd apps/osv && \
+	 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
+	 go build -trimpath \
+	   -ldflags "-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.buildDate=$(BUILD_DATE)" \
+	   -o ../../dist/osv-server ./cmd/server/)
+	@echo "$(GREEN)Binary ready: dist/osv-server ($(shell du -sh dist/osv-server 2>/dev/null | cut -f1))$(RESET)"
+
+.PHONY: deploy-server
+deploy-server: build-linux ## Build + sync binary to 172.20.2.48 + restart container
+	@DEPLOY_USER=$(DEPLOY_USER) NGINX_USER=$(NGINX_USER) SSH_KEY=$(SSH_KEY) \
+	 ./deploy/server/deploy.sh
+	@echo "$(GREEN)Deployed to https://c12.openledger.vn$(RESET)"
+
+.PHONY: deploy-nginx
+deploy-nginx: ## Push nginx config to 172.20.2.16 and reload
+	@DEPLOY_USER=$(DEPLOY_USER) NGINX_USER=$(NGINX_USER) SSH_KEY=$(SSH_KEY) \
+	 ./deploy/server/deploy.sh --nginx-only
+
+.PHONY: deploy-full
+deploy-full: deploy-server deploy-nginx ## Full deploy: binary + nginx config
 
 .PHONY: docker-build
 docker-build: ## Build Docker images for all services
@@ -149,4 +181,5 @@ fmt: ## Format all Go code with gofumpt
 .PHONY: clean
 clean: ## Remove build artifacts and volumes
 	find services -name "*.test" -delete
+	rm -rf dist/
 	docker-compose --profile all down -v --remove-orphans 2>/dev/null || true

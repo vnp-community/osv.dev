@@ -1,0 +1,24 @@
+[
+  {
+    "_id": "bbb285f1-3e3c-451c-8847-5acfe08659c2",
+    "name": "Log4Shell variants",
+    "product_id": "a60da6c5-1a12-4fbd-aa3c-2f920df94e29",
+    "finding_ids": [
+      "38710aa5-fb41-48df-aeca-c5ea9616a360",
+      "e537dc92-f206-4274-8858-acae4bf22eee",
+      "75a0c559-99af-4b64-b43e-e5346e29f43e",
+      "f783fc25-d51e-4656-9a59-c00f704e92f5",
+      "ab058c71-bbf8-49e9-a8bd-41e685138d67"
+    ]
+  },
+  {
+    "_id": "f5842d4b-066c-4113-b155-20644fa6b0bf",
+    "name": "Spring4Shell cluster",
+    "product_id": "3cc795ad-98dc-4ef0-9ad7-0a433734cae0",
+    "finding_ids": [
+      "f218b487-52d3-4c8d-b1e0-89d33d6d3181",
+      "93972ea1-0fd7-4fb0-b417-c82a51cbf6b8",
+      "cab9a1aa-5fb5-4d0a-b3b7-eaf021c71f19"
+    ]
+  }
+]

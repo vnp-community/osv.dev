@@ -22,13 +22,17 @@ type cisaResponse struct {
 }
 
 type cisaVuln struct {
-	CveID             string `json:"cveID"`
-	VendorProject     string `json:"vendorProject"`
-	Product           string `json:"product"`
-	VulnerabilityName string `json:"vulnerabilityName"`
-	DateAdded         string `json:"dateAdded"` // "2021-11-03"
-	DueDate           string `json:"dueDate"`   // "2021-11-17"
-	Notes             string `json:"notes"`
+	CveID                      string `json:"cveID"`
+	VendorProject              string `json:"vendorProject"`
+	Product                    string `json:"product"`
+	VulnerabilityName          string `json:"vulnerabilityName"`
+	DateAdded                  string `json:"dateAdded"` // "2021-11-03"
+	DueDate                    string `json:"dueDate"`   // "2021-11-17"
+	Notes                      string `json:"notes"`
+	// CR-GCV-007 extended fields
+	ShortDescription           string `json:"shortDescription"`
+	RequiredAction             string `json:"requiredAction"`
+	KnownRansomwareCampaignUse string `json:"knownRansomwareCampaignUse"`
 }
 
 // Client fetches the CISA KEV catalog over HTTP.
@@ -75,11 +79,14 @@ func (c *Client) FetchKEVCatalog(ctx context.Context) ([]*keventity.KEVEntry, er
 	entries := make([]*keventity.KEVEntry, 0, len(cr.Vulnerabilities))
 	for _, v := range cr.Vulnerabilities {
 		e := &keventity.KEVEntry{
-			CVEID:             v.CveID,
-			VendorProject:     v.VendorProject,
-			Product:           v.Product,
-			VulnerabilityName: v.VulnerabilityName,
-			Notes:             v.Notes,
+			CVEID:                      v.CveID,
+			VendorProject:              v.VendorProject,
+			Product:                    v.Product,
+			VulnerabilityName:          v.VulnerabilityName,
+			Notes:                      v.Notes,
+			ShortDescription:           v.ShortDescription,
+			RequiredAction:             v.RequiredAction,
+			KnownRansomwareCampaignUse: v.KnownRansomwareCampaignUse,
 		}
 		if t, err := time.Parse("2006-01-02", v.DateAdded); err == nil {
 			e.DateAdded = t

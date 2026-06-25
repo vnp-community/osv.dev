@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/osv/finding-service/internal/domain/entity"
-	"github.com/osv/finding-service/internal/domain/service"
+	"github.com/osv/finding-service/internal/domain/report"
+	"github.com/osv/finding-service/internal/domain/report/service"
 	"github.com/osv/finding-service/internal/formatters"
 )
 
@@ -39,7 +39,7 @@ func (f *ConsoleFormatter) ContentType() string { return "text/plain; charset=ut
 func (f *ConsoleFormatter) FileExtension() string { return ".txt" }
 
 // Format renders CVE findings to ANSI-colored text.
-func (f *ConsoleFormatter) Format(_ context.Context, data entity.ReportInput, opts formatters.FormatOptions) ([]byte, error) {
+func (f *ConsoleFormatter) Format(_ context.Context, data report.ReportInput, opts formatters.FormatOptions) ([]byte, error) {
 	var buf bytes.Buffer
 
 	// Header

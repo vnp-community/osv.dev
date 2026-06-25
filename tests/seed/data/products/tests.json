@@ -1,0 +1,522 @@
+[
+  {
+    "_id": "b9378357-8a9a-436d-b30e-9b630b88b55d",
+    "engagement_id": "84c1d40e-5c22-4a90-850c-2d501330597b",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-04-25T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 86,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "fbdb42c9-a576-460f-b2ad-eba3dd812b45",
+    "engagement_id": "84c1d40e-5c22-4a90-850c-2d501330597b",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-04-25T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 83,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "0122b142-7597-48cb-80df-6ceae723f80c",
+    "engagement_id": "fdbd46f1-0b44-4719-89cf-5a5c63d034ce",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-04-26T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 62,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "f45092b4-f95a-4e35-a739-78187c336f52",
+    "engagement_id": "fdbd46f1-0b44-4719-89cf-5a5c63d034ce",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-04-26T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 100,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "25eb7009-e406-4972-b2d8-d1b2f5f239cb",
+    "engagement_id": "47971fa3-2f86-4064-8f39-8a410b207d48",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-01-24T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 80,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "ae4f148b-d452-4355-8eba-a1f4fa12437b",
+    "engagement_id": "47971fa3-2f86-4064-8f39-8a410b207d48",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-01-24T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 98,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "e85f9dae-8695-4b4d-87b7-618d1e1c0fb1",
+    "engagement_id": "b56ee0a4-a4af-438b-b2d7-e25db921024c",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2025-12-29T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 79,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "a439e61e-fdf0-458c-bc80-e63214bb77f4",
+    "engagement_id": "b56ee0a4-a4af-438b-b2d7-e25db921024c",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2025-12-29T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 88,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "eedd11d0-a73c-44c3-b106-3497ac5a3d8d",
+    "engagement_id": "7f5c6f1d-ca69-4188-87c4-ab4b7ca412e8",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-01-17T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 85,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "d9fba3cd-2afc-40e9-85e1-43cc6379b71e",
+    "engagement_id": "7f5c6f1d-ca69-4188-87c4-ab4b7ca412e8",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-01-17T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 74,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "fd0e32b6-26d1-4afe-a66d-e6039bb62500",
+    "engagement_id": "da96f141-296b-4e58-a6b5-2b02e86b56ed",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-04-25T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 88,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "52a96d43-99e1-4aab-9899-47c3338368db",
+    "engagement_id": "da96f141-296b-4e58-a6b5-2b02e86b56ed",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-04-25T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 79,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "218a3962-bc31-4c00-a40b-b5108a25c704",
+    "engagement_id": "a6256fbf-c475-44cc-8e52-1f13aa188555",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-04-11T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 75,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "deba892d-dfa6-40f0-81d8-9e2e37c6747e",
+    "engagement_id": "a6256fbf-c475-44cc-8e52-1f13aa188555",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-04-11T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 97,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "e7bd120e-5904-4d74-baa9-25346d80e497",
+    "engagement_id": "bceb0b41-21bc-43cf-bc1c-21427458ebb4",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-02-09T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 74,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "1a5d04e3-5e71-4092-9d25-6abe9c03539d",
+    "engagement_id": "bceb0b41-21bc-43cf-bc1c-21427458ebb4",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-02-09T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 83,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "0fb828ad-4db9-4f95-9a33-6b0533d0ca22",
+    "engagement_id": "cf986045-b610-4f2b-8e21-b65f3a2d34ff",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-05-08T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 99,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "b2314f1e-f7ec-405d-a2b8-b83ea63823b5",
+    "engagement_id": "cf986045-b610-4f2b-8e21-b65f3a2d34ff",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-05-08T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 86,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "0b47d0aa-7364-4f50-80b6-0e56de279aac",
+    "engagement_id": "2db0abd8-6a2d-4b5c-a5b8-efd70fea64c7",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-02-06T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 73,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "b21a7301-cba3-447b-bbec-ed50b236408e",
+    "engagement_id": "2db0abd8-6a2d-4b5c-a5b8-efd70fea64c7",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-02-06T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 81,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "f68da1df-91d9-4f3c-a386-b3351b40dc6a",
+    "engagement_id": "05465221-4f42-412d-a6ec-6ca27c22907d",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-02-02T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 98,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "e183bb60-12cc-492a-b781-ba2e5adf28d2",
+    "engagement_id": "05465221-4f42-412d-a6ec-6ca27c22907d",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-02-02T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 94,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "46eccfc8-88fb-4de5-a40f-3809e027294c",
+    "engagement_id": "653c2588-4c41-486c-b00e-02eb1d43c7c8",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-03-04T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 72,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "a572eb76-53b0-4da4-ba84-2da4f72a6834",
+    "engagement_id": "653c2588-4c41-486c-b00e-02eb1d43c7c8",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-03-04T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 91,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "545a7bfc-f45d-427b-9109-a4a148606867",
+    "engagement_id": "69d50cc7-ab2d-4f64-92f0-3fc20dc07558",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-04-21T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 89,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "5b9006e9-6a06-446b-bc40-efc44a7066ad",
+    "engagement_id": "69d50cc7-ab2d-4f64-92f0-3fc20dc07558",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-04-21T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 69,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "e191862f-0ea3-4a1c-8d47-f37bc3691d95",
+    "engagement_id": "c388a0db-7a70-4b35-bdbc-f64a5f3824ee",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-01-02T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 94,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "5610ac79-1074-46fd-8c71-172066218587",
+    "engagement_id": "c388a0db-7a70-4b35-bdbc-f64a5f3824ee",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-01-02T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 93,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "ace8ab9c-f494-45e9-b2ba-ec14ae6e3260",
+    "engagement_id": "f7631629-805d-44af-a3b4-6d7cf3970567",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2025-12-27T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 80,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "7422b72a-fd2e-4058-809d-c06c82f4175a",
+    "engagement_id": "f7631629-805d-44af-a3b4-6d7cf3970567",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2025-12-27T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 66,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "cc55c950-b886-4b75-badd-c6342e8bc73c",
+    "engagement_id": "8b731f7b-7420-45e6-8922-8b4b2534a4f8",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-01-16T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 81,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "b1b03e42-eb38-402b-a616-72f2b0220017",
+    "engagement_id": "8b731f7b-7420-45e6-8922-8b4b2534a4f8",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-01-16T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 96,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "b31c82ca-b7d0-423b-b648-c81712d2d7fc",
+    "engagement_id": "f964361d-a623-40f4-b8d6-32e9b729c2d4",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-01-21T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 92,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "51e9bff2-d2a6-4a0e-a538-4ba43fa6e40d",
+    "engagement_id": "f964361d-a623-40f4-b8d6-32e9b729c2d4",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-01-21T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 83,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "8436c2fa-846e-40ae-a201-a3f66e36faee",
+    "engagement_id": "6fe9ef79-2593-4d16-83e7-be5883466707",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-03-20T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 86,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "3da2f62c-2fee-4045-a3e9-12a7f8dd0fac",
+    "engagement_id": "6fe9ef79-2593-4d16-83e7-be5883466707",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-03-20T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 82,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "7685a0ec-64c6-4a84-ad86-422697246624",
+    "engagement_id": "325aaba6-2be9-42ec-9ce6-a7b451395a93",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-05-10T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 96,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "0f7d2bff-de3b-48fe-aff1-0654686b3727",
+    "engagement_id": "325aaba6-2be9-42ec-9ce6-a7b451395a93",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-05-10T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 63,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "ec7a5930-d2c6-48e5-bb4b-33ce2376b4ac",
+    "engagement_id": "f3873f6d-2006-4e49-86d3-cd643fe6f52c",
+    "scan_type": "Trivy Scan",
+    "title": "Trivy Scan — 2026-06-24",
+    "description": "Automated Trivy Scan run",
+    "target_start": "2026-03-20T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 96,
+    "tags": [
+      "automated"
+    ]
+  },
+  {
+    "_id": "95bb48cb-cee7-4d3c-ae61-b95c213fcb9c",
+    "engagement_id": "f3873f6d-2006-4e49-86d3-cd643fe6f52c",
+    "scan_type": "Bandit Scan",
+    "title": "Bandit Scan — 2026-06-24",
+    "description": "Automated Bandit Scan run",
+    "target_start": "2026-03-20T11:07:40Z",
+    "target_end": "2026-07-08T11:07:40Z",
+    "percent_complete": 79,
+    "tags": [
+      "automated"
+    ]
+  }
+]

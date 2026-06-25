@@ -4,13 +4,13 @@ package formatters
 import (
 	"context"
 
-	"github.com/osv/finding-service/internal/domain/entity"
+	"github.com/osv/finding-service/internal/domain/report"
 )
 
 // Formatter produces a report in a specific format.
 type Formatter interface {
 	// Format generates report bytes from the input data.
-	Format(ctx context.Context, data entity.ReportInput, opts FormatOptions) ([]byte, error)
+	Format(ctx context.Context, data report.ReportInput, opts FormatOptions) ([]byte, error)
 	// ContentType returns the MIME type of the output (e.g. "text/html").
 	ContentType() string
 	// FileExtension returns the recommended file extension (e.g. ".html").
@@ -25,10 +25,10 @@ type FormatOptions struct {
 }
 
 // Registry maps OutputFormat → Formatter.
-type Registry map[entity.OutputFormat]Formatter
+type Registry map[report.OutputFormat]Formatter
 
 // Get returns the formatter for a given format, or false if not found.
-func (r Registry) Get(f entity.OutputFormat) (Formatter, bool) {
+func (r Registry) Get(f report.OutputFormat) (Formatter, bool) {
 	fm, ok := r[f]
 	return fm, ok
 }

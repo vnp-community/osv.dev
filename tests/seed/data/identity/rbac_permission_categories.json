@@ -1,0 +1,68 @@
+[
+  {
+    "category": "Dashboard",
+    "sort_order": 1,
+    "permissions": [
+      "product:view"
+    ]
+  },
+  {
+    "category": "Scanning",
+    "sort_order": 2,
+    "permissions": [
+      "scan:execute",
+      "scan:manage",
+      "import:scan_result"
+    ]
+  },
+  {
+    "category": "Findings",
+    "sort_order": 3,
+    "permissions": [
+      "finding:view",
+      "finding:add",
+      "finding:edit",
+      "finding:close",
+      "finding:delete",
+      "risk_acceptance:view",
+      "risk_acceptance:manage"
+    ]
+  },
+  {
+    "category": "Reports",
+    "sort_order": 4,
+    "permissions": [
+      "report:download"
+    ]
+  },
+  {
+    "category": "AI Center",
+    "sort_order": 5,
+    "permissions": [
+      "ai:enrich",
+      "ai:triage"
+    ]
+  },
+  {
+    "category": "Administration",
+    "sort_order": 6,
+    "permissions": [
+      "user:view",
+      "user:add",
+      "user:edit",
+      "product:add",
+      "product:edit",
+      "product:delete",
+      "system:configure"
+    ]
+  },
+  {
+    "category": "Agent",
+    "sort_order": 7,
+    "permissions": [
+      "scan:execute",
+      "import:scan_result",
+      "finding:add"
+    ]
+  }
+]

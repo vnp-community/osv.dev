@@ -10,11 +10,15 @@ import (
 	"os/signal"
 	"syscall"
 
+	"net/http"
+
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+
+	httpdelivery "github.com/osv/scan-service/internal/delivery/http"
 )
 
 func main() {
@@ -49,8 +53,33 @@ func main() {
 		}
 	}()
 
+	// Start HTTP Server
+	httpPort := envOr("HTTP_PORT", "8082")
+	
+	// Create handlers (dependencies are nil for now until fully wired)
+	var importHandler *httpdelivery.ImportHandler
+	var parserHandler *httpdelivery.ParserHandler
+	var agentHandler  *httpdelivery.AgentHandler = httpdelivery.NewAgentHandler(nil, log.Logger)
+
+	router := httpdelivery.NewRouter(importHandler, parserHandler, agentHandler, log.Logger)
+	httpSrv := &http.Server{
+		Addr:    ":" + httpPort,
+		Handler: router,
+	}
+
+	log.Info().Str("port", httpPort).Msg("scan-service HTTP starting")
+	go func() {
+		if err := httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal().Err(err).Msg("HTTP serve failed")
+		}
+	}()
+
 	<-ctx.Done()
 	log.Info().Msg("shutting down scan-service")
+	
+	// Shutdown HTTP Server gracefully
+	httpSrv.Shutdown(context.Background())
+
 	s.GracefulStop()
 	fmt.Println("scan-service stopped")
 }

@@ -11,9 +11,13 @@ require (
 	github.com/go-git/go-git/v6 v6.0.0-alpha.4
 	github.com/google/go-cmp v0.7.0
 	github.com/klauspost/compress v1.18.5
+
+	// Microservices backend dependencies
+	github.com/nats-io/nats.go v1.42.0 // NATS client for CLI_BACKEND=microservices
 	github.com/ossf/osv-schema/bindings/go v0.0.0-20260525004216-afe0bddbf893
 	// New shared pkg (pkg/clients, pkg/models, pkg/logger, etc.)
 	github.com/osv/pkg v0.0.0
+	github.com/osv/shared/proto v0.0.0 // proto-generated gRPC stubs
 	github.com/package-url/packageurl-go v0.1.6
 	github.com/tidwall/gjson v1.19.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0
@@ -105,6 +109,8 @@ require (
 	github.com/moby/term v0.5.2 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
+	github.com/nats-io/nkeys v0.4.11 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/pjbgf/sha1cd v0.6.0 // indirect
@@ -159,6 +165,10 @@ require (
 
 replace (
 	github.com/osv/ingestion => ../../services/ingestion
-	github.com/osv/pkg => ../../services/pkg
+	github.com/osv/pkg => ../../services/shared/pkg
+
+	// Microservices backend local module — shared/proto only
+	// NOTE: shared/pkg is already mapped via github.com/osv/pkg above
+	github.com/osv/shared/proto => ../../services/shared/proto
 	github.com/osv/source-sync => ../../services/source-sync
 )

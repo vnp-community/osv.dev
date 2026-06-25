@@ -12,7 +12,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
+	
+	"github.com/osv/gateway-service/internal/cache"
 )
 
 // UpstreamConfig holds address and timeout config for a single upstream service.
@@ -76,11 +79,12 @@ type HTTPProxy struct {
 	proxies  map[string]*httputil.ReverseProxy
 	circuits map[string]*circuitState
 	log      zerolog.Logger
+	redis    *redis.Client
 }
 
 // NewHTTPProxy creates an HTTPProxy from a route list and upstream URL map.
 // upstreamURLs maps upstream names to their base URLs.
-func NewHTTPProxy(routes []RouteConfig, upstreamURLs map[string]string, log zerolog.Logger) (*HTTPProxy, error) {
+func NewHTTPProxy(routes []RouteConfig, upstreamURLs map[string]string, redisClient *redis.Client, log zerolog.Logger) (*HTTPProxy, error) {
 	proxies := make(map[string]*httputil.ReverseProxy, len(upstreamURLs))
 	circuits := make(map[string]*circuitState, len(upstreamURLs))
 
@@ -105,16 +109,35 @@ func NewHTTPProxy(routes []RouteConfig, upstreamURLs map[string]string, log zero
 		proxies:  proxies,
 		circuits: circuits,
 		log:      log,
+		redis:    redisClient,
 	}, nil
 }
 
 // ServeHTTP implements http.Handler. It matches the request path to a route,
 // checks the circuit breaker, then forwards to the upstream.
 func (p *HTTPProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	route := FindRoute(r.URL.Path)
+	// Use RequestURI to get the full original path (chi.Mount strips URL.Path prefix).
+	// Fall back to URL.Path if RequestURI is not available.
+	routePath := r.RequestURI
+	if idx := strings.Index(routePath, "?"); idx >= 0 {
+		routePath = routePath[:idx]
+	}
+	if routePath == "" {
+		routePath = r.URL.Path
+	}
+	route := FindRoute(routePath)
 	if route == nil {
 		http.Error(w, `{"error":"not_found","message":"no route matches this path"}`, http.StatusNotFound)
 		return
+	}
+
+	// Restore r.URL.Path from the full RequestURI path.
+	// chi.Mount() strips the mount prefix from r.URL.Path (e.g. /api/v2/cves/search → /cves/search).
+	// httputil.ReverseProxy uses r.URL.Path to construct the upstream URL, so we must restore
+	// the original full path to prevent the upstream from receiving a broken path.
+	if routePath != r.URL.Path {
+		r = r.Clone(r.Context())
+		r.URL.Path = routePath
 	}
 
 	upstream := route.Upstream
@@ -138,7 +161,13 @@ func (p *HTTPProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Wrap response writer to detect failures
 	crw := &captureResponseWriter{ResponseWriter: w}
-	proxy.ServeHTTP(crw, r)
+	
+	var handler http.Handler = proxy
+	if route.CacheTTL > 0 && p.redis != nil {
+		handler = cache.Middleware(p.redis, route.CacheTTL)(handler)
+	}
+
+	handler.ServeHTTP(crw, r)
 
 	if crw.statusCode >= 500 {
 		cb.recordFailure()

@@ -13,6 +13,7 @@ type EventType string
 
 const (
 	EventScanAdded                EventType = "scan_added"
+	EventTestAdded                EventType = "test_added"
 	EventFindingAdded             EventType = "finding_added"
 	EventFindingStatusChanged     EventType = "finding_status_changed"
 	EventJIRAUpdate               EventType = "jira_update"
@@ -23,6 +24,8 @@ const (
 	EventSLAExpiringSoon          EventType = "sla_expiring_soon"
 	EventProductAdded             EventType = "product_added"
 	EventUserMentioned            EventType = "user_mentioned"
+	EventClosedFindingRemoved     EventType = "closed_finding_removed"
+	EventReviewRequested          EventType = "review_requested"
 )
 
 // Channel identifies the delivery channel for a notification.
@@ -43,6 +46,7 @@ type NotificationRule struct {
 	ProductID *uuid.UUID // nil = applies to all products
 
 	ScanAdded                []Channel
+	TestAdded                []Channel
 	FindingAdded             []Channel
 	FindingStatusChanged     []Channel
 	JIRAUpdate               []Channel
@@ -51,6 +55,10 @@ type NotificationRule struct {
 	RiskAcceptanceExpiration []Channel
 	SLABreach                []Channel
 	SLAExpiringSoon          []Channel
+	ProductAdded             []Channel
+	UserMentioned            []Channel
+	ClosedFindingRemoved     []Channel
+	ReviewRequested          []Channel
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -61,6 +69,8 @@ func (r *NotificationRule) ChannelsForEvent(et EventType) []Channel {
 	switch et {
 	case EventScanAdded:
 		return r.ScanAdded
+	case EventTestAdded:
+		return r.TestAdded
 	case EventFindingAdded:
 		return r.FindingAdded
 	case EventFindingStatusChanged:
@@ -77,6 +87,14 @@ func (r *NotificationRule) ChannelsForEvent(et EventType) []Channel {
 		return r.SLABreach
 	case EventSLAExpiringSoon:
 		return r.SLAExpiringSoon
+	case EventProductAdded:
+		return r.ProductAdded
+	case EventUserMentioned:
+		return r.UserMentioned
+	case EventClosedFindingRemoved:
+		return r.ClosedFindingRemoved
+	case EventReviewRequested:
+		return r.ReviewRequested
 	default:
 		return nil
 	}

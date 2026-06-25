@@ -92,6 +92,14 @@ type CVE struct {
 	CAPEC   interface{} `bson:"-" json:"capec,omitempty"`
 	Ranking interface{} `bson:"-" json:"ranking,omitempty"`
 
+	// CR-GCV-001/CR-GCV-003: Source attribution and exploit enrichment
+	Source    string `bson:"source,omitempty"     db:"source" json:"source,omitempty"`     // NVD|CIRCL|JVN|EXPLOITDB|CVE.ORG|CNNVD
+	IsKEV     bool   `bson:"is_kev,omitempty"     db:"-" json:"is_kev,omitempty"`     // in CISA KEV catalog
+	IsExploit bool   `bson:"is_exploit,omitempty" db:"is_exploit" json:"is_exploit,omitempty"` // has public exploit
+	Link      string `bson:"link,omitempty"       db:"-"          json:"link,omitempty"`
+	SourceJVN bool   `bson:"source_jvn,omitempty" db:"-" json:"-"`                    // cross-reference JVN
+	JVNID     string `bson:"jvn_id,omitempty"     db:"-" json:"jvn_id,omitempty"`    // e.g. "JVNDB-2021-002374"
+
 	// ── PostgreSQL / CVE Binary Tool fields (db tags, bson:"-") ──────────────
 	// These are used by the existing binary-tool-oriented codebase.
 	InternalID       uuid.UUID         `bson:"-" db:"id"                json:"-"`
@@ -114,7 +122,6 @@ type CVE struct {
 
 	// Triage/VEX fields
 	Remarks       Remarks  `bson:"-" db:"-" json:"remarks,omitempty"`
-	IsExploit     bool     `bson:"-" db:"-" json:"is_exploit,omitempty"`
 	DataSource    string   `bson:"-" db:"-" json:"data_source,omitempty"`
 	Justification string   `bson:"-" db:"-" json:"justification,omitempty"`
 	Response      []string `bson:"-" db:"-" json:"response,omitempty"`

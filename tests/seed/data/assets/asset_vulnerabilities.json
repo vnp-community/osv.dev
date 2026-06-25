@@ -1,0 +1,140 @@
+[
+  {
+    "_id": "803d9417-9fa3-4447-a49a-8bc8f377fd32",
+    "asset_id": "073b17f2-61f5-4c23-a780-792fdd61d2b6",
+    "asset_ip": "10.2.83.86",
+    "vulnerabilities": [
+      {
+        "cve_id": "CVE-2021-44228",
+        "severity": "critical",
+        "cvss": 10.0,
+        "detected_at": "2026-06-16T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2023-44487",
+        "severity": "high",
+        "cvss": 7.5,
+        "detected_at": "2026-06-21T11:07:40Z"
+      }
+    ]
+  },
+  {
+    "_id": "fa7079ea-7e66-471f-95c9-344d4f0f4d3d",
+    "asset_id": "87df0115-05b7-4d57-910c-823dc8bbea2e",
+    "asset_ip": "10.3.251.1",
+    "vulnerabilities": [
+      {
+        "cve_id": "CVE-2021-41773",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-06-12T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2022-22965",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-06-08T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2022-1388",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-05-28T11:07:40Z"
+      }
+    ]
+  },
+  {
+    "_id": "7961bb44-069a-443c-8ee7-253b73896446",
+    "asset_id": "98238cad-d764-4903-8cbc-b2a86e9583c5",
+    "asset_ip": "10.0.219.220",
+    "vulnerabilities": [
+      {
+        "cve_id": "CVE-2021-44228",
+        "severity": "critical",
+        "cvss": 10.0,
+        "detected_at": "2026-06-11T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2023-20198",
+        "severity": "critical",
+        "cvss": 10.0,
+        "detected_at": "2026-06-22T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2022-22965",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-06-18T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2022-1388",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-06-09T11:07:40Z"
+      }
+    ]
+  },
+  {
+    "_id": "3ce709af-c598-4a87-aff7-ebd0694e55dc",
+    "asset_id": "cbeac933-0915-4f46-ad0a-4b2509da6243",
+    "asset_ip": "10.1.152.154",
+    "vulnerabilities": [
+      {
+        "cve_id": "CVE-2022-22965",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-06-07T11:07:40Z"
+      }
+    ]
+  },
+  {
+    "_id": "d20a672b-2ebd-4dc0-af85-ef960dddaae5",
+    "asset_id": "b28a3ab9-a5b0-4198-b3b9-c926690d8d6b",
+    "asset_ip": "10.1.163.165",
+    "vulnerabilities": [
+      {
+        "cve_id": "CVE-2021-41773",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-06-22T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2023-20198",
+        "severity": "critical",
+        "cvss": 10.0,
+        "detected_at": "2026-05-29T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2022-1388",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-06-12T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2022-22965",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-06-14T11:07:40Z"
+      }
+    ]
+  },
+  {
+    "_id": "98d15812-8cbd-47ab-828a-1f64472d81ee",
+    "asset_id": "ab0242bd-bd3e-42f1-9e4e-8daf80652ffa",
+    "asset_ip": "10.1.173.175",
+    "vulnerabilities": [
+      {
+        "cve_id": "CVE-2022-1388",
+        "severity": "critical",
+        "cvss": 9.8,
+        "detected_at": "2026-06-19T11:07:40Z"
+      },
+      {
+        "cve_id": "CVE-2023-20198",
+        "severity": "critical",
+        "cvss": 10.0,
+        "detected_at": "2026-06-16T11:07:40Z"
+      }
+    ]
+  }
+]

@@ -9,7 +9,7 @@
 -- auth service initial schema
 -- Run: psql $DATABASE_URL -f 001_initial_schema.sql
 
-SET search_path TO auth;
+SET search_path TO auth, public;
 
 CREATE TABLE IF NOT EXISTS users (
     id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),

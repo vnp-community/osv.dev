@@ -74,7 +74,10 @@ func (uc *BatchCreateFindingsUseCase) Execute(ctx context.Context, in BatchCreat
 		entities := make([]*finding.Finding, 0, len(batch))
 		for _, fi := range batch {
 			sev := finding.Severity(fi.Severity)
-			f := finding.New(fi.Title, sev, in.TestID, in.EngagementID, in.ProductID)
+			f, err := finding.NewFinding(fi.Title, sev, in.TestID, in.EngagementID, in.ProductID, fi.ComponentName, fi.ComponentVersion, fi.CVE)
+			if err != nil {
+				return nil, fmt.Errorf("create finding error: %w", err)
+			}
 			f.Description = fi.Description
 			f.Mitigation = fi.Mitigation
 			f.Impact = fi.Impact
@@ -89,7 +92,7 @@ func (uc *BatchCreateFindingsUseCase) Execute(ctx context.Context, in BatchCreat
 			f.ComponentName = fi.ComponentName
 			f.ComponentVersion = fi.ComponentVersion
 			f.FilePath = fi.FilePath
-			f.LineNumber = fi.LineNumber
+			f.LineNumber = &fi.LineNumber
 			f.Service = fi.Service
 			f.HashCode = fi.HashCode
 			f.Tags = fi.Tags

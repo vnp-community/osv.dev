@@ -9,26 +9,34 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	domainerr "github.com/osv/identity-service/internal/domain/error"
+	"github.com/osv/identity-service/internal/domain/repository"
+	"github.com/osv/identity-service/internal/domain/valueobject"
 	uclogin "github.com/osv/identity-service/internal/usecase/login"
 	ucregister "github.com/osv/identity-service/internal/usecase/register"
 	ucrefresh "github.com/osv/identity-service/internal/usecase/refresh_token"
 	ucvalidate "github.com/osv/identity-service/internal/usecase/validate_token"
 	jwtpkg "github.com/osv/identity-service/internal/infrastructure/jwt"
+	pginfra "github.com/osv/identity-service/internal/infra/postgres" // [FIX TASK-HC-014]
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
 
+
 // AuthHandler handles authentication HTTP endpoints.
 type AuthHandler struct {
-	registerUC *ucregister.UseCase
-	loginUC    *uclogin.UseCase
-	refreshUC  *ucrefresh.UseCase
-	logoutUC   *ucrefresh.LogoutUseCase
-	validateUC *ucvalidate.UseCase
-	jwtSvc     *jwtpkg.Service
-	log        zerolog.Logger
+	registerUC     *ucregister.UseCase
+	loginUC        *uclogin.UseCase
+	refreshUC      *ucrefresh.UseCase
+	logoutUC       *ucrefresh.LogoutUseCase
+	validateUC     *ucvalidate.UseCase
+	jwtSvc         *jwtpkg.Service
+	userRepo       repository.UserRepository
+	// [FIX TASK-HC-014] invitation repo for AcceptInvite — nil means disabled
+	invitationRepo *pginfra.InvitationRepo
+	log            zerolog.Logger
 }
 
 // NewAuthHandler creates an AuthHandler with all required use cases.
@@ -39,6 +47,7 @@ func NewAuthHandler(
 	logoutUC *ucrefresh.LogoutUseCase,
 	validateUC *ucvalidate.UseCase,
 	jwtSvc *jwtpkg.Service,
+	userRepo repository.UserRepository,
 	log zerolog.Logger,
 ) *AuthHandler {
 	return &AuthHandler{
@@ -48,8 +57,27 @@ func NewAuthHandler(
 		logoutUC:   logoutUC,
 		validateUC: validateUC,
 		jwtSvc:     jwtSvc,
+		userRepo:   userRepo,
 		log:        log,
 	}
+}
+
+// NewAuthHandlerWithInvitation creates an AuthHandler with invitation repo injected.
+// [FIX TASK-HC-014]
+func NewAuthHandlerWithInvitation(
+	registerUC *ucregister.UseCase,
+	loginUC *uclogin.UseCase,
+	refreshUC *ucrefresh.UseCase,
+	logoutUC *ucrefresh.LogoutUseCase,
+	validateUC *ucvalidate.UseCase,
+	jwtSvc *jwtpkg.Service,
+	userRepo repository.UserRepository,
+	invitationRepo *pginfra.InvitationRepo,
+	log zerolog.Logger,
+) *AuthHandler {
+	h := NewAuthHandler(registerUC, loginUC, refreshUC, logoutUC, validateUC, jwtSvc, userRepo, log)
+	h.invitationRepo = invitationRepo
+	return h
 }
 
 // Register handles POST /api/v1/auth/register
@@ -91,9 +119,10 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 // Login handles POST /api/v1/auth/login
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-		TOTPCode string `json:"totp_code"`
+		Email      string `json:"email"`
+		Password   string `json:"password"`
+		MFACode    string `json:"mfa_code"`
+		RememberMe bool   `json:"remember_me"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeJSON(w, http.StatusBadRequest, errResp("invalid_request", err.Error()))
@@ -101,11 +130,12 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp, err := h.loginUC.Execute(r.Context(), uclogin.Request{
-		Email:     req.Email,
-		Password:  req.Password,
-		TOTPCode:  req.TOTPCode,
-		IPAddress: r.RemoteAddr,
-		UserAgent: r.Header.Get("User-Agent"),
+		Email:      req.Email,
+		Password:   req.Password,
+		TOTPCode:   req.MFACode,
+		IPAddress:  r.RemoteAddr,
+		UserAgent:  r.UserAgent(),
+		RememberMe: req.RememberMe,
 	})
 	if err != nil {
 		switch {
@@ -114,7 +144,12 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, domainerr.ErrAccountLocked):
 			writeJSON(w, http.StatusTooManyRequests, errResp("account_locked", "too many failed attempts, try again in 15 minutes"))
 		case errors.Is(err, domainerr.ErrMFARequired):
-			writeJSON(w, http.StatusUnauthorized, errResp("mfa_required", "provide your TOTP code"))
+			// CR-001: frontend expects {mfa_required:true, detail:"...", error:"mfa_required"}
+			writeJSON(w, http.StatusUnauthorized, map[string]any{
+				"error":        "mfa_required",
+				"detail":       "MFA is required. Provide your TOTP code in the totp_code field.",
+				"mfa_required": true,
+			})
 		case errors.Is(err, domainerr.ErrInvalidMFACode):
 			writeJSON(w, http.StatusUnauthorized, errResp("invalid_mfa_code", "invalid TOTP code"))
 		case errors.Is(err, domainerr.ErrAccountInactive):
@@ -126,13 +161,23 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    resp.RefreshToken,
+		Path:     "/api/v1/auth",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   7 * 24 * 3600,
+	})
+
 	writeJSON(w, http.StatusOK, map[string]any{
-		"access_token":  resp.AccessToken,
-		"refresh_token": resp.RefreshToken,
-		"token_type":    "Bearer",
-		"expires_in":    resp.ExpiresIn,
-		"user_id":       resp.UserID,
-		"role":          resp.Role,
+		"access_token":       resp.AccessToken,
+		"refresh_token":      resp.RefreshToken,
+		"expires_in":         resp.ExpiresIn,
+		"refresh_expires_in": resp.RefreshExpiresIn,
+		"user_id":            resp.UserID,
+		"role":               resp.Role,
 	})
 }
 
@@ -141,9 +186,14 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		RefreshToken string `json:"refresh_token"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil && err.Error() != "EOF" {
 		writeJSON(w, http.StatusBadRequest, errResp("invalid_request", err.Error()))
 		return
+	}
+	if req.RefreshToken == "" {
+		if cookie, err := r.Cookie("refresh_token"); err == nil {
+			req.RefreshToken = cookie.Value
+		}
 	}
 	if req.RefreshToken == "" {
 		writeJSON(w, http.StatusBadRequest, errResp("missing_token", "refresh_token is required"))
@@ -170,11 +220,21 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, map[string]any{
-		"access_token":  resp.AccessToken,
-		"refresh_token": resp.RefreshToken,
-		"token_type":    "Bearer",
-		"expires_in":    resp.ExpiresIn,
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    resp.RefreshToken,
+		Path:     "/api/v1/auth",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   7 * 24 * 3600,
+	})
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"access_token":       resp.AccessToken,
+		"refresh_token":      resp.RefreshToken,
+		"expires_in":         resp.ExpiresIn,
+		"refresh_expires_in": resp.RefreshExpiresIn,
 	})
 }
 
@@ -203,16 +263,32 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	rt := ""
 	if !req.AllDevices {
 		rt = req.RefreshToken
+		if rt == "" {
+			if cookie, err := r.Cookie("refresh_token"); err == nil {
+				rt = cookie.Value
+			}
+		}
 	}
 	h.logoutUC.Execute(r.Context(), userID, rt) //nolint:errcheck
 
-	writeJSON(w, http.StatusOK, map[string]string{"message": "logged out successfully"})
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Path:     "/api/v1/auth",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   -1,
+	})
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // Me handles GET /api/v1/auth/me — returns current user info from JWT claims.
+// CR-001: also returns mfa_enabled by querying userRepo.
+// FIX: wraps response in {"user": {...}} as required by frontend spec.
 func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	// Claims injected by api-gateway via X-User-* headers
-	userID := r.Header.Get("X-User-ID")
+	userIDStr := r.Header.Get("X-User-ID")
 	role := r.Header.Get("X-User-Role")
 	permsHeader := r.Header.Get("X-User-Permissions")
 
@@ -221,15 +297,43 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 		perms = strings.Split(permsHeader, ",")
 	}
 
-	if userID == "" {
+	if userIDStr == "" {
 		writeJSON(w, http.StatusUnauthorized, errResp("unauthorized", "not authenticated"))
 		return
 	}
 
-	writeJSON(w, http.StatusOK, map[string]any{
-		"user_id":     userID,
+	// Defaults from JWT headers (always available)
+	userInfo := map[string]any{
+		"id":          userIDStr,
 		"role":        role,
 		"permissions": perms,
+		"mfa_enabled": false,
+		"email":       "",
+		"name":        "",
+		"username":    "",
+		"created_at":  "",
+	}
+
+	// CR-001: enrich from DB (email, username, mfa_enabled) if userRepo available
+	if h.userRepo != nil {
+		if uid, err := uuid.Parse(userIDStr); err == nil {
+			if user, err := h.userRepo.FindByID(r.Context(), uid); err == nil {
+				userInfo["mfa_enabled"] = user.MFAEnabled
+				userInfo["email"]       = user.Email
+				userInfo["name"]        = user.Username // "name" is the spec alias for username
+				userInfo["username"]    = user.Username
+				userInfo["created_at"]  = user.CreatedAt.Format(time.RFC3339)
+				if len(perms) == 0 {
+					// Fill permissions from role if not injected by gateway
+					userInfo["permissions"] = valueobject.PermissionsFor(string(user.Role))
+				}
+			}
+		}
+	}
+
+	// FIX: wrap in "user" key — frontend reads response.user, not response directly
+	writeJSON(w, http.StatusOK, map[string]any{
+		"user": userInfo,
 	})
 }
 
@@ -259,6 +363,7 @@ func errResp(code, message string) map[string]string {
 	return map[string]string{"error": code, "message": message}
 }
 
+// extractBearer extracts the Bearer token from the Authorization header.
 func extractBearer(r *http.Request) string {
 	h := r.Header.Get("Authorization")
 	parts := strings.SplitN(h, " ", 2)
@@ -266,4 +371,36 @@ func extractBearer(r *http.Request) string {
 		return parts[1]
 	}
 	return ""
+}
+
+// AcceptInvite handles GET /api/v1/auth/accept-invite?token=...
+// [FIX TASK-HC-014] Validates invitation token and activates user account.
+func (h *AuthHandler) AcceptInvite(w http.ResponseWriter, r *http.Request) {
+	if h.invitationRepo == nil {
+		writeJSON(w, http.StatusServiceUnavailable, errResp("not_configured", "invitation system not available"))
+		return
+	}
+	token := r.URL.Query().Get("token")
+	if token == "" {
+		writeJSON(w, http.StatusBadRequest, errResp("missing_token", "token query parameter is required"))
+		return
+	}
+	inv, err := h.invitationRepo.FindByToken(r.Context(), token)
+	if err != nil || inv == nil {
+		writeJSON(w, http.StatusBadRequest, errResp("invalid_token", "invitation token is invalid or expired"))
+		return
+	}
+	// Activate the user account
+	if err := h.userRepo.Activate(r.Context(), inv.UserID); err != nil {
+		h.log.Error().Err(err).Str("user_id", inv.UserID.String()).Msg("AcceptInvite: activate failed")
+		writeJSON(w, http.StatusInternalServerError, errResp("activation_failed", "failed to activate account"))
+		return
+	}
+	if err := h.invitationRepo.MarkAccepted(r.Context(), token); err != nil {
+		h.log.Warn().Err(err).Msg("AcceptInvite: MarkAccepted failed (non-fatal)")
+	}
+	writeJSON(w, http.StatusOK, map[string]string{
+		"status":  "account_activated",
+		"user_id": inv.UserID.String(),
+	})
 }

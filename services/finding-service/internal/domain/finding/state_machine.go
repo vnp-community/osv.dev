@@ -112,3 +112,59 @@ func (f *Finding) AcceptRisk() error {
 	f.UpdatedAt = now
 	return nil
 }
+
+// MarkOutOfScope transitions Active → OutOfScope.
+func (f *Finding) MarkOutOfScope() error {
+	if !f.CanTransitionTo(StateOutOfScope) {
+		return ErrInvalidTransition
+	}
+	now := nowUTC()
+	f.OutOfScope = true
+	f.Active = false
+	f.LastStatusUpdate = &now
+	f.UpdatedAt = now
+	return nil
+}
+
+// MarkDuplicate marks this finding as a duplicate of originalID.
+// Duplicates cannot be manually transitioned; only the dedup engine sets this.
+func (f *Finding) MarkDuplicate(originalID *string) {
+	now := nowUTC()
+	f.Duplicate = true
+	f.Active = false
+	if originalID != nil {
+		id := mustParseUUID(*originalID)
+		f.DuplicateFindingID = &id
+	}
+	f.LastStatusUpdate = &now
+	f.UpdatedAt = now
+}
+
+// ApplyTransition is a generic state transition dispatcher.
+// It delegates to the appropriate method and validates the transition.
+func (f *Finding) ApplyTransition(target FindingState) error {
+	switch target {
+	case StateMitigated:
+		// Use Close with no mitigated-by — caller should use Close() for full audit
+		if !f.CanTransitionTo(StateMitigated) {
+			return ErrInvalidTransition
+		}
+		now := nowUTC()
+		f.IsMitigated = true
+		f.Active = false
+		f.MitigatedAt = &now
+		f.LastStatusUpdate = &now
+		f.UpdatedAt = now
+		return nil
+	case StateActive:
+		return f.Reopen()
+	case StateFalsePositive:
+		return f.MarkFalsePositive()
+	case StateOutOfScope:
+		return f.MarkOutOfScope()
+	case StateRiskAccepted:
+		return f.AcceptRisk()
+	default:
+		return ErrInvalidTransition
+	}
+}

@@ -15,29 +15,48 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/osv/search-service/internal/factory"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	deliveryhttp "github.com/osv/search-service/internal/delivery/http"
+	rediscache "github.com/osv/search-service/internal/infra/cache/redis"
+	"github.com/osv/search-service/internal/usecase/browse"
+	"github.com/osv/shared/pkg/observability"
+	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func main() {
-	log.Logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+	// [FIX BUG-006] SERVICE_VERSION env var set by CI/CD
+	version := envOr("SERVICE_VERSION", "dev")
+
+	log := observability.InitLogger("search-service", version)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
+	metrics := observability.NewCommonMetrics("search-service")
+	// [FIX BUG-005] METRICS_PORT env var — default 9091 for search-service per port map
+	metricsPort := parseInt(envOr("METRICS_PORT", "9091"), 9091)
+	observability.StartMetricsServer(metricsPort)
+
+	shutdown, err := observability.InitTracer(ctx, "search-service", version) // [FIX BUG-006]
+	if err != nil {
+		log.Warn().Err(err).Msg("tracing init failed, continuing without tracing")
+	}
+	defer shutdown()
+
 	backend := factory.FromEnv()
-	grpcPort := envOr("GRPC_PORT", "50056")
-	httpPort := envOr("HTTP_PORT", "8082")
+	grpcPort := envOr("SEARCH_GRPC_PORT", envOr("GRPC_PORT", "50056"))
+	httpPort := envOr("SEARCH_HTTP_PORT", envOr("HTTP_PORT", "8083"))
 
 	lis, err := net.Listen("tcp", ":"+grpcPort)
 	if err != nil {
@@ -51,12 +70,42 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"ok"}`)) //nolint:errcheck
+		fmt.Fprintf(w, `{"status":"ok","service":"search-service","backend":"%s"}`,
+			envOr("SEARCH_BACKEND", "auto")) //nolint:errcheck
 	})
-	// TODO: mux.HandleFunc("/api/v1/search", searchHandler.ServeHTTP)
 
-	httpSrv := &http.Server{Addr: ":" + httpPort, Handler: mux}
+	// Wire Browse handler (CR-002): vendor/product browsing via Redis CPE cache
+	redisAddr := envOr("REDIS_ADDR", "localhost:6379")
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     redisAddr,
+		Password: envOr("REDIS_PASSWORD", ""),
+	})
+	browseRepo := rediscache.NewRedisBrowseRepository(redisClient)
+	browseUC := browse.New(browseRepo)
+	browseH := deliveryhttp.NewBrowseHandler(browseUC)
+
+	// TASK-010 FIX: Build the full chi router with all handlers (was missing api/v2/* routes).
+	// NewRouter returns http.Handler (internally a *chi.Mux), but BrowseHandler.Mount needs chi.Router.
+	// Solution: create a chi.Mux, mount browse on it, then use NewRouter for /api/v2/* routes.
+	browseRouter := chi.NewRouter()
+	browseH.Mount(browseRouter)
+
+	// The full search/cve router (returns http.Handler wrapping chi internally)
+	fullRouter := deliveryhttp.NewRouter(nil, nil, nil, nil, nil, log)
+
+	// Mount: browse routes (handles /browse/*, /api/v2/browse*)
+	mux.Handle("/browse/", browseRouter)
+	// Gateway sends /api/v2/browse → search-service — mount full router for all api/v2
+	mux.Handle("/api/v2/", fullRouter)
+	mux.Handle("/api/v1/", fullRouter)
+	mux.Handle("/internal/", fullRouter)
+
+	// Add middleware to HTTP router
+	handler := observability.LoggingMiddleware(log)(observability.MetricsMiddleware(metrics)(mux))
+
+	httpSrv := &http.Server{Addr: ":" + httpPort, Handler: handler}
 
 	log.Info().
 		Str("backend", string(backend)).
@@ -76,6 +125,15 @@ func main() {
 func envOr(key, def string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
+	}
+	return def
+}
+
+// parseInt parses a string as int, returning def on error.
+func parseInt(s string, def int) int {
+	var n int
+	if _, err := fmt.Sscanf(s, "%d", &n); err == nil && n > 0 {
+		return n
 	}
 	return def
 }

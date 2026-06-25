@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/osv/finding-service/internal/domain/entity"
-	"github.com/osv/finding-service/internal/domain/service"
+	"github.com/osv/finding-service/internal/domain/report"
+	"github.com/osv/finding-service/internal/domain/report/service"
 	"github.com/osv/finding-service/internal/formatters"
 )
 
@@ -83,7 +83,7 @@ func (f *HTMLFormatter) ContentType() string { return "text/html; charset=utf-8"
 func (f *HTMLFormatter) FileExtension() string { return ".html" }
 
 // Format renders the HTML report.
-func (f *HTMLFormatter) Format(_ context.Context, data entity.ReportInput, opts formatters.FormatOptions) ([]byte, error) {
+func (f *HTMLFormatter) Format(_ context.Context, data report.ReportInput, opts formatters.FormatOptions) ([]byte, error) {
 	theme := opts.Theme
 	if theme == "" {
 		theme = "light"

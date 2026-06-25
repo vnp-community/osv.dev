@@ -50,7 +50,7 @@ func (r *SessionRepo) Create(ctx context.Context, s *entity.Session) error {
 func (r *SessionRepo) FindByRefreshTokenHash(ctx context.Context, hash string) (*entity.Session, error) {
 	row := r.db.QueryRow(ctx, `
 		SELECT id, user_id, refresh_token_hash, token_family,
-		       ip_address, user_agent, expires_at, revoked_at, created_at
+		       COALESCE(ip_address::text, ''), COALESCE(user_agent, ''), expires_at, revoked_at, created_at
 		FROM auth.sessions
 		WHERE refresh_token_hash=$1`,
 		hash,
@@ -76,7 +76,7 @@ func (r *SessionRepo) RevokeByID(ctx context.Context, id uuid.UUID) error {
 
 // RevokeByFamily revokes ALL sessions in a token family.
 // Called on replay attack detection (reuse of a revoked refresh token).
-func (r *SessionRepo) RevokeByFamily(ctx context.Context, family string) error {
+func (r *SessionRepo) RevokeByFamily(ctx context.Context, family uuid.UUID) error {
 	now := time.Now().UTC()
 	_, err := r.db.Exec(ctx,
 		`UPDATE auth.sessions SET revoked_at=$2 WHERE token_family=$1 AND revoked_at IS NULL`,
@@ -103,6 +103,48 @@ func (r *SessionRepo) CleanExpired(ctx context.Context) error {
 		cutoff,
 	)
 	return err
+}
+
+// ListByUserID lists active sessions for a user.
+func (r *SessionRepo) ListByUserID(ctx context.Context, userID uuid.UUID) ([]*entity.Session, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT id, user_id, refresh_token_hash, token_family,
+		       COALESCE(ip_address::text, ''), COALESCE(user_agent, ''), expires_at, revoked_at, created_at
+		FROM auth.sessions
+		WHERE user_id=$1 AND revoked_at IS NULL AND expires_at > NOW()
+		ORDER BY created_at DESC`,
+		userID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("list sessions: %w", err)
+	}
+	defer rows.Close()
+
+	var sessions []*entity.Session
+	for rows.Next() {
+		s, err := scanSession(rows)
+		if err != nil {
+			return nil, err
+		}
+		sessions = append(sessions, s)
+	}
+	return sessions, nil
+}
+
+// RevokeSession revokes a session, ensuring it belongs to the specified user.
+func (r *SessionRepo) RevokeSession(ctx context.Context, userID uuid.UUID, sessionID uuid.UUID) error {
+	now := time.Now().UTC()
+	cmd, err := r.db.Exec(ctx,
+		`UPDATE auth.sessions SET revoked_at=$3 WHERE id=$1 AND user_id=$2 AND revoked_at IS NULL`,
+		sessionID, userID, now,
+	)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return domainerr.ErrSessionNotFound
+	}
+	return nil
 }
 
 func scanSession(row pgx.Row) (*entity.Session, error) {

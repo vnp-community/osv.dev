@@ -1,0 +1,33 @@
+[
+  {
+    "_id": "4388b863-cdfa-4da1-a57e-c81e078405fe",
+    "user_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "name": "Admin Master Key",
+    "scopes": [
+      "admin:*"
+    ],
+    "expires_at": null
+  },
+  {
+    "_id": "8cc23e85-2236-4c5b-a743-523febb09268",
+    "user_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "name": "CI/CD Pipeline",
+    "scopes": [
+      "cve:read",
+      "finding:write",
+      "scan:execute"
+    ],
+    "expires_at": "2027-06-24T11:07:40Z"
+  },
+  {
+    "_id": "d7de75ed-ba62-4fb5-882a-983d7f3203d5",
+    "user_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "name": "Analytics Dashboard",
+    "scopes": [
+      "cve:read",
+      "finding:read",
+      "asset:read"
+    ],
+    "expires_at": "2026-12-21T11:07:40Z"
+  }
+]

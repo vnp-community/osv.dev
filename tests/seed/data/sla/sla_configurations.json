@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "a06d870a-ce80-4228-b262-cbd42d045320",
+    "name": "Standard SLA",
+    "description": "Default SLA policy for most products",
+    "critical_days": 7,
+    "high_days": 30,
+    "medium_days": 90,
+    "low_days": 365,
+    "is_default": true
+  },
+  {
+    "_id": "5915cdb6-cb38-4a3b-b7a1-ecdb6a7da4fb",
+    "name": "Critical Assets SLA",
+    "description": "Stricter SLA for business-critical / internet-facing systems",
+    "critical_days": 3,
+    "high_days": 14,
+    "medium_days": 60,
+    "low_days": 180,
+    "is_default": false
+  },
+  {
+    "_id": "8abf798b-cb9f-4f46-b01b-5ad8b49b10e1",
+    "name": "Relaxed SLA",
+    "description": "Relaxed SLA for internal / low-risk systems",
+    "critical_days": 14,
+    "high_days": 60,
+    "medium_days": 180,
+    "low_days": 365,
+    "is_default": false
+  }
+]

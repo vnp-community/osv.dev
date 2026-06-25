@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "15f4b51f-e63b-487d-875a-623a6b3ec839",
+    "url": "https://hooks.slack.com/services/T00/B00/placeholder",
+    "events": [
+      "kev.new",
+      "cve.new.critical"
+    ],
+    "description": "Slack alerts for new KEV and critical CVEs"
+  },
+  {
+    "_id": "57d68099-0b05-4def-9e49-60cbce4e9c4f",
+    "url": "https://ci.company.internal/hooks/security",
+    "events": [
+      "cve.epss.high",
+      "cve.vendor"
+    ],
+    "description": "CI pipeline security gate trigger"
+  },
+  {
+    "_id": "7ed3fcb7-b1f8-4187-a686-f08e1b8d2c17",
+    "url": "https://teams.microsoft.com/webhooks/placeholder",
+    "events": [
+      "sla.breach",
+      "finding.critical.new"
+    ],
+    "description": "Microsoft Teams channel for SLA breaches"
+  }
+]

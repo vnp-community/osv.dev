@@ -1,0 +1,189 @@
+[
+  {
+    "_id": "6d416c6b-86af-43d6-82e4-3fef413b7410",
+    "product_id": "a60da6c5-1a12-4fbd-aa3c-2f920df94e29",
+    "finding_added": [
+      "email",
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": [
+      "email"
+    ]
+  },
+  {
+    "_id": "1da5bae7-63af-4562-b280-3169dd40e443",
+    "product_id": "3cc795ad-98dc-4ef0-9ad7-0a433734cae0",
+    "finding_added": [
+      "email",
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": [
+      "email"
+    ]
+  },
+  {
+    "_id": "40e338e9-e44c-4c19-92a1-36ad19ab2440",
+    "product_id": "c57dbf2e-6dd4-48c6-8f55-b8932f04adf8",
+    "finding_added": [
+      "email",
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": []
+  },
+  {
+    "_id": "671c6447-b1af-4213-960c-8cd4048f2da0",
+    "product_id": "13993f18-dce8-41cb-b340-0e9fb0d7dac3",
+    "finding_added": [
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": []
+  },
+  {
+    "_id": "71f7b1f8-9530-4da8-9d09-3fe941de74c5",
+    "product_id": "b170160d-8fb4-4ff6-9771-726efd4a0af5",
+    "finding_added": [
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": []
+  },
+  {
+    "_id": "17317e0c-3a18-44ae-8040-3b6c06fd10b4",
+    "product_id": "7a7be1e0-c905-451a-bb16-cb38ab9072a4",
+    "finding_added": [
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": []
+  },
+  {
+    "_id": "9bfc342a-f71b-448d-9931-bedbd84a8376",
+    "product_id": "dd8c98ac-4ce6-4494-963b-b20707be7d98",
+    "finding_added": [
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": []
+  },
+  {
+    "_id": "a612f95e-811e-49b7-b554-43c040e504ec",
+    "product_id": "0835add2-db61-49bf-baab-2f05981c65bd",
+    "finding_added": [
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": []
+  },
+  {
+    "_id": "3832e1a4-10c8-43dc-8317-fa412e7fe38a",
+    "product_id": "7414ce8c-14d9-482f-b114-ee0dbb872b2a",
+    "finding_added": [
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": []
+  },
+  {
+    "_id": "4fa0711e-4c1c-459e-bb4a-33ff0fd02d19",
+    "product_id": "44aff8cd-d6f5-4650-8e0b-d7c42465c308",
+    "finding_added": [
+      "inapp"
+    ],
+    "sla_breach": [
+      "email",
+      "inapp"
+    ],
+    "sla_expiring_soon": [
+      "email"
+    ],
+    "finding_status_changed": [
+      "inapp"
+    ],
+    "risk_acceptance_expiration": []
+  }
+]

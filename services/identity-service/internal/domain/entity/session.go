@@ -20,7 +20,7 @@ type Session struct {
 	// TokenFamily is a UUID grouping related refresh tokens.
 	// If a revoked token in a family is used, the entire family is revoked
 	// (replay attack detection).
-	TokenFamily string
+	TokenFamily uuid.UUID
 
 	// IPAddress of the client at session creation.
 	IPAddress string
@@ -36,6 +36,7 @@ type Session struct {
 	RevokedAt *time.Time
 
 	CreatedAt time.Time
+	UpdatedAt time.Time // updated on rotation/revocation
 }
 
 // IsActive returns true if the session has not been revoked and has not expired.

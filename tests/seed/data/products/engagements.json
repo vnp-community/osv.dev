@@ -1,0 +1,342 @@
+[
+  {
+    "_id": "84c1d40e-5c22-4a90-850c-2d501330597b",
+    "product_id": "a60da6c5-1a12-4fbd-aa3c-2f920df94e29",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for Customer Portal",
+    "lead_id": "1c973b81-d8db-4e2e-b0b1-f61c9cd87536",
+    "engagement_type": "CI/CD",
+    "status": "In Progress",
+    "start_date": "2026-04-25T11:07:40Z",
+    "end_date": "2026-07-02T11:07:40Z",
+    "version": "v2.5.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "fdbd46f1-0b44-4719-89cf-5a5c63d034ce",
+    "product_id": "a60da6c5-1a12-4fbd-aa3c-2f920df94e29",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for Customer Portal",
+    "lead_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "engagement_type": "CI/CD",
+    "status": "In Progress",
+    "start_date": "2026-04-26T11:07:40Z",
+    "end_date": "2026-06-19T11:07:40Z",
+    "version": "v1.0.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "47971fa3-2f86-4064-8f39-8a410b207d48",
+    "product_id": "3cc795ad-98dc-4ef0-9ad7-0a433734cae0",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for Internal HR System",
+    "lead_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "engagement_type": "Interactive",
+    "status": "Not Started",
+    "start_date": "2026-01-24T11:07:40Z",
+    "end_date": "2026-06-21T11:07:40Z",
+    "version": "v2.9.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "b56ee0a4-a4af-438b-b2d7-e25db921024c",
+    "product_id": "3cc795ad-98dc-4ef0-9ad7-0a433734cae0",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for Internal HR System",
+    "lead_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "engagement_type": "CI/CD",
+    "status": "Completed",
+    "start_date": "2025-12-29T11:07:40Z",
+    "end_date": "2026-07-01T11:07:40Z",
+    "version": "v1.5.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "7f5c6f1d-ca69-4188-87c4-ab4b7ca412e8",
+    "product_id": "c57dbf2e-6dd4-48c6-8f55-b8932f04adf8",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for Payment Gateway API",
+    "lead_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "engagement_type": "Interactive",
+    "status": "In Progress",
+    "start_date": "2026-01-17T11:07:40Z",
+    "end_date": "2026-06-25T11:07:40Z",
+    "version": "v3.0.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "da96f141-296b-4e58-a6b5-2b02e86b56ed",
+    "product_id": "c57dbf2e-6dd4-48c6-8f55-b8932f04adf8",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for Payment Gateway API",
+    "lead_id": "88fd1dfd-d706-4c4a-8074-715ec3e347dc",
+    "engagement_type": "Interactive",
+    "status": "Completed",
+    "start_date": "2026-04-25T11:07:40Z",
+    "end_date": "2026-07-08T11:07:40Z",
+    "version": "v4.3.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "a6256fbf-c475-44cc-8e52-1f13aa188555",
+    "product_id": "13993f18-dce8-41cb-b340-0e9fb0d7dac3",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for Mobile Banking App",
+    "lead_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "engagement_type": "Interactive",
+    "status": "Not Started",
+    "start_date": "2026-04-11T11:07:40Z",
+    "end_date": "2026-07-20T11:07:40Z",
+    "version": "v3.9.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "bceb0b41-21bc-43cf-bc1c-21427458ebb4",
+    "product_id": "13993f18-dce8-41cb-b340-0e9fb0d7dac3",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for Mobile Banking App",
+    "lead_id": "eba282b0-98d4-49b0-a337-9635d0843371",
+    "engagement_type": "Interactive",
+    "status": "Completed",
+    "start_date": "2026-02-09T11:07:40Z",
+    "end_date": "2026-06-29T11:07:40Z",
+    "version": "v5.4.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "cf986045-b610-4f2b-8e21-b65f3a2d34ff",
+    "product_id": "b170160d-8fb4-4ff6-9771-726efd4a0af5",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for Admin Dashboard",
+    "lead_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "engagement_type": "CI/CD",
+    "status": "Completed",
+    "start_date": "2026-05-08T11:07:40Z",
+    "end_date": "2026-07-09T11:07:40Z",
+    "version": "v1.6.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "2db0abd8-6a2d-4b5c-a5b8-efd70fea64c7",
+    "product_id": "b170160d-8fb4-4ff6-9771-726efd4a0af5",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for Admin Dashboard",
+    "lead_id": "87e4d75c-fcd2-42b1-a421-40006be2e34f",
+    "engagement_type": "CI/CD",
+    "status": "Not Started",
+    "start_date": "2026-02-06T11:07:40Z",
+    "end_date": "2026-07-20T11:07:40Z",
+    "version": "v4.0.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "05465221-4f42-412d-a6ec-6ca27c22907d",
+    "product_id": "7a7be1e0-c905-451a-bb16-cb38ab9072a4",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for Inventory Service",
+    "lead_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "engagement_type": "Interactive",
+    "status": "Not Started",
+    "start_date": "2026-02-02T11:07:40Z",
+    "end_date": "2026-06-30T11:07:40Z",
+    "version": "v2.3.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "653c2588-4c41-486c-b00e-02eb1d43c7c8",
+    "product_id": "7a7be1e0-c905-451a-bb16-cb38ab9072a4",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for Inventory Service",
+    "lead_id": "1c973b81-d8db-4e2e-b0b1-f61c9cd87536",
+    "engagement_type": "CI/CD",
+    "status": "Not Started",
+    "start_date": "2026-03-04T11:07:40Z",
+    "end_date": "2026-06-20T11:07:40Z",
+    "version": "v5.9.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "69d50cc7-ab2d-4f64-92f0-3fc20dc07558",
+    "product_id": "dd8c98ac-4ce6-4494-963b-b20707be7d98",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for Analytics Platform",
+    "lead_id": "9457c28e-72f9-42ea-839e-83117a5d5471",
+    "engagement_type": "Interactive",
+    "status": "Completed",
+    "start_date": "2026-04-21T11:07:40Z",
+    "end_date": "2026-07-21T11:07:40Z",
+    "version": "v2.5.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "c388a0db-7a70-4b35-bdbc-f64a5f3824ee",
+    "product_id": "dd8c98ac-4ce6-4494-963b-b20707be7d98",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for Analytics Platform",
+    "lead_id": "62d887af-5f61-4bcd-ae4d-d2c14f4b6082",
+    "engagement_type": "CI/CD",
+    "status": "In Progress",
+    "start_date": "2026-01-02T11:07:40Z",
+    "end_date": "2026-07-18T11:07:40Z",
+    "version": "v1.6.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "f7631629-805d-44af-a3b4-6d7cf3970567",
+    "product_id": "0835add2-db61-49bf-baab-2f05981c65bd",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for VPN Gateway",
+    "lead_id": "87e4d75c-fcd2-42b1-a421-40006be2e34f",
+    "engagement_type": "CI/CD",
+    "status": "Not Started",
+    "start_date": "2025-12-27T11:07:40Z",
+    "end_date": "2026-07-07T11:07:40Z",
+    "version": "v1.1.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "8b731f7b-7420-45e6-8922-8b4b2534a4f8",
+    "product_id": "0835add2-db61-49bf-baab-2f05981c65bd",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for VPN Gateway",
+    "lead_id": "1c973b81-d8db-4e2e-b0b1-f61c9cd87536",
+    "engagement_type": "Interactive",
+    "status": "In Progress",
+    "start_date": "2026-01-16T11:07:40Z",
+    "end_date": "2026-06-26T11:07:40Z",
+    "version": "v5.5.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "f964361d-a623-40f4-b8d6-32e9b729c2d4",
+    "product_id": "7414ce8c-14d9-482f-b114-ee0dbb872b2a",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for Legacy ERP",
+    "lead_id": "da1291e1-57d8-4edb-9932-0b287daff906",
+    "engagement_type": "Interactive",
+    "status": "In Progress",
+    "start_date": "2026-01-21T11:07:40Z",
+    "end_date": "2026-06-24T11:07:40Z",
+    "version": "v3.0.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "6fe9ef79-2593-4d16-83e7-be5883466707",
+    "product_id": "7414ce8c-14d9-482f-b114-ee0dbb872b2a",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for Legacy ERP",
+    "lead_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "engagement_type": "Interactive",
+    "status": "In Progress",
+    "start_date": "2026-03-20T11:07:40Z",
+    "end_date": "2026-07-02T11:07:40Z",
+    "version": "v1.8.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "325aaba6-2be9-42ec-9ce6-a7b451395a93",
+    "product_id": "44aff8cd-d6f5-4650-8e0b-d7c42465c308",
+    "name": "Security Assessment Q1 2026",
+    "description": "Quarterly security assessment for DevOps Toolchain",
+    "lead_id": "87e4d75c-fcd2-42b1-a421-40006be2e34f",
+    "engagement_type": "CI/CD",
+    "status": "Completed",
+    "start_date": "2026-05-10T11:07:40Z",
+    "end_date": "2026-07-23T11:07:40Z",
+    "version": "v1.3.0",
+    "tags": [
+      "quarterly",
+      "manual"
+    ],
+    "deduplication_on_engagement": true
+  },
+  {
+    "_id": "f3873f6d-2006-4e49-86d3-cd643fe6f52c",
+    "product_id": "44aff8cd-d6f5-4650-8e0b-d7c42465c308",
+    "name": "Security Assessment Q2 2026",
+    "description": "Quarterly security assessment for DevOps Toolchain",
+    "lead_id": "1bd61b4f-50a7-4fe0-9a20-8de07d94ebdf",
+    "engagement_type": "CI/CD",
+    "status": "Not Started",
+    "start_date": "2026-03-20T11:07:40Z",
+    "end_date": "2026-06-30T11:07:40Z",
+    "version": "v5.6.0",
+    "tags": [
+      "ci-cd",
+      "automated"
+    ],
+    "deduplication_on_engagement": true
+  }
+]

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 	"time"
 
@@ -150,8 +151,8 @@ func (uc *UseCase) Execute(ctx context.Context, req CallbackRequest) (*CallbackR
 	session := &entity.Session{
 		UserID:           user.ID,
 		RefreshTokenHash: pgRepo.HashRefreshToken(refreshToken),
-		TokenFamily:      uuid.New().String(),
-		IPAddress:        req.IPAddress,
+		TokenFamily:      uuid.New(),
+		IPAddress:        extractIP(req.IPAddress),
 		UserAgent:        req.UserAgent,
 		ExpiresAt:        time.Now().UTC().Add(7 * 24 * time.Hour),
 	}
@@ -224,4 +225,11 @@ func generateUsername(name, email string) string {
 		result = result[:40]
 	}
 	return result
+}
+
+func extractIP(addr string) string {
+	if host, _, err := net.SplitHostPort(addr); err == nil {
+		return host
+	}
+	return addr
 }
